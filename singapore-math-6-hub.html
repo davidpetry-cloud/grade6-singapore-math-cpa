@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grade 6 Mathematics — Singapore CPA Curriculum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="curriculum.css">
+<style>
+:root{
+  --ink:#0F2338; --ink-2:#1B3A5C; --ink-3:#33557A;
+  --teal:#1F8A7D; --teal-lt:#37B0A0; --teal-pale:#DCEFEB;
+  --amber:#E4A03C; --amber-dk:#B87C1C; --amber-pale:#FAEDD6;
+  --rose:#C2536B; --peri:#6B7FB3;
+  --paper:#F3F6F8; --card:#FFFFFF; --line:#D3DCE4;
+  --grid:rgba(15,35,56,.055);
+  --text:#16283C; --muted:#5B7189;
+  --sans:"Libre Franklin",system-ui,sans-serif;
+  --serif:"Fraunces",Georgia,serif;
+  --mono:"Inconsolata",ui-monospace,monospace;
+  --r:10px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{
+  margin:0; background:var(--paper); color:var(--text);
+  font-family:var(--sans); font-size:17px; line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+a{color:var(--ink-2)}
+:focus-visible{outline:3px solid var(--amber);outline-offset:3px;border-radius:3px}
+
+/* ---------- hero ---------- */
+.hero{
+  background:var(--ink);
+  background-image:
+    linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+  background-size:26px 26px;
+  color:#fff; padding:64px 0 72px; border-bottom:5px solid var(--amber);
+}
+.hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.kicker{font-family:var(--mono);font-size:14px;color:var(--amber);letter-spacing:.04em;margin:0 0 14px}
+.hero h1{
+  font-family:var(--serif);font-weight:600;font-size:clamp(2.5rem,5.2vw,3.9rem);
+  line-height:1.02;margin:0 0 20px;letter-spacing:-.015em;
+}
+.hero p{color:#C7D6E4;max-width:44ch;margin:0 0 26px;font-size:1.06rem}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px}
+.chip{
+  font-size:.83rem;font-weight:600;padding:6px 13px;border-radius:100px;
+  background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.2);color:#E3EDF5;
+}
+.demo{background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:24px}
+.demo-q{font-size:.95rem;color:#D8E5F0;margin:0 0 20px;line-height:1.5}
+.demo-q b{color:#fff;font-weight:600}
+.demo-note{font-family:var(--mono);font-size:.8rem;color:#93AAC2;margin:16px 0 0}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.bar-seg{transform-origin:left center}
+.animate .bar-seg{animation:grow .5s cubic-bezier(.22,1,.36,1) both}
+@media(prefers-reduced-motion:reduce){.animate .bar-seg{animation:none}}
+
+/* ---------- sections ---------- */
+section{padding:64px 0}
+.sec-head{margin:0 0 8px;font-family:var(--serif);font-weight:600;font-size:2rem;letter-spacing:-.01em;color:var(--ink)}
+.sec-sub{margin:0 0 34px;color:var(--muted);max-width:62ch}
+
+/* ---------- year bar model ---------- */
+.year{background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.78rem;color:var(--muted);margin-bottom:6px}
+.yearbar{display:flex;width:100%;height:76px;border-radius:6px;overflow:hidden;border:1px solid var(--line)}
+.useg{
+  border:0;border-right:1px solid rgba(255,255,255,.55);cursor:pointer;color:#fff;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;gap:2px;
+  padding:4px 3px;font-family:var(--sans);font-size:.74rem;font-weight:600;line-height:1.1;
+  transition:filter .15s ease; text-align:center;
+}
+.useg:last-child{border-right:0}
+.useg:hover,.useg:focus-visible{filter:brightness(1.14)}
+.useg .n{font-family:var(--mono);font-size:.95rem;font-weight:600}
+.useg .w{font-weight:400;opacity:.85;font-size:.68rem}
+.brace{display:flex;margin-top:7px;font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+.brace span{border-top:1px solid var(--line);border-left:1px solid var(--line);border-right:1px solid var(--line);
+  padding:5px 4px 0;text-align:center;height:22px}
+.readout{
+  margin-top:22px;background:var(--paper);border-left:4px solid var(--teal);
+  border-radius:0 var(--r) var(--r) 0;padding:18px 22px;min-height:96px
+}
+.readout h3{margin:0 0 6px;font-family:var(--serif);font-size:1.25rem;font-weight:600;color:var(--ink)}
+.readout p{margin:0;color:var(--muted);font-size:.95rem}
+.readout .tags{margin-top:10px;display:flex;flex-wrap:wrap;gap:7px}
+.tag{font-family:var(--mono);font-size:.75rem;background:var(--card);border:1px solid var(--line);
+  border-radius:4px;padding:3px 8px;color:var(--ink-3)}
+
+/* ---------- CPA ---------- */
+.cpa{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+.stage{padding:28px 26px;background:var(--card);border:1px solid var(--line);border-right:0;position:relative}
+.stage:last-child{border-right:1px solid var(--line)}
+.stage:first-child{border-radius:var(--r) 0 0 var(--r)}
+.stage:last-child{border-radius:0 var(--r) var(--r) 0}
+.stage-n{font-family:var(--mono);font-size:.8rem;color:#fff;background:var(--ink-2);
+  width:26px;height:26px;border-radius:50%;display:grid;place-items:center;margin-bottom:14px}
+.stage h3{margin:0 0 4px;font-family:var(--serif);font-size:1.3rem;font-weight:600;color:var(--ink)}
+.stage .sense{font-family:var(--mono);font-size:.76rem;color:var(--teal);margin:0 0 12px}
+.stage p{margin:0 0 12px;font-size:.93rem;color:var(--muted)}
+.stage ul{margin:0;padding-left:17px;font-size:.9rem;color:var(--text)}
+.stage li{margin-bottom:5px}
+.stage:nth-child(1){border-top:4px solid var(--teal)}
+.stage:nth-child(2){border-top:4px solid var(--amber)}
+.stage:nth-child(3){border-top:4px solid var(--peri)}
+
+/* ---------- units ---------- */
+.units{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.unit{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:22px;display:flex;flex-direction:column;text-decoration:none;color:inherit;
+}
+a.unit:hover,a.unit:focus-visible{border-color:var(--ink-3);box-shadow:0 2px 0 var(--ink-3)}
+.unit .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.unit .num{font-family:var(--mono);font-size:.82rem;color:#fff;padding:2px 9px;border-radius:4px}
+.unit .days{font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+.unit h3{margin:0 0 8px;font-family:var(--serif);font-size:1.22rem;font-weight:600;line-height:1.2;color:var(--ink)}
+.unit p{margin:0 0 14px;font-size:.9rem;color:var(--muted);flex:1}
+.status{font-size:.8rem;font-weight:600;padding:4px 10px;border-radius:4px;align-self:flex-start}
+.ready{background:var(--teal-pale);color:#14655B}
+.soon{background:#EEF1F4;color:var(--muted)}
+
+/* ---------- access ---------- */
+.access{background:var(--ink);color:#D8E5F0}
+.access .sec-head{color:#fff}
+.access .sec-sub{color:#A9BFD3}
+.acc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+.acc{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.13);border-radius:var(--r);padding:20px}
+.acc h4{margin:0 0 8px;font-family:var(--serif);font-size:1.1rem;font-weight:600;color:#fff}
+.acc p{margin:0;font-size:.9rem;color:#B8CBDC}
+.acc .s{font-family:var(--mono);font-size:.74rem;color:var(--amber);display:block;margin-bottom:8px}
+
+footer{padding:36px 0;font-size:.85rem;color:var(--muted);border-top:1px solid var(--line)}
+
+@media(max-width:860px){
+  .hero-grid{grid-template-columns:1fr;gap:36px}
+  .cpa{grid-template-columns:1fr}
+  .stage{border-right:1px solid var(--line);border-bottom:0;border-radius:0}
+  .stage:first-child{border-radius:var(--r) var(--r) 0 0}
+  .stage:last-child{border-radius:0 0 var(--r) var(--r);border-bottom:1px solid var(--line)}
+  .useg .w{display:none}
+  .yearbar{height:64px}
+}
+@media print{
+  .hero{background:#fff;color:#000;border-bottom:2px solid #000}
+  .hero h1,.access .sec-head{color:#000}
+  body{background:#fff}
+  .access{background:#fff;color:#000}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="kicker">Grade 6 · 36 weeks · 150 instructional days</p>
+      <h1>Mathematics through concrete, pictorial, abstract</h1>
+      <p>A full-year sixth grade curriculum built on the Singapore CPA progression. Every concept starts in students' hands, moves to a drawn model, and only then becomes a symbol on the page.</p>
+      <div class="hero-meta">
+        <span class="chip">10 units</span>
+        <span class="chip">Daily lesson plans</span>
+        <span class="chip">Interactive manipulatives</span>
+        <span class="chip">Bar-model problem solving</span>
+        <span class="chip">CCSS-aligned</span>
+      </div>
+    </div>
+    <div class="demo">
+      <p class="demo-q">Aiden and Beth share <b>$960</b> in the ratio <b>3 : 5</b>. How much more does Beth receive?</p>
+      <svg viewBox="0 0 420 150" role="img" aria-label="Bar model. Aiden's bar is three equal units long; Beth's bar is five equal units long. Eight units together represent 960 dollars, so one unit is 120 dollars. Beth's bar is two units longer, a difference of 240 dollars." style="width:100%;height:auto">
+        <text x="0" y="26" fill="#C7D6E4" font-family="Libre Franklin" font-size="13">Aiden</text>
+        <g id="barA"></g>
+        <text x="0" y="80" fill="#C7D6E4" font-family="Libre Franklin" font-size="13">Beth</text>
+        <g id="barB"></g>
+        <line x1="52" y1="106" x2="404" y2="106" stroke="#93AAC2" stroke-width="1"/>
+        <line x1="52" y1="102" x2="52" y2="110" stroke="#93AAC2" stroke-width="1"/>
+        <line x1="404" y1="102" x2="404" y2="110" stroke="#93AAC2" stroke-width="1"/>
+        <text x="228" y="124" fill="#E4A03C" font-family="Inconsolata" font-size="14" text-anchor="middle">8 units = $960</text>
+        <text x="228" y="142" fill="#37B0A0" font-family="Inconsolata" font-size="14" text-anchor="middle">1 unit = $120 → difference = 2 × $120 = $240</text>
+      </svg>
+      <p class="demo-note">The model does the reasoning. The arithmetic is the last step.</p>
+    </div>
+  </div>
+</header>
+
+<section class="year">
+  <div class="wrap">
+    <h2 class="sec-head">The year, drawn to scale</h2>
+    <p class="sec-sub">The same tool students use to compare quantities lays out their year. Each segment is proportional to its teaching time. Select a unit to see what it covers.</p>
+    <div class="scale"><span>Week 1</span><span>Week 15</span><span>Week 30</span></div>
+    <div class="yearbar" id="yearbar" role="tablist" aria-label="Curriculum units by teaching weeks"></div>
+    <div class="brace" id="brace"></div>
+    <div class="readout" id="readout" role="region" aria-live="polite"></div>
+    <p class="sec-sub" style="margin-top:22px;font-size:.9rem">Six additional weeks are held back for cumulative review, reteaching and assessment, distributed across the year rather than banked at the end.</p>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="sec-head">How every lesson moves</h2>
+    <p class="sec-sub">CPA is a sequence, not a menu. A student who has not held the quantity cannot draw it, and a student who cannot draw it will only memorise the symbol. Each stage engages a different channel, which is also what makes the progression work for a wide range of learners.</p>
+    <div class="cpa">
+      <div class="stage">
+        <div class="stage-n">1</div>
+        <h3>Concrete</h3>
+        <p class="sense">touch · manipulation</p>
+        <p>Students handle the actual quantity before it is ever written down.</p>
+        <ul>
+          <li>Place-value discs and counters</li>
+          <li>Fraction tiles, measuring tools</li>
+          <li>Balance scales for equations</li>
+          <li>Physical sorting and grouping</li>
+        </ul>
+      </div>
+      <div class="stage">
+        <div class="stage-n">2</div>
+        <h3>Pictorial</h3>
+        <p class="sense">sight · spatial reasoning</p>
+        <p>The objects become a drawing that holds the same relationships.</p>
+        <ul>
+          <li>Bar models: part–whole and comparison</li>
+          <li>Number lines and place-value charts</li>
+          <li>Area models and arrays</li>
+          <li>Tape diagrams for ratio</li>
+        </ul>
+      </div>
+      <div class="stage">
+        <div class="stage-n">3</div>
+        <h3>Abstract</h3>
+        <p class="sense">symbol · notation</p>
+        <p>Only now does the drawing compress into numerals and letters.</p>
+        <ul>
+          <li>Standard algorithms</li>
+          <li>Algebraic expressions and equations</li>
+          <li>Formulas derived, not given</li>
+          <li>Written justification of method</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <h2 class="sec-head">Units</h2>
+    <p class="sec-sub">Each unit file contains day-by-day lesson plans: objectives, materials, a warm-up, scripted CPA sequence, guided practice, a printable worksheet, an exit ticket, and differentiation notes. Every lesson also carries a working manipulative built for that day’s concept — discs students can trade, bars they can size, expressions they can step through.</p>
+    <div class="units" id="units"></div>
+  </div>
+</section>
+
+<section class="access">
+  <div class="wrap">
+    <h2 class="sec-head">Designed for every sixth grader</h2>
+    <p class="sec-sub">The CPA progression is already multi-sensory. These supports make that deliberate rather than incidental.</p>
+    <div class="acc-grid">
+      <div class="acc"><span class="s">touch</span><h4>Tactile equivalents</h4><p>Every bar model has a physical counterpart — linking cubes, fraction strips, textured place-value discs — so a student with low vision can hold the relationship a sighted peer draws.</p></div>
+      <div class="acc"><span class="s">sight</span><h4>Colour is never the only cue</h4><p>Bar segments carry labels, patterns and length differences. Palette meets WCAG AA contrast and stays legible under the common colour-vision deficiencies.</p></div>
+      <div class="acc"><span class="s">hearing</span><h4>Spoken model descriptions</h4><p>Each lesson script includes a read-aloud description of the diagram, giving auditory learners and screen-reader users the same information as the drawing.</p></div>
+      <div class="acc"><span class="s">language</span><h4>Vocabulary front-loaded</h4><p>Terms are introduced with the concrete object present, supporting multilingual learners and students with language-based learning differences.</p></div>
+      <div class="acc"><span class="s">attention</span><h4>Short, bounded segments</h4><p>Lessons run in 5–15 minute blocks with a clear transition between each CPA stage, which reduces working-memory load and sustained-attention demand.</p></div>
+      <div class="acc"><span class="s">motor</span><h4>Low-dexterity alternatives</h4><p>Manipulation tasks list a partner-assisted or digital option so fine-motor difficulty never blocks access to the mathematics.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer><div class="wrap">Grade 6 Mathematics — Singapore CPA Curriculum. Keep unit files in the same folder as this page for the links to open.</div></footer>
+
+<script>
+const C={teal:"#1F8A7D",amber:"#C07E1E",peri:"#5A6FA6",rose:"#B04A61",ink:"#1B3A5C",tealLt:"#2E9E8F",amberLt:"#D99433",periLt:"#6B7FB3",roseLt:"#C2536B",inkLt:"#33557A"};
+
+const UNITS=[
+ {n:1,w:2,days:10,c:C.ink,title:"Whole Numbers & Order of Operations",blurb:"Place value to billions, powers of ten, brackets and the four operations, factors and multiples.",tags:["6.NS.B.4","6.EE.A.1","6.EE.A.2c"],file:"unit-01-whole-numbers-and-operations.html",ready:true},
+ {n:2,w:4,days:20,c:C.teal,title:"Fractions & Decimals",blurb:"Dividing by fractions with models, four operations on decimals, converting between forms.",tags:["6.NS.A.1","6.NS.B.2","6.NS.B.3"],file:"unit-02-fractions-and-decimals.html",ready:true},
+ {n:3,w:3,days:15,c:C.amber,title:"Ratio & Rate",blurb:"Ratio language, equivalent ratios, unit rate, and comparison bar models for ratio problems.",tags:["6.RP.A.1","6.RP.A.2","6.RP.A.3b"],file:"unit-03-ratio-and-rate.html",ready:false},
+ {n:4,w:3,days:15,c:C.peri,title:"Percentage",blurb:"Percent as a rate per hundred, finding the whole, percent increase and decrease.",tags:["6.RP.A.3c"],file:"unit-04-percentage.html",ready:false},
+ {n:5,w:4,days:20,c:C.rose,title:"Algebraic Expressions & Equations",blurb:"Letters as unknowns, writing and evaluating expressions, solving one-step equations, inequalities.",tags:["6.EE.A.2","6.EE.B.5","6.EE.B.7"],file:"unit-05-algebra.html",ready:false},
+ {n:6,w:3,days:15,c:C.inkLt,title:"Angles & Geometric Figures",blurb:"Unknown angles in triangles, parallelograms, trapezoids and rhombuses through reasoning.",tags:["6.G.A.1","6.G.A.3"],file:"unit-06-angles-and-figures.html",ready:false},
+ {n:7,w:3,days:15,c:C.tealLt,title:"Circles",blurb:"Radius, diameter, circumference and area; composite figures and semicircle perimeters.",tags:["6.G.A.1"],file:"unit-07-circles.html",ready:false},
+ {n:8,w:3,days:15,c:C.amberLt,title:"Volume of Solids",blurb:"Volume of rectangular prisms with fractional edges, surface area from nets, capacity.",tags:["6.G.A.2","6.G.A.4"],file:"unit-08-volume.html",ready:false},
+ {n:9,w:3,days:15,c:C.periLt,title:"Data Analysis & Statistics",blurb:"Statistical questions, dot plots and histograms, mean, median, mode and variability.",tags:["6.SP.A.1","6.SP.B.4","6.SP.B.5"],file:"unit-09-data-and-statistics.html",ready:false},
+ {n:10,w:2,days:10,c:C.roseLt,title:"Negative Numbers & the Coordinate Plane",blurb:"Integers in context, absolute value, ordering, and plotting in all four quadrants.",tags:["6.NS.C.5","6.NS.C.6","6.NS.C.8"],file:"unit-10-integers-and-coordinates.html",ready:false}
+];
+
+const TOTAL=UNITS.reduce((s,u)=>s+u.w,0);
+const bar=document.getElementById("yearbar");
+const brace=document.getElementById("brace");
+const readout=document.getElementById("readout");
+
+UNITS.forEach((u,i)=>{
+  const b=document.createElement("button");
+  b.className="useg"; b.style.background=u.c; b.style.flex=u.w;
+  b.setAttribute("role","tab"); b.setAttribute("aria-selected","false");
+  b.innerHTML=`<span class="n">${u.n}</span><span class="w">${u.w} wks</span>`;
+  b.setAttribute("aria-label",`Unit ${u.n}: ${u.title}. ${u.w} weeks, ${u.days} days.`);
+  b.addEventListener("click",()=>select(i));
+  b.addEventListener("focus",()=>select(i));
+  bar.appendChild(b);
+  const s=document.createElement("span"); s.style.flex=u.w; s.textContent=u.w>2?u.days+"d":""; brace.appendChild(s);
+});
+
+function select(i){
+  const u=UNITS[i];
+  [...bar.children].forEach((el,j)=>el.setAttribute("aria-selected",j===i?"true":"false"));
+  readout.style.borderLeftColor=u.c;
+  readout.innerHTML=`<h3>Unit ${u.n} — ${u.title}</h3><p>${u.blurb}</p>
+    <div class="tags">${u.tags.map(t=>`<span class="tag">${t}</span>`).join("")}
+    <span class="tag">${u.days} instructional days</span></div>`;
+}
+select(0);
+
+document.getElementById("units").innerHTML=UNITS.map(u=>{
+  const inner=`<div class="top"><span class="num" style="background:${u.c}">Unit ${u.n}</span>
+      <span class="days">${u.days} days · ${u.w} weeks</span></div>
+    <h3>${u.title}</h3><p>${u.blurb}</p>
+    <span class="status ${u.ready?"ready":"soon"}">${u.ready?"Lesson plans ready":"In development"}</span>`;
+  return u.ready
+    ? `<a class="unit" href="${u.file}">${inner}</a>`
+    : `<div class="unit">${inner}</div>`;
+}).join("");
+
+if(!(window.matchMedia("(prefers-reduced-motion: reduce)").matches)){
+  document.querySelector(".demo svg").classList.add("animate");
+}
+(function(){
+  const A=document.getElementById("barA"), B=document.getElementById("barB");
+  const w=44,x0=52,cols=["#37B0A0","#37B0A0","#37B0A0","#E4A03C","#E4A03C","#E4A03C","#E4A03C","#E4A03C"];
+  for(let i=0;i<3;i++)A.innerHTML+=`<rect class="bar-seg" x="${x0+i*w}" y="10" width="${w-2}" height="24" rx="2" fill="${cols[i]}" style="animation-delay:${i*.07}s"/>`;
+  for(let i=0;i<5;i++)B.innerHTML+=`<rect class="bar-seg" x="${x0+i*w}" y="62" width="${w-2}" height="24" rx="2" fill="${cols[3]}" style="animation-delay:${(i+3)*.07}s"/>`;
+})();
+</script>
+</body>
+</html>

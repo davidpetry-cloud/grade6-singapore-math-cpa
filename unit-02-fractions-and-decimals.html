@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit 2 &mdash; Fractions &amp; Decimals | Grade 6 CPA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="curriculum.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+    <h1>Unit 2 &mdash; Fractions &amp; Decimals</h1>
+    <p class="sub">Fractions and decimals are two notations for one idea: a whole cut into equal pieces. This unit builds both from the same pictures, so that dividing by a fraction stops being a rule to remember and becomes a question a student can act out with paper. The reciprocal is derived, never handed over.</p>
+    <div class="facts">
+      <span><b>20</b> instructional days</span>
+      <span><b>4</b> weeks</span>
+      <span><b>55</b> minutes per lesson</span>
+      <span><b>6.NS</b> standards</span>
+    </div>
+  </div>
+  <div class="wrap"><nav class="daynav" id="daynav" aria-label="Lesson days"></nav></div>
+</header>
+
+<main class="wrap">
+  <div class="lesson">
+    <div id="content"></div>
+    <aside class="side" id="side"></aside>
+  </div>
+  <div class="pager">
+    <button id="prev">&larr; Previous lesson</button>
+    <button id="next">Next lesson &rarr;</button>
+  </div>
+</main>
+
+<!-- Unit-specific manipulatives. Must load before curriculum-core.js. -->
+<script>
+window.__EXTRA_TOOLS__=(function(){
+const rm=()=>(!!window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a);
+const lcm=(a,b)=>a*b/gcd(a,b);
+const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#5B7189", LINE="#D3DCE4";
+/* mixed-number string from an improper fraction */
+function mixed(n,d){
+  const g=gcd(n,d)||1,N=n/g,D=d/g;
+  if(D===1)return String(N);
+  if(N<D)return `${N}/${D}`;
+  const w=Math.floor(N/D),r=N%D;
+  return r?`${w} ${r}/${D}`:String(w);
+}
+function simp(n,d){const g=gcd(n,d)||1;return[n/g,d/g];}
+
+/* ---------- 8. FRACTION MODEL ---------- */
+function fractionModel(host){
+  const box=el("div","tool");
+  box.innerHTML=`<h3>Fraction model<span class="mins">tool</span></h3>
+    <p class="sense">sight · proportion</p>
+    <p class="how">The same bar, cut four different ways. Equivalence re-cuts the pieces without moving the shading; addition re-cuts both bars until the pieces match; multiplication cuts the square twice, once each way.</p>
+    <div class="ctl">
+      <label for="fmm">what are we doing</label>
+      <select id="fmm">
+        <option value="eq">making equivalent fractions</option>
+        <option value="cmp">comparing two fractions</option>
+        <option value="add">adding or subtracting</option>
+        <option value="mul">multiplying</option>
+      </select>
+      <label for="fa">first</label>
+      <input id="fa" type="number" value="2" min="0" max="20" aria-label="first numerator">
+      <span aria-hidden="true">/</span>
+      <input id="fb" type="number" value="3" min="1" max="20" aria-label="first denominator">
+      <span id="fmop" hidden><select id="fop"><option value="+">+</option><option value="-">−</option></select></span>
+      <span id="fm2" hidden><label for="fc">second</label>
+        <input id="fc" type="number" value="1" min="0" max="20" aria-label="second numerator">
+        <span aria-hidden="true">/</span>
+        <input id="fd" type="number" value="4" min="1" max="20" aria-label="second denominator"></span>
+      <span id="fmk" ><label for="fk">cut each piece into</label>
+        <input id="fk" type="number" value="2" min="1" max="8" aria-label="pieces per part"></span>
+      <button class="btn go" id="fmgo">Draw</button>
+    </div>
+    <div class="stage-area"><svg class="bm" viewBox="0 0 700 230" role="img"></svg></div>
+    <div class="out" id="fmout"></div>
+    <p class="note">Nothing here is a rule to copy down. The picture comes first; the notation underneath it should look like a description of what you can already see.</p>`;
+  host.appendChild(box);
+  const svg=box.querySelector("svg"),out=box.querySelector("#fmout"),q=s=>box.querySelector(s);
+  const $m=q("#fmm");
+  function vis(){
+    q("#fm2").hidden=$m.value==="eq";
+    q("#fmop").hidden=$m.value!=="add";
+    q("#fmk").hidden=$m.value!=="eq";
+  }
+  const X0=60,W=580;
+
+  function strip(x,y,w,h,parts,shaded,fill,sub){
+    const pw=w/parts;let s=`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#fff" stroke="${INK}" stroke-width="1.5"/>`;
+    for(let i=0;i<parts;i++){
+      if(i<shaded)s+=`<rect class="bmseg" x="${x+i*pw}" y="${y}" width="${pw}" height="${h}" fill="${fill}" opacity=".92"/>`;
+    }
+    /* hatch the shaded region so colour is not the only cue */
+    for(let i=0;i<shaded;i++){
+      for(let t=4;t<pw;t+=9)s+=`<line x1="${x+i*pw+t}" y1="${y}" x2="${x+i*pw+t-h*0.5}" y2="${y+h}" stroke="#fff" stroke-width="1" opacity=".38"/>`;
+    }
+    for(let i=1;i<parts;i++)s+=`<line x1="${x+i*pw}" y1="${y}" x2="${x+i*pw}" y2="${y+h}" stroke="${INK}" stroke-width="1.5"/>`;
+    if(sub){
+      const spw=pw/sub, cut=shaded*sub;
+      for(let i=1;i<parts*sub;i++){
+        if(i%sub===0)continue;                 /* already drawn as a full part divider */
+        const inShaded=i<cut;                  /* white reads on the fill, ink reads on the paper */
+        s+=`<line x1="${x+i*spw}" y1="${y}" x2="${x+i*spw}" y2="${y+h}" stroke="${inShaded?"#fff":INK}" stroke-width="1" stroke-dasharray="3 3" opacity="${inShaded?".85":".6"}"/>`;
+      }
+    }
+    return s;
+  }
+  const lab=(x,y,t,c,sz)=>`<text x="${x}" y="${y}" font-family="Inconsolata" font-size="${sz||13}" fill="${c||MUT}" text-anchor="middle">${t}</text>`;
+
+  function draw(){
+    const a=Math.max(0,+q("#fa").value||0),b=Math.max(1,+q("#fb").value||1);
+    const c=Math.max(0,+q("#fc").value||0),d=Math.max(1,+q("#fd").value||1);
+    const k=Math.min(8,Math.max(1,+q("#fk").value||1));
+    svg.classList.remove("anim");void svg.offsetWidth;if(!rm())svg.classList.add("anim");
+    const m=$m.value;
+
+    if(m==="eq"){
+      svg.innerHTML=
+        lab(X0+W/2,22,`${a}/${b} — ${b} equal pieces, ${a} shaded`,MUT)+
+        strip(X0,32,W,52,b,a,T)+
+        lab(X0+W/2,112,`every one of the ${b} pieces cut into ${k} — ${b*k} pieces now`,MUT)+
+        strip(X0,122,W,52,b,a,T,k)+
+        lab(X0+W/2,200,`${a*k}/${b*k} — same shaded length, ${k} times as many pieces`,INK,14);
+      svg.setAttribute("aria-label",`Two identical bars. The upper bar is divided into ${b} equal parts with ${a} shaded. The lower bar shows the same shading, with each part cut into ${k} smaller pieces, giving ${a*k} shaded pieces out of ${b*k}. The shaded length is unchanged.`);
+      const [sn,sd]=simp(a,b);
+      out.innerHTML=`${a}/${b} = <b>${a*k}/${b*k}</b>. The shaded length never moved — only the size of the pieces changed.<br>
+        Written out: ${a}/${b} × ${k}/${k} = ${a*k}/${b*k}, and ${k}/${k} is 1. Multiplying by one cannot change the value.<br>
+        <span style="color:${MUT}">Simplest form of this fraction: ${sn}/${sd}${sd===1?" (a whole number)":""}.</span>`;
+      return;
+    }
+
+    if(m==="mul"){
+      /* unit square: d columns (second fraction), b rows (first fraction) */
+      const S=190,GX=X0+30,GY=24,cw=S/d,ch=S/b;
+      let s=`<rect x="${GX}" y="${GY}" width="${S}" height="${S}" fill="#fff" stroke="${INK}" stroke-width="1.5"/>`;
+      for(let i=0;i<b;i++)if(i<a)s+=`<rect x="${GX}" y="${GY+i*ch}" width="${S}" height="${ch}" fill="${T}" opacity=".30"/>`;
+      for(let j=0;j<d;j++)if(j<c)s+=`<rect x="${GX+j*cw}" y="${GY}" width="${cw}" height="${S}" fill="${A}" opacity=".30"/>`;
+      for(let i=0;i<Math.min(a,b);i++)for(let j=0;j<Math.min(c,d);j++)
+        s+=`<rect class="bmseg" x="${GX+j*cw}" y="${GY+i*ch}" width="${cw}" height="${ch}" fill="${INK}"/>`;
+      for(let i=1;i<b;i++)s+=`<line x1="${GX}" y1="${GY+i*ch}" x2="${GX+S}" y2="${GY+i*ch}" stroke="${INK}" stroke-width="1"/>`;
+      for(let j=1;j<d;j++)s+=`<line x1="${GX+j*cw}" y1="${GY}" x2="${GX+j*cw}" y2="${GY+S}" stroke="${INK}" stroke-width="1"/>`;
+      const n=a*c,den=b*d,[sn,sd]=simp(n,den);
+      s+=lab(GX+S/2,GY+S+22,`${c}/${d} of the width (shaded down)`,MUT)+
+         `<text x="${GX-12}" y="${GY+S/2}" font-family="Inconsolata" font-size="13" fill="${MUT}" text-anchor="middle" transform="rotate(-90 ${GX-12} ${GY+S/2})">${a}/${b} of the height</text>`+
+         `<text x="${GX+S+40}" y="${GY+60}" font-family="Inconsolata" font-size="14" fill="${INK}">overlap = ${n} small pieces</text>`+
+         `<text x="${GX+S+40}" y="${GY+84}" font-family="Inconsolata" font-size="14" fill="${INK}">whole square = ${den} small pieces</text>`+
+         `<text x="${GX+S+40}" y="${GY+116}" font-family="Fraunces" font-size="20" fill="${T}">${n}/${den} = ${mixed(n,den)}</text>`;
+      svg.innerHTML=s;
+      svg.setAttribute("aria-label",`A unit square cut into ${b} rows and ${d} columns, making ${den} small pieces. ${a} rows are shaded one way and ${c} columns the other. The ${n} pieces shaded both ways are the product, ${n} out of ${den}.`);
+      out.innerHTML=`${a}/${b} × ${c}/${d} = <b>${n}/${den}</b>${sd!==den?` = <b>${sn}/${sd}</b>`:""}.<br>
+        The word "of" is doing the work. ${c}/${d} <i>of</i> the square, then ${a}/${b} <i>of that</i>. The doubly-shaded corner is what is left.<br>
+        <span style="color:${MUT}">Size check: both factors are less than 1, so the answer must be smaller than either one. ${n/den<Math.min(a/b,c/d)?"It is.":"Check your inputs — with a factor of 1 or more the product grows instead."}</span>`;
+      return;
+    }
+
+    /* cmp and add share the common-denominator picture */
+    const L=lcm(b,d),ka=L/b,kb=L/d;
+    let s=lab(X0+W/2,20,`${a}/${b} and ${c}/${d} — different sized pieces, so they cannot be compared yet`,MUT);
+    s+=strip(X0,30,W,40,b,a,T)+`<text x="${X0-34}" y="${55}" font-family="Inconsolata" font-size="13" fill="${MUT}">${a}/${b}</text>`;
+    s+=strip(X0,80,W,40,d,c,A)+`<text x="${X0-34}" y="${105}" font-family="Inconsolata" font-size="13" fill="${MUT}">${c}/${d}</text>`;
+    s+=lab(X0+W/2,144,`both re-cut into ${L}ths — now the pieces match`,INK,14);
+    s+=strip(X0,154,W,32,L,a*ka,T)+`<text x="${X0-34}" y="${174}" font-family="Inconsolata" font-size="13" fill="${MUT}">${a*ka}/${L}</text>`;
+    s+=strip(X0,192,W,32,L,c*kb,A)+`<text x="${X0-34}" y="${212}" font-family="Inconsolata" font-size="13" fill="${MUT}">${c*kb}/${L}</text>`;
+    svg.innerHTML=s;
+    svg.setAttribute("aria-label",`Four bars of equal length. The first is ${a} of ${b} parts shaded, the second ${c} of ${d}. Below, both are re-cut into ${L} equal parts: ${a*ka} shaded and ${c*kb} shaded, so the pieces are now the same size and can be compared directly.`);
+
+    if(m==="cmp"){
+      const A1=a*ka,B1=c*kb;
+      out.innerHTML=`Re-cut into ${L}ths: <b>${A1}/${L}</b> and <b>${B1}/${L}</b>.<br>
+        ${A1===B1?`They are <b>equal</b> — the same length, written two ways.`:`${A1>B1?`${a}/${b} &gt; ${c}/${d}`:`${a}/${b} &lt; ${c}/${d}`} — once the pieces are the same size, you only have to count them.`}<br>
+        <span style="color:${MUT}">${L===b*d?"Here the common denominator is just b × d.":`Notice ${L} is smaller than ${b*d}. The least common denominator keeps the numbers manageable.`}</span>`;
+    }else{
+      const op=q("#fop").value,A1=a*ka,B1=c*kb;
+      const n=op==="+"?A1+B1:A1-B1;
+      const [sn,sd]=simp(Math.abs(n),L);
+      const mx=mixed(Math.abs(n),L);
+      out.innerHTML=`${a}/${b} ${op==="+"?"+":"−"} ${c}/${d} = ${A1}/${L} ${op==="+"?"+":"−"} ${B1}/${L} = <b>${n}/${L}</b>${mx!==`${Math.abs(n)}/${L}`?` = <b>${n<0?"−":""}${mx}</b>`:""}.<br>
+        Only the numerators moved. The denominator names the piece size, and the piece size did not change.<br>
+        <span style="color:${MUT}">${n<0?"The answer is negative — the second fraction was larger. Unit 10 gives that a home on the number line.":n>L?"The answer is more than one whole, so write it as a mixed number.":"Answer is less than one whole."}</span>`;
+    }
+  }
+  $m.addEventListener("change",()=>{vis();draw();});
+  q("#fmgo").addEventListener("click",draw);
+  box.querySelectorAll("input,select").forEach(i=>i.addEventListener("input",draw));
+  vis();draw();
+}
+
+/* ---------- 9. FRACTION DIVISION ---------- */
+function fractionDivide(host){
+  const box=el("div","tool");
+  box.innerHTML=`<h3>Fraction division<span class="mins">tool</span></h3>
+    <p class="sense">sight · measurement</p>
+    <p class="how">Division asks a question you can act out: how many of the divisor fit inside the dividend? Count the groups on the bar before anyone says the word "reciprocal".</p>
+    <div class="ctl">
+      <label for="dvn">how much we have</label>
+      <input id="dvn" type="number" value="3" min="0" max="40" aria-label="dividend numerator">
+      <span aria-hidden="true">/</span>
+      <input id="dvd" type="number" value="1" min="1" max="20" aria-label="dividend denominator">
+      <label for="dsn">in groups of</label>
+      <input id="dsn" type="number" value="1" min="1" max="20" aria-label="divisor numerator">
+      <span aria-hidden="true">/</span>
+      <input id="dsd" type="number" value="4" min="1" max="20" aria-label="divisor denominator">
+      <button class="btn go" id="dgo">Fit the groups</button>
+    </div>
+    <div class="ctl picker">
+      <button class="btn sm" data-p="3,1,1,4">3 ÷ ¼</button>
+      <button class="btn sm" data-p="2,1,1,3">2 ÷ ⅓</button>
+      <button class="btn sm" data-p="3,4,1,8">¾ ÷ ⅛</button>
+      <button class="btn sm" data-p="1,2,3,4">½ ÷ ¾</button>
+      <button class="btn sm" data-p="5,2,1,2">2½ ÷ ½</button>
+      <button class="btn sm" data-p="2,3,4,1">⅔ ÷ 4</button>
+    </div>
+    <div class="stage-area"><svg class="bm" viewBox="0 0 700 200" role="img"></svg></div>
+    <div class="out" id="dout"></div>
+    <p class="note">A leftover is not a remainder here. It is a fraction <i>of one group</i> — which is why the answer can end in a fraction even when both numbers looked tidy.</p>`;
+  host.appendChild(box);
+  const svg=box.querySelector("svg"),out=box.querySelector("#dout"),q=s=>box.querySelector(s);
+
+  function draw(){
+    const n=Math.max(0,+q("#dvn").value||0),d=Math.max(1,+q("#dvd").value||1);
+    const sn=Math.max(1,+q("#dsn").value||1),sd=Math.max(1,+q("#dsd").value||1);
+    const V=n/d, D=sn/sd;
+    svg.classList.remove("anim");void svg.offsetWidth;if(!rm())svg.classList.add("anim");
+    const X0=52,W=596,H=54,Y=64;
+    const span=Math.max(V,D);
+    const px=x=>X0+(x/span)*W;
+    const groups=V/D, whole=Math.floor(groups+1e-9), left=groups-whole;
+
+    let s=`<text x="${X0}" y="30" font-family="Inconsolata" font-size="13" fill="${MUT}">we have ${mixed(n,d)}</text>`;
+    s+=`<rect x="${X0}" y="${Y}" width="${px(V)-X0}" height="${H}" fill="${T}" opacity=".18" stroke="${INK}" stroke-width="1.5"/>`;
+    /* whole-unit ticks along the bar */
+    for(let u=1;u<=Math.ceil(span);u++){const x=px(u);if(x<=X0+W+.5)s+=`<line x1="${x}" y1="${Y-6}" x2="${x}" y2="${Y+H+6}" stroke="${MUT}" stroke-width="1" stroke-dasharray="2 3"/><text x="${x}" y="${Y+H+22}" font-family="Inconsolata" font-size="11" fill="${MUT}" text-anchor="middle">${u}</text>`;}
+    /* group segments */
+    const cap=Math.min(whole,40);
+    for(let i=0;i<cap;i++){
+      const x1=px(i*D),x2=px((i+1)*D);
+      s+=`<rect class="bmseg" x="${x1+1.5}" y="${Y+7}" width="${Math.max(1,x2-x1-3)}" height="${H-14}" rx="3" fill="${T}" stroke="#fff" stroke-width="1.5"/>`;
+      if(x2-x1>22)s+=`<text x="${(x1+x2)/2}" y="${Y+H/2+5}" font-family="Inconsolata" font-size="12" fill="#fff" text-anchor="middle">${i+1}</text>`;
+    }
+    if(left>1e-9){
+      const x1=px(whole*D),x2=px(V);
+      s+=`<rect class="bmseg" x="${x1+1.5}" y="${Y+7}" width="${Math.max(1,x2-x1-3)}" height="${H-14}" rx="3" fill="${A}" stroke="#fff" stroke-width="1.5"/>`;
+      const [ln,ld]=simp(Math.round(left*sd*d*100)/100===0?0:1,1);
+      s+=`<path d="M${x1} ${Y+H+30} L${x1} ${Y+H+38} L${x2} ${Y+H+38} L${x2} ${Y+H+30}" fill="none" stroke="#B87C1C" stroke-width="1.5"/>`;
+      s+=`<text x="${(x1+x2)/2}" y="${Y+H+54}" font-family="Inconsolata" font-size="12" fill="#B87C1C" text-anchor="middle">part of a group</text>`;
+    }
+    s+=`<text x="${X0}" y="${Y-16}" font-family="Inconsolata" font-size="12" fill="${MUT}">each group is ${mixed(sn,sd)} long</text>`;
+    svg.innerHTML=s;
+
+    /* exact answer as a fraction */
+    const an=n*sd, ad=d*sn, [qn,qd]=simp(an,ad);
+    svg.setAttribute("aria-label",`A bar of length ${mixed(n,d)} divided into segments each ${mixed(sn,sd)} long. ${whole} whole segment${whole===1?"":"s"} fit${whole===1?"s":""}${left>1e-9?`, with a leftover piece that is part of another segment`:" exactly"}. The answer is ${mixed(qn,qd)}.`);
+
+    const cd=lcm(d,sd);
+    out.innerHTML=`<b>${whole}</b> whole group${whole===1?"":"s"} fit${left>1e-9?`, and the leftover is <b>${mixed(an-whole*ad,ad)}</b> of another group`:" exactly"}.<br>
+      ${mixed(n,d)} ÷ ${mixed(sn,sd)} = <b>${mixed(qn,qd)}</b><br>
+      <span style="color:${MUT}">Same-size pieces: ${n*(cd/d)}/${cd} ÷ ${sn*(cd/sd)}/${cd} — once the pieces match, it is just ${n*(cd/d)} ÷ ${sn*(cd/sd)}. That is where ×${sd}/${sn} comes from; it is a shortcut for this picture, not a new rule.</span><br>
+      <span style="color:${D<1?T:"#C2536B"}">Size check: dividing by ${D<1?"less than one gives an answer larger than what you started with — you are counting small groups, so there are many of them.":D===1?"one leaves the amount unchanged.":"more than one gives an answer smaller than what you started with."}</span>`;
+  }
+  box.querySelector("#dgo").addEventListener("click",draw);
+  box.querySelectorAll("input").forEach(i=>i.addEventListener("input",draw));
+  box.querySelector(".picker").addEventListener("click",e=>{
+    const b=e.target.closest("button[data-p]");if(!b)return;
+    const p=b.dataset.p.split(",");
+    q("#dvn").value=p[0];q("#dvd").value=p[1];q("#dsn").value=p[2];q("#dsd").value=p[3];draw();
+  });
+  draw();
+}
+
+/* ---------- 10. DECIMAL GRID ---------- */
+function decimalGrid(host){
+  const box=el("div","tool");
+  box.innerHTML=`<h3>Decimal grid<span class="mins">tool</span></h3>
+    <p class="sense">sight · area</p>
+    <p class="how">One square is one whole. A column is a tenth, a small cell is a hundredth. Every decimal question below is answered by shading the same square.</p>
+    <div class="ctl">
+      <label for="dgm">what are we doing</label>
+      <select id="dgm">
+        <option value="show">showing a decimal</option>
+        <option value="cmp">comparing two decimals</option>
+        <option value="add">adding or subtracting</option>
+        <option value="mul">multiplying</option>
+      </select>
+      <label for="dga">first</label><input id="dga" type="number" value="0.4" step="0.01" min="0" max="9">
+      <span id="dgops" hidden><select id="dgop"><option value="+">+</option><option value="-">−</option></select></span>
+      <span id="dgb2" hidden><label for="dgb">second</label><input id="dgb" type="number" value="0.25" step="0.01" min="0" max="9"></span>
+      <button class="btn go" id="dggo">Shade it</button>
+    </div>
+    <div class="stage-area"><svg viewBox="0 0 700 250" role="img" style="width:100%;height:auto"></svg></div>
+    <div class="out" id="dgout"></div>
+    <p class="note">Line up the decimal points, never the last digits. On the grid the reason is visible: tenths sit above tenths because they are the same size of piece.</p>`;
+  host.appendChild(box);
+  const svg=box.querySelector("svg"),out=box.querySelector("#dgout"),q=s=>box.querySelector(s);
+  const $m=q("#dgm");
+  const r2=x=>Math.round(x*100)/100;
+
+  function grid(x,y,S,val,fill,label,second,fill2){
+    const c=S/10;let s=`<rect x="${x}" y="${y}" width="${S}" height="${S}" fill="#fff" stroke="${INK}" stroke-width="1.5"/>`;
+    const cells=Math.round(Math.min(1,val)*100);
+    for(let i=0;i<cells;i++){
+      const r=Math.floor(i/10),k=i%10;
+      s+=`<rect class="bmseg" x="${x+k*c}" y="${y+r*c}" width="${c}" height="${c}" fill="${fill}" opacity=".9"/>`;
+    }
+    if(second!=null){
+      const c2=Math.round(Math.min(1,second)*100);
+      for(let i=0;i<c2;i++){
+        const r=Math.floor((99-i)/10),k=(99-i)%10;
+        s+=`<rect class="bmseg" x="${x+k*c}" y="${y+r*c}" width="${c}" height="${c}" fill="${fill2}" opacity=".9"/>`;
+        for(let t=2;t<c;t+=5)s+=`<line x1="${x+k*c+t}" y1="${y+r*c}" x2="${x+k*c+t-c}" y2="${y+r*c+c}" stroke="#fff" stroke-width="1" opacity=".5"/>`;
+      }
+    }
+    for(let i=1;i<10;i++){
+      const w=i===5?1.4:.7;
+      s+=`<line x1="${x+i*c}" y1="${y}" x2="${x+i*c}" y2="${y+S}" stroke="${INK}" stroke-width="${w}" opacity=".5"/>`;
+      s+=`<line x1="${x}" y1="${y+i*c}" x2="${x+S}" y2="${y+i*c}" stroke="${INK}" stroke-width="${w}" opacity=".5"/>`;
+    }
+    if(label)s+=`<text x="${x+S/2}" y="${y+S+22}" font-family="Inconsolata" font-size="14" fill="${INK}" text-anchor="middle">${label}</text>`;
+    return s;
+  }
+  function vis(){q("#dgb2").hidden=$m.value==="show";q("#dgops").hidden=$m.value!=="add";}
+
+  function draw(){
+    const a=Math.max(0,r2(+q("#dga").value||0)),b=Math.max(0,r2(+q("#dgb").value||0));
+    svg.classList.remove("anim");void svg.offsetWidth;if(!rm())svg.classList.add("anim");
+    const m=$m.value,S=180;
+
+    if(m==="show"){
+      const wholes=Math.floor(a),frac=r2(a-wholes);
+      let s="",x=40;const n=Math.min(3,wholes)+(frac>0?1:0);
+      for(let i=0;i<Math.min(3,wholes);i++){s+=grid(x,30,S*0.62,1,T,"1 whole");x+=S*0.62+22;}
+      if(frac>0)s+=grid(x,30,S*0.62,frac,A,frac.toFixed(2).replace(/0+$/,"").replace(/\.$/,""));
+      s+=`<text x="40" y="${30+S*0.62+52}" font-family="Inconsolata" font-size="13" fill="${MUT}">tenths = full columns · hundredths = single cells</text>`;
+      svg.innerHTML=s;
+      const t=Math.round(frac*10)/1,h=Math.round(frac*100);
+      svg.setAttribute("aria-label",`${wholes} full unit squares shaded, plus a square with ${h} of its 100 cells shaded, representing ${a}.`);
+      out.innerHTML=`<b>${a}</b> = ${wholes?wholes+" whole"+(wholes>1?"s":"")+" and ":""}${h} hundredths.<br>
+        As a fraction: <b>${wholes?mixed(Math.round(a*100),100):""}${wholes?"":Math.round(a*100)+"/100 = "+mixed(Math.round(a*100),100)}</b>.<br>
+        <span style="color:${MUT}">Say it as "${wholes?wholes+" and ":""}${h} hundredths", not "point ${String(a).split(".")[1]||"0"}". The place name is the whole idea.</span>`;
+      return;
+    }
+
+    if(m==="mul"){
+      const GX=60,GY=26,c=S/10;
+      const ac=Math.round(Math.min(1,a)*10),bc=Math.round(Math.min(1,b)*10);
+      let s=`<rect x="${GX}" y="${GY}" width="${S}" height="${S}" fill="#fff" stroke="${INK}" stroke-width="1.5"/>`;
+      s+=`<rect x="${GX}" y="${GY}" width="${S}" height="${ac*c}" fill="${T}" opacity=".28"/>`;
+      s+=`<rect x="${GX}" y="${GY}" width="${bc*c}" height="${S}" fill="${A}" opacity=".28"/>`;
+      s+=`<rect class="bmseg" x="${GX}" y="${GY}" width="${bc*c}" height="${ac*c}" fill="${INK}"/>`;
+      for(let i=1;i<10;i++){
+        s+=`<line x1="${GX+i*c}" y1="${GY}" x2="${GX+i*c}" y2="${GY+S}" stroke="${INK}" stroke-width=".7" opacity=".5"/>`;
+        s+=`<line x1="${GX}" y1="${GY+i*c}" x2="${GX+S}" y2="${GY+i*c}" stroke="${INK}" stroke-width=".7" opacity=".5"/>`;
+      }
+      const cells=ac*bc,val=r2(ac*bc/100);
+      s+=`<text x="${GX+S/2}" y="${GY+S+24}" font-family="Inconsolata" font-size="13" fill="${MUT}" text-anchor="middle">${(bc/10)} across</text>`;
+      s+=`<text x="${GX-14}" y="${GY+S/2}" font-family="Inconsolata" font-size="13" fill="${MUT}" text-anchor="middle" transform="rotate(-90 ${GX-14} ${GY+S/2})">${(ac/10)} down</text>`;
+      s+=`<text x="${GX+S+40}" y="${GY+70}" font-family="Inconsolata" font-size="14" fill="${INK}">overlap = ${cells} cells</text>`;
+      s+=`<text x="${GX+S+40}" y="${GY+94}" font-family="Inconsolata" font-size="14" fill="${INK}">each cell = 0.01</text>`;
+      s+=`<text x="${GX+S+40}" y="${GY+128}" font-family="Fraunces" font-size="22" fill="${T}">${val}</text>`;
+      svg.innerHTML=s;
+      svg.setAttribute("aria-label",`A unit square. ${ac} of ten rows shaded one way, ${bc} of ten columns the other. The ${cells} cells shaded both ways equal ${val}.`);
+      out.innerHTML=`${ac/10} × ${bc/10} = <b>${val}</b>.<br>
+        One digit after the point times one digit after the point gives ${cells} hundredths — two digits after the point. The count of decimal places is a count of how many times the cell was cut.<br>
+        <span style="color:${MUT}">Size check: multiplying by a number below 1 makes it smaller. ${val<Math.max(ac,bc)/10?"It did.":"Check your inputs."} This mode uses tenths only; go past 0.9 and it clips.</span>`;
+      return;
+    }
+
+    /* cmp and add */
+    if(m==="cmp"){
+      svg.innerHTML=grid(70,26,S,Math.min(1,a),T,String(a))+grid(330,26,S,Math.min(1,b),A,String(b))+
+        `<text x="350" y="${26+S+52}" font-family="Inconsolata" font-size="13" fill="${MUT}" text-anchor="middle">shade both, then look — no digit-counting required</text>`;
+      svg.setAttribute("aria-label",`Two unit squares side by side. The left has ${Math.round(a*100)} of 100 cells shaded for ${a}; the right has ${Math.round(b*100)} for ${b}. ${a===b?"They match.":a>b?"The left is larger.":"The right is larger."}`);
+      const pad=(x)=>x.toFixed(2);
+      out.innerHTML=`${a} ${a===b?"=":a>b?"&gt;":"&lt;"} ${b}.<br>
+        Written to the same place: ${pad(a)} and ${pad(b)}. ${a===b?"Identical shading.":`${Math.round(Math.max(a,b)*100)} hundredths beats ${Math.round(Math.min(a,b)*100)} hundredths.`}<br>
+        <span style="color:${MUT}">The trap: a longer decimal is not automatically bigger. 0.5 has fewer digits than 0.25 and is twice as large. Count hundredths, not digits.</span>`;
+      return;
+    }
+    const op=q("#dgop").value,res=r2(op==="+"?a+b:a-b);
+    svg.innerHTML=grid(70,26,S,Math.min(1,a),T,String(a),op==="+"?Math.min(1,b):null,A)+
+      grid(360,26,S,Math.max(0,Math.min(1,res)),T,`= ${res}`)+
+      `<text x="300" y="${26+S/2}" font-family="Fraunces" font-size="26" fill="${INK}" text-anchor="middle">${op==="+"?"+":"−"}</text>`;
+    svg.setAttribute("aria-label",`Left square shows ${a}${op==="+"?` shaded from the top and ${b} shaded from the bottom`:""}. The right square shows the result, ${res}.`);
+    out.innerHTML=`${a.toFixed(2)} ${op==="+"?"+":"−"} ${b.toFixed(2)} = <b>${res}</b>.<br>
+      Hundredths were added to hundredths, tenths to tenths. That is all "line up the decimal point" means.<br>
+      <span style="color:${MUT}">${res<0?"A negative result — the picture runs out of square. Unit 10 handles that.":op==="+"&&a+b>1?"The result passed one whole, so cells traded up into a full square — the same trade as the place-value discs in Unit 1.":"Both numbers stayed inside one whole."}</span>`;
+  }
+  $m.addEventListener("change",()=>{vis();draw();});
+  box.querySelector("#dggo").addEventListener("click",draw);
+  box.querySelectorAll("input,select").forEach(i=>i.addEventListener("input",draw));
+  vis();draw();
+}
+
+return {fractionModel,fractionDivide,decimalGrid};
+})();
+window.__EXTRA_NAMES__={fractionModel:"Fraction model",fractionDivide:"Fraction division",decimalGrid:"Decimal grid"};
+</script>
+
+<script>
+/* Unit metadata. Core tools: placeValue, rounding, shift, stepper, power,
+   barModel, factors. This unit adds fractionModel, fractionDivide, decimalGrid. */
+window.UNIT={
+  number:2,
+  minutes:55,
+  tools:{
+     1:["fractionModel"],  2:["fractionModel"],  3:["fractionModel"],  4:["fractionModel"],
+     5:["fractionModel"],  6:["fractionModel"],  7:["fractionModel"],  8:["fractionModel"],
+     9:["fractionDivide"],10:["fractionDivide"],11:["decimalGrid"],  12:["decimalGrid"],
+    13:["decimalGrid"],  14:["decimalGrid"],  15:["shift"],        16:["decimalGrid"],
+    17:["shift"],        18:["decimalGrid","fractionModel"],       19:["barModel"],
+    20:"all"
+  }
+};
+
+window.LESSONS=
+[
+{
+ day:1, short:"Fraction = division", title:"A fraction is a division that hasn't finished yet",
+ objective:"Interpret a fraction as the quotient of its numerator divided by its denominator, and justify the interpretation by physically sharing a quantity.",
+ standards:["6.NS.A.1","5.NF.B.3","6.RP.A.1"],
+ vocab:[["Numerator","How many pieces you have. It is also the amount being shared."],["Denominator","How many equal pieces the whole was cut into. It is also the number of sharers."],["Quotient","The result of a division. A fraction is one."],["Unit fraction","One single piece: 1/2, 1/3, 1/8. Every other fraction is built from copies of one."]],
+ materials:["Paper strips, 8 per pair, all the same length","Scissors","Rulers","Three identical paper 'sandwiches' or circles per group of four"],
+ warmup:{mins:5,text:"Write 3 ÷ 4 on the board and ask for the answer, allowing calculators. Someone will say 0.75. Then write 3/4 beside it and ask whether these are two facts or one fact written twice. Take a show of hands, record the split, and do not settle it. Say: by the end of today you will have cut it up and seen why."},
+ stages:[
+  {k:"c",label:"Concrete",mins:13,sense:"touch · fair sharing",
+   moves:["Groups of four receive three identical paper sandwiches and must share them equally, using every scrap.","Most groups cut each sandwich into quarters and deal them out. Let this happen before intervening.","Each student counts what they personally received: three quarter-pieces.","Repeat with 5 sandwiches shared among 4, then 2 shared among 3."],
+   say:[["Teacher","Three sandwiches, four of you, nothing thrown away. Cut and share."],["Teacher","How many pieces did each person end up holding, and what is each piece worth?"],["Expected","Three pieces, and each one is a quarter."],["Teacher","So three divided by four gave each person three quarters. Say the division out loud, then say what each person is holding. They are the same sentence."],["Teacher","Now five sandwiches among four. Predict before you cut."],["Expected","One whole and a quarter each."]],
+   watch:["Groups that cut each sandwich in half first and then get stuck with three halves and four people. Do not rescue them immediately — the stuck moment is the lesson. Ask: how many people are sharing? Then how many pieces should each sandwich become?"]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · partitioning",
+   moves:["Draw three rectangles in a row; draw the cuts made with the paper.","Circle one person's share and label it 3/4.","Draw the 5 ÷ 4 case and label the share as 1 1/4 and as 5/4 side by side.","Draw a bar for 2 ÷ 3 and label the share 2/3."],
+   say:[["Teacher","Draw the three sandwiches, then draw exactly the cuts your group made."],["Teacher","Circle one person's share, wherever the pieces landed. Write the division sentence above it and the fraction below it."],["Teacher","In the second picture you can write the answer two ways. One and a quarter, or five quarters. Are those different amounts?"],["Expected","No, they're the same, just counted differently."],["Teacher","Then a mixed number is a counting choice, not a different answer."]],
+   readaloud:["Say the picture aloud: 'Three equal rectangles sit in a row. Each is divided by vertical lines into four equal parts, twelve parts in total. One part from each rectangle is outlined together as one person's share — three parts out of the twelve, which is three quarters of one rectangle.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · notation",
+   moves:["Write the general statement: a ÷ b = a/b, with b not zero.","Convert between the two notations in both directions: 7 ÷ 8, 9/5, 12 ÷ 3.","Test the edge cases: 4/4, 0/6, 6/1, and 6/0.","Establish why 6/0 has no answer by asking how zero people share six sandwiches."],
+   say:[["Teacher","Every fraction bar is a division sign wearing a different coat."],["Teacher","So what is 12/3, and how do you know without a picture?"],["Expected","Four, because twelve divided by three is four."],["Teacher","And 6/0? Do not tell me the rule. Tell me how zero people share six sandwiches."],["Expected","They can't — there's nobody to give them to."],["Teacher","That is the reason. The rule is just the short version of that sentence."]],
+   watch:["Students who convert 9/5 to 5 ÷ 9. The bar is read top-to-bottom, and the direction matters. Send them back to the sandwiches: nine sandwiches, five people, does each person get more than one or less than one?"]}
+ ],
+ guided:[["Write 7 ÷ 8 as a fraction.","7/8"],["Six friends share 4 pizzas equally. How much does each get?","4/6 = 2/3 of a pizza"],["Write 11/4 as a mixed number using a picture, not a rule.","2 3/4 — two whole bars plus three of four parts"],["Which is more, 5 ÷ 4 or 4 ÷ 5? Explain without calculating.","5 ÷ 4, because more sandwiches than people means each person gets over one; the other way round gives less than one."]],
+ worksheet:[
+  {t:"A · Two ways to write it",d:"Write each division as a fraction, and each fraction as a division.",items:["3 ÷ 5","9 ÷ 2","7/10","15/4","1 ÷ 6","20/5"]},
+  {t:"B · Share it out",d:"Draw the sharing, then write the answer as a fraction.",items:["2 cakes, 5 people","7 metres of ribbon, 4 people","3 litres of paint, 8 pots","9 apples, 6 people"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Nadia says 3/4 and 4/3 are the same because they use the same digits. Use a sharing story to show she is wrong.","Explain why 8/8 equals 1 by talking about sharing, not by cancelling.","Without dividing, decide whether 17/6 is more or less than 3. Explain how you knew."]}],
+ exit:["Write 5 ÷ 6 as a fraction.","Four people share 6 granola bars. How much does each get? Draw it.","Explain in one sentence why a fraction bar and a division sign mean the same thing."],
+ crit:"Mastery: items 1 and 2 correct and item 3 mentions sharing or equal groups. Reteach if a student reverses the division (writes 6 ÷ 5), which means the bar is still being read as a picture rather than an operation.",
+ support:["Keep the paper strips out for the whole lesson; do not clear them before the abstract stage.","Restrict to sharing amounts smaller than the number of people so every answer stays under one whole, then extend.","Pre-cut the strips for students whose scissor control makes cutting the bottleneck rather than the maths."],
+ extend:["Ask: for what values of a and b is a/b greater than 1? Write the condition as a sentence, then as an inequality.","Share 3 sandwiches among 4 people in two genuinely different cutting schemes and prove the shares are equal."],
+ access:["Motor: pre-cut strips and adhesive putty for students who cannot manage scissors; the mathematical work is the sharing decision, not the cutting.","Vision: use strips of contrasting textures rather than colours so pieces can be told apart by touch.","Language: 'share', 'split', 'divide' and 'cut' are used interchangeably today — post all four with the same diagram so the vocabulary does not become the obstacle.","Attention: three sharing rounds is the maximum before the point is made; stop at three even if time remains."]
+},
+{
+ day:2, short:"Equivalence", title:"Equivalent fractions and simplest form",
+ objective:"Generate equivalent fractions by re-partitioning a bar, and reduce a fraction to simplest form using the greatest common factor.",
+ standards:["6.NS.B.4","5.NF.A.1","6.RP.A.1"],
+ vocab:[["Equivalent","Different names, same amount. The shaded length does not move."],["Simplest form","The name with the largest possible pieces — numerator and denominator share no factor but 1."],["Greatest common factor","The largest number that divides both, from Unit 1's factor lab."],["Re-partition","To cut the same whole into a different number of equal pieces."]],
+ materials:["Fraction strips, unmarked, 6 per pair","Rulers","Coloured pencils","Unit 1 factor lists, if students kept them"],
+ warmup:{mins:5,text:"Show 6/8 and 3/4 shaded on two identical bars, without labels. Ask: which bar has more shaded? Students will look, and see they match. Then reveal the labels and ask why two different pairs of numbers describe the same length. Hold the question."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · re-cutting",
+   moves:["Pairs fold a strip in half and shade one half.","Without unshading anything, fold the same strip in half again and count the pieces.","Continue folding: 1/2 becomes 2/4 becomes 4/8 becomes 8/16.","Repeat starting from 2/3, folding each third into two, then three."],
+   say:[["Teacher","Shade one half. Now fold again — do not change your shading. How many pieces are shaded, and how many are there altogether?"],["Expected","Two out of four."],["Teacher","Did the amount of shaded paper change when you folded?"],["Expected","No, just the number of pieces."],["Teacher","So folding renames the amount. It never changes it. That single sentence is the whole topic."]],
+   watch:["Students who re-shade after folding, ending with 4/4. The rule is: the pencil does not move, only the folds do. Hand them a fresh strip and shade it yourself before they fold."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · subdivision",
+   moves:["Draw a bar, shade 2/3, then draw the extra cut lines rather than a new bar.","Record the chain 2/3 = 4/6 = 6/9 = 8/12 underneath.","Work the other direction: start from 12/18 and rub out cut lines in groups until the pieces are as large as possible.","Circle the moment when no more lines can be removed and name it simplest form."],
+   say:[["Teacher","Cut each third into two. How many shaded now? How many altogether?"],["Expected","Four out of six."],["Teacher","Both numbers doubled, because every piece became two pieces — the shaded ones and the unshaded ones alike."],["Teacher","Now go backwards. Rub out lines from 12/18 in equal groups. How many lines can you remove?"],["Expected","You can group them in sixes, so it becomes 2/3."],["Teacher","Six was the greatest common factor. Removing lines is dividing; you already met that number in Unit 1."]],
+   readaloud:["Say the picture aloud: 'One bar is divided into three equal parts with two shaded. A second identical bar has each of those three parts cut in half, giving six parts, and four of them fall inside the same shaded region. The shaded length is identical in both bars.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · notation",
+   moves:["Write the multiplication form: 2/3 × 2/2 = 4/6, and name 2/2 as one.","Write the division form: 12/18 ÷ 6/6 = 2/3.","Practise finding the GCF for 18/24, 15/45, 14/35 using the factor method from Unit 1.","State the test for simplest form: the only shared factor left is 1."],
+   say:[["Teacher","Multiplying by 2/2 is multiplying by one. One never changes a value — it only changes the name."],["Teacher","To go the other way, divide both by their greatest common factor and you land in simplest form in a single step."],["Teacher","If you divide by a smaller common factor, are you wrong?"],["Expected","No, you just have to do it again."],["Teacher","Correct — slower, not wrong. But the GCF gets you there in one move."]],
+   watch:["Students who add rather than multiply: 2/3 becoming 3/4 by adding one to each. Send them straight back to the folded strip — 3/4 is visibly more shading, and the strip proves it in a way an argument will not."]}
+ ],
+ guided:[["Write three fractions equivalent to 3/5.","6/10, 9/15, 12/20"],["Simplify 24/36.","2/3, dividing both by the GCF 12"],["Fill the blank: 4/7 = 20/__","35"],["Is 15/40 in simplest form? How do you know?","No — both share the factor 5, so it reduces to 3/8."]],
+ worksheet:[
+  {t:"A · Rename it",d:"Write two equivalent fractions for each.",items:["1/4","3/8","5/6","2/9","7/10","4/5"]},
+  {t:"B · Simplest form",d:"Reduce each using the greatest common factor. Show the factor you divided by.",items:["18/24","30/45","16/64","21/28","42/56","25/100"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Theo says 5/10 and 6/11 must be close in value because both numerators are about half their denominators. Test his claim and comment on the reasoning.","A fraction is equivalent to 3/4 and its denominator is 44. What is the numerator? Explain how you found it.","Why can a fraction have infinitely many equivalent forms but only one simplest form?"]}],
+ exit:["Write two fractions equivalent to 2/5.","Simplify 27/36 and state the factor you used.","Explain why multiplying by 3/3 does not change a fraction's value."],
+ crit:"Mastery: correct on 1 and 2, and item 3 refers to 3/3 being equal to one. Reteach if a student adds the same number to both parts — that is a different misconception from a simple arithmetic slip and needs the paper strip, not more practice.",
+ support:["Provide a printed equivalence wall (halves through twelfths, aligned) as a checking tool, not an answer key.","Allow reduction in several small steps rather than requiring the GCF in one move.","Keep the folding strips available; re-folding beats re-explaining."],
+ extend:["Which fractions with denominators under 20 are already in simplest form? Look for the pattern and connect it to prime numbers.","Show that 3/4 and 75/100 are equivalent by two different routes, one using GCF and one using multiplication."],
+ access:["Touch: creased fold lines are readable by finger, so the equivalence can be verified without sight.","Vision: pair shading with a texture or hatch so shaded and unshaded are distinguishable in greyscale.","Memory: the phrase 'the pencil does not move, only the folds do' is short enough to be recalled under pressure — repeat it rather than restating the rule formally.","Attention: the equivalence chain is written left to right on one line so the whole pattern is visible without scrolling or turning the page."]
+},
+{
+ day:3, short:"Compare & order", title:"Comparing and ordering fractions",
+ objective:"Compare and order fractions with unlike denominators, choosing between benchmarking, common denominators, and reasoning about missing pieces.",
+ standards:["6.NS.B.4","4.NF.A.2","6.RP.A.1"],
+ vocab:[["Common denominator","A shared piece size that lets you compare by counting."],["Least common denominator","The smallest common denominator — usually the least common multiple of the two denominators."],["Benchmark","A landmark you compare against, most often 0, 1/2 and 1."],["Missing piece","How far a fraction sits below one whole. 7/8 is one eighth short."]],
+ materials:["Fraction strips or a printed equivalence wall","Blank number lines, 0 to 1, several per student","Index cards with one fraction on each, for the ordering line-up"],
+ warmup:{mins:5,text:"Post 3/4 and 5/8. Ask students to vote on which is larger without writing anything, then to explain their reasoning to a neighbour. Collect two different reasoning routes on the board — someone will benchmark against 1/2 and someone will convert. Both are correct; that is today's point."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · direct comparison",
+   moves:["Pairs lay fraction strips physically on top of each other to compare 3/4 and 5/8.","Sort six fraction cards into 'less than half', 'exactly half', 'more than half' by laying them against the half strip.","Order four fractions by lining the strips up left-aligned.","Compare 7/8 and 11/12 by laying both against the whole and looking at the gap, not the shading."],
+   say:[["Teacher","Lay one strip directly on the other. Do not calculate. Which sticks out further?"],["Teacher","Now sort these six against the half strip. Only three groups: under, exactly, over."],["Teacher","Last pair: 7/8 and 11/12. The shading looks nearly identical. Try looking at what's missing instead."],["Expected","One eighth is missing from the first and one twelfth from the second, and a twelfth is smaller, so 11/12 is bigger."],["Teacher","That is a genuine strategy, not a trick. Sometimes the gap is easier to see than the amount."]],
+   watch:["Students comparing strips that were cut to different total lengths. The whole must be identical or nothing can be compared — check strip lengths before the sorting begins, and make the check explicit so students learn to ask it."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · position on a line",
+   moves:["Place 3/4 and 5/8 on the same 0-to-1 number line, marking eighths since eighths also give quarters.","Mark the 1/2 benchmark first on every line drawn today.","Place 2/5, 1/3, 5/6 and 7/10 on one line by benchmarking before converting.","Redraw one comparison with the least common denominator marked as ticks."],
+   say:[["Teacher","Mark a half first, every time. Half is free information and it eliminates most of the work."],["Teacher","Which of these four are under a half? Place those on the left before worrying about their exact order."],["Teacher","Now, for the ones still competing, what piece size would let you compare by counting?"],["Expected","Thirtieths — because 5, 3, 6 and 10 all divide into 30."]],
+   readaloud:["Say the picture aloud: 'A number line runs from zero on the left to one on the right, with a dashed mark at the halfway point. Three quarters sits to the right of the halfway mark, three quarters of the way along. Five eighths sits between the halfway mark and three quarters, closer to the middle.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · inequality",
+   moves:["Convert to a common denominator and compare numerators: 3/4 = 6/8 versus 5/8.","Write results using &lt; and &gt; with the fractions in their original form.","Order a set of five fractions and write the chain 1/3 &lt; 2/5 &lt; 1/2 &lt; 7/10 &lt; 5/6.","Name the three available strategies and when each is fastest."],
+   say:[["Teacher","When the denominators match, comparison is just counting. That is the whole reason we bother converting."],["Teacher","But converting is not always fastest. When would you benchmark instead?"],["Expected","When one is obviously under a half and the other is over."],["Teacher","And the missing-piece strategy?"],["Expected","When both are really close to one."],["Teacher","Three tools. Read the numbers before you pick one."]],
+   watch:["Students who compare numerators alone (5/8 &gt; 3/4 because 5 &gt; 3) or denominators alone (1/8 &gt; 1/4 because 8 &gt; 4). The second is the more stubborn error. Return to the strips: more pieces means smaller pieces."]}
+ ],
+ guided:[["Which is larger, 5/6 or 7/9?","5/6 — as 15/18 against 14/18"],["Order: 3/5, 1/2, 7/10.","1/2 &lt; 3/5 &lt; 7/10"],["Which is closer to 1, 9/10 or 11/12? Use missing pieces.","11/12 — it is only one twelfth short, and a twelfth is smaller than a tenth."],["True or false: if two fractions have the same numerator, the one with the larger denominator is smaller.","True — same number of pieces, but smaller pieces."]],
+ worksheet:[
+  {t:"A · Compare",d:"Write &lt;, &gt; or =.",items:["2/3 __ 3/5","4/9 __ 1/2","7/8 __ 13/16","5/12 __ 3/8","9/10 __ 8/9","6/15 __ 2/5"]},
+  {t:"B · Put them in order",d:"Order each set from smallest to largest. Show the strategy you chose.",items:["1/4, 2/5, 1/3","5/8, 1/2, 3/5","7/12, 2/3, 5/9","9/10, 7/8, 11/12"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Priya says 4/7 is bigger than 5/9 because 7 is smaller than 9 and smaller denominators mean bigger fractions. Where does her reasoning break down?","Name a fraction between 1/3 and 1/2. Explain how you found it, and then find a second one that is different.","Two fractions are each one piece short of a whole. Explain how to tell which is larger without any calculation."]}],
+ exit:["Which is larger, 3/8 or 2/5? Show your method.","Order 1/2, 5/12, 2/3 from smallest to largest.","Explain why 1/5 is smaller than 1/4 even though 5 is bigger than 4."],
+ crit:"Mastery: both comparisons correct and item 3 explains that more pieces means smaller pieces. Reteach if a student ranks unit fractions by denominator size — that error will silently corrupt every fraction operation that follows.",
+ support:["Provide the equivalence wall and permit its use for all comparisons; fluency in the strategy matters more than doing conversions from memory today.","Restrict sets to related denominators (halves, quarters, eighths) before mixing families.","Give a partly-marked number line rather than a blank one."],
+ extend:["Find a fraction exactly halfway between 2/5 and 3/5, then between 2/5 and 1/2. Why is the second one harder?","Order 5/6, 7/8, 9/10 and 11/12 in your head using missing pieces, then verify by converting. Which was faster, and by how much?"],
+ access:["Touch: physically stacking strips gives the comparison without any symbolic step — keep this route open for students all lesson, not just in the concrete stage.","Vision: number lines are printed with raised or bold benchmark ticks at 0, 1/2 and 1.","Language: 'greater than' and 'more than' both appear in the worksheet; confirm both are understood before the independent section.","Motor: the ordering line-up can be done by directing a partner rather than physically moving cards."]
+},
+{
+ day:4, short:"Add & subtract", title:"Adding and subtracting fractions with unlike denominators",
+ objective:"Add and subtract fractions with unlike denominators by re-partitioning both to a common piece size, and explain why the denominators are not added.",
+ standards:["6.NS.B.4","5.NF.A.1","6.EE.A.2"],
+ vocab:[["Like denominators","Pieces of the same size, so they can be counted together."],["Least common multiple","The smallest number both denominators divide into — the least common denominator."],["Sum","The total when the shaded lengths are joined."],["Difference","How much longer one shaded length is than the other."]],
+ materials:["Fraction strips or circles, two colours","Blank bars printed three to a page","Rulers"],
+ warmup:{mins:5,text:"Write 1/2 + 1/3 = 2/5 on the board as though it were correct. Ask students to test it with strips, not with an argument. Give three minutes. The strips will show the sum is more than a half, while 2/5 is less. Say: your job today is to explain what went wrong, not just to fix it."},
+ stages:[
+  {k:"c",label:"Concrete",mins:13,sense:"touch · combining",
+   moves:["Lay a 1/2 strip and a 1/3 strip end to end and look for a single fraction strip that matches the combined length.","Discover nothing matches until sixths are tried.","Rebuild the half as three sixths and the third as two sixths, physically swapping the pieces.","Combine: five sixths, confirmed by laying a 5/6 strip alongside."],
+   say:[["Teacher","Put the half and the third end to end. Now find one strip family that matches that total exactly."],["Teacher","Try quarters. Try fifths. What happens?"],["Expected","Nothing lines up."],["Teacher","Try sixths."],["Expected","It works — three sixths plus two sixths."],["Teacher","Sixths worked because a half and a third can both be rebuilt in sixths. You are not finding a new number, you are finding a piece size that both can be built from."]],
+   watch:["Students who conclude that you always multiply the denominators. It works, but it is not always the least common denominator. Ask them to try 1/4 + 1/6 with 24ths and then with 12ths, and to say which they would rather simplify afterwards."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · re-partition",
+   moves:["Draw two identical bars, shade 1/2 and 1/3.","Draw the extra cuts on both until both show sixths.","Draw a third bar and shade the combined amount.","Repeat for a subtraction: 3/4 − 1/6, drawing the take-away as an unshading."],
+   say:[["Teacher","Do not draw a new picture. Add the cuts to the picture you already have."],["Teacher","How many cuts does the half bar need? How many does the third bar need?"],["Expected","The half needs two more cuts, the third needs one more."],["Teacher","For subtraction the move is identical — same piece size first, then take away. Only the last step changes."]],
+   readaloud:["Say the picture aloud: 'Three bars of equal length are stacked. The top bar is divided into six parts with three shaded. The middle bar is divided into six parts with two shaded. The bottom bar is divided into six parts with five shaded, matching the two above it combined.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · notation",
+   moves:["Write the full chain: 1/2 + 1/3 = 3/6 + 2/6 = 5/6.","Find the LCD using multiples: list them and take the first shared one.","Work 3/4 − 1/6 and 5/6 − 3/8 with the chain written out in full.","Simplify the result where possible, and check the answer against the picture for size."],
+   say:[["Teacher","Write every step. The middle line is where the thinking is — skipping it is where the mistakes live."],["Teacher","Why does the denominator stay at six in the answer rather than becoming twelve?"],["Expected","Because the piece size didn't change, only how many pieces we have."],["Teacher","Exactly. The denominator names the piece. You are not doing arithmetic on the name."]],
+   watch:["Students who find the common denominator correctly but forget to adjust the numerator, writing 1/2 + 1/3 = 1/6 + 1/6. The cut lines were drawn but the shading was not recounted. Send them to the picture, not to the rule."]}
+ ],
+ guided:[["1/4 + 2/5","5/20 + 8/20 = 13/20"],["5/6 − 1/4","10/12 − 3/12 = 7/12"],["2/3 + 5/6","4/6 + 5/6 = 9/6 = 1 1/2"],["Explain why 1/2 + 1/3 cannot be 2/5.","2/5 is less than a half, and adding a positive amount to a half must give more than a half."]],
+ worksheet:[
+  {t:"A · Add",d:"Give each answer in simplest form.",items:["1/3 + 1/4","2/5 + 1/2","3/8 + 1/6","5/12 + 1/3","2/9 + 1/6","3/10 + 2/5"]},
+  {t:"B · Subtract",d:"Give each answer in simplest form.",items:["3/4 − 1/3","7/8 − 1/2","5/6 − 3/10","2/3 − 1/4","9/10 − 3/5","5/8 − 1/6"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A recipe needs 2/3 cup of oats and 1/4 cup of seeds. Will it fit in a 1-cup jar? Justify with the calculation and with a size estimate.","Marco adds 2/5 + 1/5 and gets 3/10. Explain his mistake in terms of piece size.","Write two different fractions with different denominators that add to exactly 1. Then write another pair. What has to be true of the pair?"]}],
+ exit:["1/2 + 2/5","3/4 − 1/6","Explain in one sentence why the denominators are not added."],
+ crit:"Mastery: both calculations correct and item 3 refers to piece size or naming. Reteach if a student adds denominators — do it with strips rather than with a restated rule, because the rule has clearly already been heard and did not take.",
+ support:["Provide the multiples table so LCD-finding does not become the barrier to the actual operation.","Permit multiplying denominators rather than finding the LCD, and simplify afterwards.","Colour-code the two fractions consistently across every problem so the tracking is visual."],
+ extend:["Add three fractions with unrelated denominators: 1/2 + 1/3 + 1/5. Does the LCD strategy still work? What changes?","Find all pairs of unit fractions that sum to 1/2. Prove you have them all."],
+ access:["Touch: two-colour strips let the sum be assembled physically and read by length, no symbols required.","Vision: draw the extra cut lines in a distinct dashed style so the re-partition is visible without relying on colour.","Language: 'common denominator' is three words doing one job — post the plain version, 'make the pieces the same size', beside it all lesson.","Attention: the full three-line chain is the format all lesson; consistency reduces the load of deciding how much to write."]
+},
+{
+ day:5, short:"Mixed numbers", title:"Adding and subtracting mixed numbers, with regrouping",
+ objective:"Add and subtract mixed numbers, regrouping a whole into fractional parts when the fraction being subtracted is larger.",
+ standards:["6.NS.B.4","5.NF.A.1"],
+ vocab:[["Mixed number","A whole number and a fraction written together: 2 3/4."],["Improper fraction","A fraction whose numerator is at least its denominator: 11/4. Not an error — just a different count."],["Regroup","To trade one whole for its equivalent in fractional pieces, exactly like trading a ten for ten ones."],["Convert","To rewrite a mixed number as an improper fraction, or the reverse."]],
+ materials:["Fraction circles or strips including several whole units","Place-value discs from Unit 1, for the trading analogy","Blank bars, four per student"],
+ warmup:{mins:5,text:"Write 4 − 1/3. Ask for the answer without any written work. Collect responses; 3 2/3 and 3 1/3 will both appear. Draw four whole bars and take a third away from one of them. Do not explain — just leave the picture up while students revise their answers."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · trading",
+   moves:["Build 3 1/4 with three whole strips and one quarter.","Subtract 3/4: discover there is not enough quarter to take from.","Physically break one whole strip into four quarters and combine: 2 wholes and 5 quarters.","Take three quarters away, leaving 2 2/4, and simplify to 2 1/2."],
+   say:[["Teacher","Three and a quarter. Take away three quarters. Try it with the strips."],["Teacher","You are one quarter short. What can you do without changing the total?"],["Expected","Cut up one of the whole ones."],["Teacher","Say what you just did in Unit 1 language."],["Expected","Traded — like trading a ten for ten ones."],["Teacher","Identical move. The only difference is what the pieces are called."]],
+   watch:["Students who subtract the fractions in the wrong direction to avoid regrouping: 3 1/4 − 3/4 giving 2 2/4 by computing 3/4 − 1/4. The answer looks right here by coincidence. Change the numbers to 3 1/4 − 1/2 and the error surfaces immediately."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · exchange",
+   moves:["Draw 3 1/4 as three full bars plus a partly shaded one.","Draw the regrouping by adding cut lines to one full bar and re-labelling it 4/4.","Cross out three quarters and count what remains.","Draw an addition needing the opposite move: 1 3/5 + 2 4/5, where five fifths combine into a new whole."],
+   say:[["Teacher","When you regroup, one whole bar becomes four quarter-pieces on the page. The picture holds the same amount, drawn differently."],["Teacher","Now the addition. You have seven fifths in the fraction column. What happens?"],["Expected","Five of them make a whole, so it becomes one more whole and two fifths."],["Teacher","So regrouping runs both directions, exactly as carrying and borrowing did with whole numbers."]],
+   readaloud:["Say the picture aloud: 'Four equal bars sit in a row. The first two are fully shaded. The third has been divided into four equal parts, all shaded, showing it is still one whole. The fourth bar has one of its four parts shaded.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · two methods",
+   moves:["Method one: regroup in place, keeping the whole and fraction columns separate.","Method two: convert both to improper fractions, subtract, convert back.","Work 5 1/6 − 2 3/4 by both methods and compare the arithmetic load.","Decide as a class when each method is preferable."],
+   say:[["Teacher","Both methods are correct. Do 5 1/6 minus 2 3/4 both ways and then tell me which you would use again."],["Teacher","What made the improper-fraction method harder here?"],["Expected","The numbers got big — 31/6 and 11/4."],["Teacher","And what makes it easier when the whole numbers are small?"],["Expected","You only do one subtraction instead of two."],["Teacher","Then the choice depends on the numbers, and reading them first is part of the work."]],
+   watch:["Students converting 5 1/6 to 51/6 by writing the digits together. Ask what 5 wholes are worth in sixths before any conversion is written; the answer is thirty, and the mistake cannot survive that question."]}
+ ],
+ guided:[["2 1/3 + 1 1/2","3 5/6"],["4 − 2/5","3 3/5"],["5 1/4 − 2 2/3","2 7/12"],["3 3/8 + 2 5/8","6 — the fractions make exactly one whole"]],
+ worksheet:[
+  {t:"A · Convert",d:"Mixed to improper, or improper back to mixed.",items:["3 2/5","17/4","2 7/8","23/6","1 5/9","31/10"]},
+  {t:"B · Add and subtract",d:"Give each answer in simplest form.",items:["1 1/2 + 2 1/3","4 3/5 − 1 1/2","3 1/4 + 2 5/6","6 − 1 3/8","5 2/9 − 2 2/3","2 7/10 + 3 4/5"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A plank is 3 1/2 m long. You cut off 1 3/4 m. How much is left? Draw the regrouping you used.","Explain why 4 − 1/3 is not 4 1/3, using a picture in your explanation.","Amara says she never regroups — she converts everything to improper fractions instead. Give one problem where her method is clearly easier and one where it is clearly harder."]}],
+ exit:["2 1/6 + 1 1/2","4 1/5 − 1 3/5","Explain what regrouping means using the word 'trade'."],
+ crit:"Mastery: both correct and item 3 describes exchanging one whole for fractional pieces. Reteach if a student subtracts the smaller fraction from the larger regardless of position — that error is invisible when the answer happens to work out and needs to be caught directly.",
+ support:["Keep whole strips physically available so regrouping stays a hand movement rather than a written procedure.","Allow the improper-fraction method exclusively if column-tracking is the obstacle.","Provide a two-column recording frame with 'wholes' and 'parts' headings."],
+ extend:["Find two mixed numbers with a difference of exactly 1 1/2 where both fractions have different denominators.","Explain why converting to improper fractions never requires regrouping. What has been traded away in exchange for that convenience?"],
+ access:["Touch: physically breaking a whole strip is the clearest version of regrouping available — do not shortcut it for any student.","Memory: the Unit 1 trading language is deliberately reused; say 'trade' rather than introducing 'borrow' as a new word.","Vision: the two-column recording frame separates wholes from parts spatially, which helps students who lose track within a single line.","Language: 'improper fraction' sounds like a criticism. Say explicitly that nothing is wrong with it; it is a counting choice."]
+},
+{
+ day:6, short:"× whole number", title:"Multiplying a fraction by a whole number",
+ objective:"Multiply a fraction by a whole number and interpret the result as repeated addition and as a fraction of a group.",
+ standards:["6.NS.A.1","5.NF.B.4","6.RP.A.3"],
+ vocab:[["Repeated addition","4 × 1/3 means 1/3 + 1/3 + 1/3 + 1/3."],["Of","In fraction work, 'of' signals multiplication: 1/3 of 12."],["Scaling","Multiplying to resize. A factor under one shrinks; over one, it grows."],["Product","The result of a multiplication."]],
+ materials:["Fraction strips","Counters, 24 per pair","Blank bars"],
+ warmup:{mins:5,text:"Write 1/3 of 12 and 12 × 1/3 side by side. Ask whether these are the same question. Take two answers, then set the counters out and ask a pair to demonstrate each one physically. Let the class watch the two demonstrations produce the same pile."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · grouping",
+   moves:["Deal 12 counters into 3 equal groups and take one group: 1/3 of 12 is 4.","Lay four 1/3 strips end to end and measure the total against whole strips: 4/3, or 1 1/3.","Take 2/3 of 12 counters by taking two of the three groups.","Compare the two situations and name what is different about them."],
+   say:[["Teacher","Twelve counters, three equal groups, take one group. What is a third of twelve?"],["Expected","Four."],["Teacher","Now lay out four one-third strips. How much is that altogether?"],["Expected","One and a third."],["Teacher","Both were multiplication. In the first the whole was twelve counters; in the second the whole was one strip. Multiplication does not care what the whole is, but you have to know what it is."]],
+   watch:["Students who compute 4 × 1/3 as 4/12, multiplying the whole number into the denominator. Ask them to lay out the strips and measure — 4/12 is a third of one strip, and they are holding well over one strip."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · repeated shading",
+   moves:["Draw four bars each shaded 1/3 and join the shaded parts on a fifth bar.","Draw 2/3 of 15 as a bar of 15 split into three parts of five, with two parts circled.","Draw 3/4 of 20 the same way.","Draw 5 × 2/3 and convert the improper result to a mixed number on the diagram."],
+   say:[["Teacher","Four thirds. Draw them separately first, then push them together."],["Teacher","For 'of' problems, the bar is the whole group and the cuts are the denominator. Where do the fifteen counters live in this picture?"],["Expected","Spread across the bar, five in each third."],["Teacher","So finding 2/3 of 15 means dividing by three first, then multiplying by two. The denominator divides; the numerator multiplies."]],
+   readaloud:["Say the picture aloud: 'A single bar is divided into three equal sections, each labelled with the number five, so the whole bar represents fifteen. The first two sections are outlined together and labelled ten.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · procedure",
+   moves:["Write 4 × 1/3 = 4/3 and connect it to repeated addition.","Write the general form: n × a/b = na/b.","Work 2/3 × 15 by dividing then multiplying, and check with na/b.","Simplify before multiplying where it helps: 3/4 × 20."],
+   say:[["Teacher","Only the numerator is multiplied, because only the count of pieces changed. The pieces stayed the same size."],["Teacher","For 3/4 of 20 you could do sixty over four, or you could cancel the four into the twenty first. Try both."],["Expected","Cancelling first gives 3 × 5, which is much easier."],["Teacher","Simplifying early is not a shortcut. It is choosing when to do the division."]],
+   watch:["Students who divide by the numerator instead of the denominator when finding a fraction 'of' an amount — 2/3 of 15 as 15 ÷ 2. Return to the bar: the number of cuts is the denominator, always."]}
+ ],
+ guided:[["6 × 2/5","12/5 = 2 2/5"],["3/4 of 28","21"],["5 × 3/8","15/8 = 1 7/8"],["2/3 of 45","30"]],
+ worksheet:[
+  {t:"A · Multiply",d:"Give each answer in simplest form, as a mixed number where needed.",items:["4 × 2/7","3 × 5/6","8 × 3/4","6 × 2/9","10 × 3/5","7 × 1/3"]},
+  {t:"B · Fractions of amounts",d:"Find each amount.",items:["1/4 of 36","2/5 of 40","3/8 of 32","5/6 of 54","2/7 of 63","4/9 of 45"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A class of 30 is 3/5 girls. How many boys are there? Show two different routes to the answer.","Without calculating, decide whether 8 × 3/4 is more or less than 8. Explain the reasoning you used.","Sam says multiplying always makes numbers bigger. Give a counterexample from today and explain what he has actually observed being true of whole numbers only."]}],
+ exit:["5 × 3/4","2/3 of 24","Explain why multiplying by 3/4 gives an answer smaller than what you started with."],
+ crit:"Mastery: both correct and item 3 mentions that 3/4 is less than one. Reteach if a student multiplies the denominator by the whole number — that error means the piece size is still being treated as a quantity.",
+ support:["Keep counters available for every 'of' problem; the grouping is the concept, not a scaffold to remove.","Restrict to unit fractions before moving to non-unit numerators.","Provide the multiplication table for the division step so arithmetic fluency is not the limiting factor."],
+ extend:["Find a whole number n and a fraction where n × the fraction is exactly 6, in three different ways.","When is n × a/b a whole number? State the condition and test it on three examples."],
+ access:["Touch: counters make 'of' physically obvious — dealing into groups is the operation, not a representation of it.","Vision: bar diagrams are labelled with numbers inside each section rather than relying on relative size alone.","Language: 'of' meaning multiply is a genuine translation problem; post it and refer to it explicitly rather than assuming it transfers.","Attention: the two situations (repeated addition and fraction of a group) are deliberately kept in separate stages to avoid interleaving them before either is secure."]
+},
+{
+ day:7, short:"× fraction", title:"Multiplying a fraction by a fraction",
+ objective:"Multiply two fractions using an area model, and explain why the product of two proper fractions is smaller than either factor.",
+ standards:["6.NS.A.1","5.NF.B.4b","6.EE.A.2"],
+ vocab:[["Area model","A square cut both ways; the overlap is the product."],["Factor","A number being multiplied."],["Proper fraction","A fraction less than one whole."],["Commutative","Order does not change the product: 2/3 × 3/4 equals 3/4 × 2/3."]],
+ materials:["Square grid paper","Two colours of transparent film or highlighter","Rulers","Squares of paper for folding, 4 per student"],
+ warmup:{mins:5,text:"Ask each student to write down, without calculating, whether 2/3 × 3/4 will be bigger or smaller than 3/4. Collect the vote silently on the board as a tally. Say only: hold that prediction, we are going to fold it."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · folding twice",
+   moves:["Fold a paper square into quarters one way and shade 3/4 with one colour.","Fold the same square into thirds the other way and shade 2/3 with a second colour, crossing over the first.","Count the doubly-shaded pieces and the total pieces: 6 out of 12.","Unfold and confirm the square is cut into twelve equal pieces."],
+   say:[["Teacher","Fold and shade three quarters going one way. Now fold the other way and shade two thirds going across."],["Teacher","How many little pieces are shaded twice, and how many pieces are there in total?"],["Expected","Six out of twelve."],["Teacher","Where did twelve come from?"],["Expected","Three times four — the two sets of folds."],["Teacher","And six?"],["Expected","Two times three."],["Teacher","You have just multiplied. The folds did it."]],
+   watch:["Students who shade the second fraction of the already-shaded region only, rather than across the whole square. Both produce the same overlap, but the second loses the denominator. Insist the second shading crosses the entire square."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · area",
+   moves:["Draw a square, cut into fourths vertically and thirds horizontally.","Shade 3/4 of the width one way, 2/3 of the height the other.","Outline the overlap and write its count over the total.","Repeat with 1/2 × 1/5 and 2/5 × 3/4, predicting the denominator before drawing."],
+   say:[["Teacher","Before you draw the next one, predict how many small pieces the square will have."],["Expected","Ten, because two times five."],["Teacher","And the overlap?"],["Expected","One."],["Teacher","So you can already see the answer. The drawing is now confirming what you reasoned, which is exactly the right order."]],
+   readaloud:["Say the picture aloud: 'A square is divided by three vertical lines into four columns and by two horizontal lines into three rows, making twelve equal small squares. The first three columns are shaded lightly, and the first two rows are shaded lightly the other way. Six small squares in the upper-left region carry both shadings.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · procedure",
+   moves:["Write a/b × c/d = ac/bd and locate each letter on the diagram.","Simplify before multiplying where a factor is shared: 2/3 × 9/10.","Revisit the warm-up prediction and settle it against the picture.","State and test the size rule: a proper-fraction factor always shrinks."],
+   say:[["Teacher","Numerator times numerator, denominator times denominator — and now you can point at where each product lives in the square."],["Teacher","Back to your prediction. Was 2/3 × 3/4 bigger or smaller than 3/4?"],["Expected","Smaller — it's two thirds of it."],["Teacher","Multiplying by 2/3 means taking two thirds of something. Taking part of something leaves you with less. That is not a rule to learn; it is what the words already say."]],
+   watch:["Students who cross-multiply, or who find a common denominator first as they did for addition. Both are the addition procedure leaking across. Ask what the folds did — the folds never matched piece sizes, they cut across each other."]}
+ ],
+ guided:[["1/2 × 3/5","3/10"],["2/3 × 3/4","6/12 = 1/2"],["3/5 × 5/9","15/45 = 1/3, or cancel first to get 1/3"],["1/4 of 2/3","2/12 = 1/6"]],
+ worksheet:[
+  {t:"A · Multiply",d:"Give each answer in simplest form.",items:["1/3 × 2/5","3/4 × 2/9","5/6 × 3/10","2/7 × 7/8","4/5 × 5/12","3/8 × 4/9"]},
+  {t:"B · Fractions of fractions",d:"Write the multiplication, then answer.",items:["1/2 of 4/7","2/3 of 6/11","3/5 of 10/13","1/4 of 8/9"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Half of a pizza is left. You eat 2/3 of what is left. What fraction of the whole pizza did you eat? Draw the area model.","Without calculating, order these from smallest to largest: 3/4 × 1/2, 3/4 × 1, 3/4 × 5/4. Explain the ordering rule you used.","Explain why 2/3 × 3/4 and 3/4 × 2/3 give the same answer, using the square in your explanation."]}],
+ exit:["2/5 × 3/4","1/3 of 6/7","Explain why multiplying two proper fractions gives an answer smaller than both."],
+ crit:"Mastery: both correct and item 3 explains that taking part of a part leaves less. Reteach if a student finds a common denominator first — that is the addition procedure surfacing, and more practice will not dislodge it; the folded square will.",
+ support:["Provide pre-gridded squares so the drawing is a shading task rather than a construction task.","Restrict to unit fractions first, where the overlap is a single square.","Permit multiply-then-simplify exclusively; cancelling first can wait."],
+ extend:["Find two fractions whose product is 1/6, in three different ways. What do the pairs have in common?","Two fractions multiply to give one of the original fractions unchanged. What must the other one be, and why?"],
+ access:["Touch: folding is the whole lesson in physical form — the crease pattern is the grid, and it is readable by finger.","Vision: use hatching in two directions rather than two colours so the overlap is visible in greyscale and to colour-blind students.","Language: 'of' means multiply, again — this is the third lesson leaning on it, so it is worth saying aloud rather than assuming.","Motor: pre-folded squares are available for students for whom folding accurately is the barrier rather than the maths."]
+},
+{
+ day:8, short:"× mixed numbers", title:"Multiplying mixed numbers and estimating first",
+ objective:"Multiply mixed numbers by converting to improper fractions, and use estimation to check whether the product is reasonable before calculating.",
+ standards:["6.NS.A.1","5.NF.B.4","6.EE.A.2"],
+ vocab:[["Estimate","A deliberate approximation made before calculating, used to test the answer afterwards."],["Improper fraction","A fraction at or above one whole — the working form for multiplication."],["Distributive","Breaking 2 1/2 × 4 into 2 × 4 plus 1/2 × 4."],["Reasonable","An answer that sits where the estimate said it would."]],
+ materials:["Grid paper","Fraction strips including wholes","Rulers"],
+ warmup:{mins:5,text:"Write 2 1/2 × 3 1/2. Ask for estimates only, no calculation, and record the range on the board. Someone will say 6 1/4 by multiplying the parts separately. Do not correct it yet — write it up with the others and return to it in the abstract stage."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · area with wholes",
+   moves:["Build a rectangle 2 1/2 units by 3 1/2 units from whole squares and half-squares on grid paper.","Count the whole squares, the halves and the quarter piece separately.","Total them: 6 wholes, 5 halves and 1 quarter, giving 8 3/4.","Compare against the warm-up estimate of 6 1/4 and locate the missing pieces physically."],
+   say:[["Teacher","Build the rectangle. Two and a half across, three and a half down."],["Teacher","Count only the full squares first. How many?"],["Expected","Six."],["Teacher","Now the half-strips along the edges, and the little corner. What is the total?"],["Expected","Eight and three quarters."],["Teacher","Somebody estimated six and a quarter by multiplying two times three and a half times a half. Point at the pieces they forgot."],["Expected","The strips along the two edges."]],
+   watch:["Students who count the corner quarter as a half. It is the overlap of two halves, so it is a quarter. Have them lay two half-strips across each other and look at what the intersection actually measures."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · partitioned rectangle",
+   moves:["Draw the rectangle and label the four regions: 2×3, 2×1/2, 1/2×3, 1/2×1/2.","Compute each region and total them.","Draw the same problem as a single improper-fraction rectangle: 5/2 by 7/2.","Confirm both routes give 35/4."],
+   say:[["Teacher","Four regions, four products. Label each one before you calculate any of them."],["Teacher","Now redraw it as fifths — sorry, as halves. Two and a half is how many halves?"],["Expected","Five halves."],["Teacher","And three and a half?"],["Expected","Seven halves."],["Teacher","Five halves by seven halves is thirty-five quarters. Same rectangle, counted in smaller pieces."]],
+   readaloud:["Say the picture aloud: 'A rectangle is divided into four regions by one vertical and one horizontal line. The large upper-left region is two by three. To its right is a narrow region two by one half. Below it is a region one half by three. The small square in the lower-right corner is one half by one half.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · conversion",
+   moves:["Convert both mixed numbers to improper fractions, multiply, convert back.","Estimate first by rounding each factor to the nearest whole, then compare.","Work 1 2/3 × 2 1/4 and 3 1/2 × 1 3/5.","Return to the warm-up and name the error precisely."],
+   say:[["Teacher","Estimate before you convert, every time. Two and a half rounds to three, three and a half rounds to four, so expect something near twelve — and eight and three quarters is in the right neighbourhood."],["Teacher","Now say exactly why multiplying the wholes and the fractions separately fails."],["Expected","It leaves out the two edge rectangles."],["Teacher","Right. Addition can be split like that. Multiplication cannot, unless you keep every region."]],
+   watch:["Students who convert only one factor and multiply a mixed number by an improper fraction. It produces a number that looks plausible. Requiring the estimate first catches it, which is the reason the estimate is not optional."]}
+ ],
+ guided:[["1 1/2 × 2 1/3","3/2 × 7/3 = 21/6 = 3 1/2"],["2 1/4 × 1 1/3","9/4 × 4/3 = 3"],["Estimate then calculate 4 1/5 × 2 3/4","Estimate 4 × 3 = 12; exact 21/5 × 11/4 = 231/20 = 11 11/20"],["Why is 2 1/2 × 3 1/2 not 6 1/4?","Because the two edge rectangles, worth 2 1/2 more, are left out."]],
+ worksheet:[
+  {t:"A · Convert and multiply",d:"Estimate first, then calculate. Write both.",items:["1 1/2 × 2 2/3","2 1/5 × 1 1/4","3 1/3 × 1 1/2","1 3/4 × 2 2/7","2 5/6 × 1 1/2","4 1/2 × 2 2/3"]},
+  {t:"B · Fraction of a mixed number",d:"Calculate each.",items:["1/2 of 3 1/4","2/3 of 4 1/2","3/4 of 2 2/3","2/5 of 3 3/4"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A garden bed is 2 1/2 m by 4 1/4 m. Find its area, and show your estimate beside your answer.","Explain, using the rectangle picture, why splitting a multiplication into wholes-times-wholes plus fractions-times-fractions does not work.","A recipe for 4 uses 1 1/2 cups of flour. You are cooking for 10. How much flour? Show how you scaled it."]}],
+ exit:["1 1/2 × 2 1/4","Estimate 3 2/3 × 2 1/5 before calculating.","Explain why the estimate is worth doing even when you are confident."],
+ crit:"Mastery: exact answer correct and estimate within one whole of it. Reteach if a student multiplies wholes and fractions separately — go back to the four-region rectangle, since the missing area is the only convincing argument.",
+ support:["Provide pre-drawn four-region rectangles with regions labelled but products blank.","Restrict the second factor to a whole number until the conversion is fluent.","Allow the distributive route throughout if converting to improper fractions is the sticking point."],
+ extend:["Show that the four-region method and the improper-fraction method are the same calculation, using algebra notation if the student is ready.","Find two mixed numbers whose product is exactly 6. How many pairs can you find?"],
+ access:["Touch: built rectangles on grid paper are countable by finger, and the corner quarter is physically distinguishable from a half.","Vision: label every region with its dimensions inside the region, never in a legend off to the side.","Memory: the estimate is required in writing on every problem today — it externalises the check rather than relying on a student remembering to do it.","Attention: four regions is the maximum tracked at once; problems needing more are held for the extension."]
+},
+{
+ day:9, short:"÷ unit fraction", title:"Dividing a whole number by a unit fraction",
+ objective:"Divide a whole number by a unit fraction by counting how many copies of the fraction fit, and explain why the quotient is larger than the dividend.",
+ standards:["6.NS.A.1","5.NF.B.7b"],
+ vocab:[["Measurement division","Asking how many groups of a given size fit inside an amount."],["Unit fraction","A fraction with numerator one."],["Quotient","The number of groups that fit."],["Reciprocal","The fraction turned upside down. It has a meaning, not just a procedure — today we build toward it."]],
+ materials:["Paper strips, several whole units per pair","Scissors","Rulers","A metre stick and a 25 cm ruler for the demonstration"],
+ warmup:{mins:5,text:"Hold up a metre stick and a 25 cm ruler. Ask how many of the small ones fit along the big one. Everyone answers four. Write 1 ÷ 1/4 = 4 on the board and say nothing else. Let students look at it. Some will object that division should make things smaller."},
+ stages:[
+  {k:"c",label:"Concrete",mins:13,sense:"touch · fitting",
+   moves:["Pairs take three whole strips and cut quarter-length pieces.","Count how many quarter-pieces cover the three strips: twelve.","Repeat with thirds: 2 ÷ 1/3 gives six.","Predict 4 ÷ 1/5 before cutting, then verify."],
+   say:[["Teacher","Three whole strips. How many quarter-pieces will it take to cover them? Predict, then cut."],["Expected","Twelve."],["Teacher","Say the division sentence for what you just did."],["Expected","Three divided by a quarter is twelve."],["Teacher","Now say why the answer got bigger, in your own words."],["Expected","Because the pieces are small, so lots of them fit."],["Teacher","That is the whole explanation. Division does not make things smaller. Division counts groups, and small groups come in large numbers."]],
+   watch:["Students who compute 3 ÷ 1/4 as 3/4, dividing by 4. Ask them to point at the answer on the strips — three quarters is less than one strip, and there are clearly twelve pieces on the table."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · tick marks",
+   moves:["Draw a bar of length 3 and tick it every quarter.","Count the intervals, not the ticks, and label them one to twelve.","Draw 2 ÷ 1/3 and 4 ÷ 1/5 the same way.","Record the pattern: whole ÷ 1/n gives whole × n."],
+   say:[["Teacher","Count the spaces between the ticks, not the ticks themselves. The spaces are the groups."],["Teacher","Look at the three results. What is happening to the whole number each time?"],["Expected","It's being multiplied by the bottom number."],["Teacher","So dividing by a fifth and multiplying by five give the same result. Do not write that as a rule yet — write it as a thing you noticed."]],
+   readaloud:["Say the picture aloud: 'A horizontal bar is marked with the whole numbers one, two and three. Between each pair of whole-number marks are three shorter ticks, dividing the bar into twelve equal intervals in total, each one quarter of a unit long.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · pattern",
+   moves:["Write the results as a table: 3 ÷ 1/4 = 12, 2 ÷ 1/3 = 6, 4 ÷ 1/5 = 20.","Write each alongside its multiplication twin: 3 × 4, 2 × 3, 4 × 5.","State the relationship in words before writing it in symbols.","Test the statement on a case not yet tried: 5 ÷ 1/2."],
+   say:[["Teacher","Write the multiplication that gives the same answer next to each division."],["Teacher","Now describe the pattern in a sentence a Year 5 student could follow."],["Expected","Dividing by one over something is the same as multiplying by that something."],["Teacher","Test it on five divided by a half without drawing. What do you predict?"],["Expected","Ten."],["Teacher","Check it on a strip. If a rule survives a test you tried to break, you can start trusting it."]],
+   watch:["Students who accept the multiply-by-the-denominator move but cannot say why. Ask for the strip picture every time for the rest of the unit; the moment the picture goes, the rule becomes fragile and reverses under pressure."]}
+ ],
+ guided:[["6 ÷ 1/2","12"],["4 ÷ 1/3","12"],["How many 1/8 m pieces of ribbon come from 3 m?","24"],["Predict 7 ÷ 1/10, then explain your prediction.","70 — seventy tenths fit in seven wholes."]],
+ worksheet:[
+  {t:"A · Divide",d:"Draw the bar for the first two, then use the pattern.",items:["2 ÷ 1/4","5 ÷ 1/3","3 ÷ 1/6","8 ÷ 1/2","6 ÷ 1/5","4 ÷ 1/10"]},
+  {t:"B · In context",d:"Write the division, then answer.",items:["A 4 m rope cut into 1/2 m pieces","A 3 kg bag split into 1/4 kg scoops","6 pizzas cut into eighths","A 5 hour shift split into 1/4 hour slots"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why 4 ÷ 1/5 is larger than 4, in a way that would convince someone who thinks division always shrinks.","A recipe uses 1/3 cup per batch. You have 5 cups. How many batches, and how much is left over? Be careful what the leftover means.","Write a real story problem whose answer is 6 ÷ 1/2. Then write a different story with the same numbers whose answer is 6 ÷ 2."]}],
+ exit:["3 ÷ 1/5","How many 1/4 m pieces are in 2 m?","Explain why dividing by a fraction less than one makes the answer bigger."],
+ crit:"Mastery: both correct and item 3 refers to counting small groups. Reteach if a student divides by the denominator rather than multiplying — return to the strips and count physical pieces, because the arithmetic is not the problem, the mental image is.",
+ support:["Keep pre-cut fraction pieces available so counting stays physical for the whole lesson.","Restrict to halves and quarters until the counting is secure.","Use a number line with the intervals pre-drawn and only the counting left to do."],
+ extend:["What is 1/4 ÷ 4? Draw it and explain why it is not 1. Then compare it with 4 ÷ 1/4.","Explain what 0 ÷ 1/5 means and why it is zero, using the fitting picture."],
+ access:["Touch: physically laying pieces along a strip makes the count tactile — a student can verify the answer without seeing or writing it.","Language: 'goes into' and 'how many fit' describe the same operation; use one consistently and name the other as an alternative rather than switching between them.","Attention: the count of intervals rather than ticks is a classic off-by-one trap; the labelled diagram removes it rather than testing it.","Motor: the metre stick demonstration is a whole-class version for students who cannot manipulate small pieces."]
+},
+{
+ day:10, short:"÷ fraction", title:"Dividing a fraction by a fraction",
+ objective:"Divide a fraction by a fraction using the measurement model, and derive the reciprocal method from the common-denominator picture.",
+ standards:["6.NS.A.1","6.NS.B.4"],
+ vocab:[["Reciprocal","The fraction inverted: the reciprocal of 3/4 is 4/3. A number times its reciprocal is one."],["Common denominator","Making both pieces the same size, which turns the division into a whole-number division."],["Leftover","A part of a group, expressed as a fraction of that group — not a remainder."],["Invert and multiply","The shortcut, stated only after the picture has been built."]],
+ materials:["Fraction strips","Blank bars, six per student","Rulers"],
+ warmup:{mins:5,text:"Write 3/4 ÷ 1/8. Ask students to say the question in ordinary English before doing anything else. Take answers until someone produces 'how many eighths fit in three quarters'. Write that sentence above the symbols and leave it there for the lesson."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · fitting again",
+   moves:["Lay a 3/4 strip and cover it with 1/8 pieces: six fit.","Try 1/2 ÷ 1/6: three fit.","Try 1/2 ÷ 3/4, where less than one group fits, and describe the leftover carefully.","Name the answer to the last one as two thirds of a group."],
+   say:[["Teacher","How many eighths cover three quarters?"],["Expected","Six."],["Teacher","Now a hard one. How many three-quarter pieces fit in a half?"],["Expected","Not even one."],["Teacher","So the answer is less than one. How much of a three-quarter piece did you actually use?"],["Expected","Two thirds of it."],["Teacher","Then the answer is two thirds. The unit of the answer is groups, and you can have part of a group."]],
+   watch:["Students who report the leftover as a fraction of the whole rather than of the group — saying 1/2 ÷ 3/4 is 1/2 because half the bar was used. Ask: half of what? The answer must be measured in groups, and naming the unit aloud fixes it."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · common pieces",
+   moves:["Draw 3/4 and 1/8 on identically-sized bars, then re-cut both to eighths.","Note that 6/8 ÷ 1/8 is now just 6 ÷ 1.","Repeat with 2/3 ÷ 1/4, re-cutting both to twelfths: 8/12 ÷ 3/12 becomes 8 ÷ 3.","Write the answer 8/3 as 2 2/3 and locate the two-thirds-of-a-group on the drawing."],
+   say:[["Teacher","Once the pieces are the same size, you can ignore the denominators entirely. Why?"],["Expected","Because you're just counting how many of the same thing fit into the other."],["Teacher","Eight twelfths divided by three twelfths is eight divided by three. The twelfths cancel out of the question."],["Teacher","Eight divided by three is two and two thirds. Find the two-thirds on the picture."],["Expected","It's the bit of the last group that got used."]],
+   readaloud:["Say the picture aloud: 'Two bars of equal length are stacked. The upper bar is divided into twelve parts with eight shaded. The lower bar is divided into twelve parts with three shaded. Along the shaded region of the upper bar, the three-part group fits twice completely and a third time only partly, using two of its three parts.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · derivation",
+   moves:["Write the common-denominator derivation in full: 2/3 ÷ 1/4 = 8/12 ÷ 3/12 = 8 ÷ 3 = 8/3.","Beside it, write 2/3 × 4/1 = 8/3 and ask what happened.","State invert-and-multiply as a shortcut for the derivation, not as a separate rule.","Practise: 3/5 ÷ 2/3, 5/6 ÷ 1/3, 3/4 ÷ 3/8."],
+   say:[["Teacher","Look at the two lines. The same answer came out. Where did the four come from in the second line?"],["Expected","It's the denominator of the thing we were dividing by, flipped up."],["Teacher","So inverting and multiplying is a compressed version of making the pieces match. It is not a new fact — it is the same fact written short."],["Teacher","You may use the shortcut. But if I ask why it works, the answer is the picture, and it must be available."]],
+   watch:["Students who invert the first fraction rather than the second. The measurement question fixes it: the divisor is the group size, and it is the group size you are counting copies of."]}
+ ],
+ guided:[["1/2 ÷ 1/6","3"],["2/3 ÷ 1/4","8/3 = 2 2/3"],["3/4 ÷ 3/8","2"],["1/2 ÷ 3/4","2/3 — less than one full group fits"]],
+ worksheet:[
+  {t:"A · Divide",d:"Draw the bar for the first two. Use the shortcut after that.",items:["3/4 ÷ 1/8","2/3 ÷ 1/6","5/6 ÷ 1/3","3/5 ÷ 2/5","7/8 ÷ 1/4","4/9 ÷ 2/3"]},
+  {t:"B · Mixed numbers too",d:"Convert first, then divide.",items:["2 1/2 ÷ 1/4","3 ÷ 2/3","1 1/2 ÷ 3/4","4 1/2 ÷ 1 1/2"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A 3/4 kg bag of rice is split into 1/8 kg portions. How many portions? Draw the fitting picture.","Explain why 1/2 ÷ 3/4 is less than one, and say what the answer is measuring.","Show that 2/3 ÷ 1/4 gives the same answer by the common-denominator method and by inverting. Which would you use, and when would you switch?"]}],
+ exit:["2/3 ÷ 1/3","3/4 ÷ 1/2","Explain in one sentence why inverting and multiplying works."],
+ crit:"Mastery: both correct and item 3 refers to matching piece sizes or counting groups. Reteach if the explanation is only 'because that's the rule' — the calculation may be reliable but the understanding will not survive Unit 3's rate problems.",
+ support:["Provide the common-denominator method exclusively; it is slower but it never becomes mysterious.","Restrict the divisor to unit fractions until fitting is fluent.","Keep pre-cut pieces available for physical checking on every problem."],
+ extend:["What happens when you divide a fraction by itself? Test three cases and explain the result.","Explain why a ÷ b and a × (1/b) are the same for any numbers, using the group-size argument."],
+ access:["Touch: physical fitting still answers every problem on this page — no student should be cut off from the concrete route today.","Vision: the leftover partial group is outlined with a distinct line style, not just a different colour.","Language: 'invert' is jargon; 'flip it over' is the plain version and both should be posted.","Memory: the English sentence from the warm-up stays on the board all lesson, so the meaning of the symbols is never more than a glance away."]
+},
+{
+ day:11, short:"Decimal place value", title:"Decimal place value to thousandths",
+ objective:"Read, write and represent decimals to thousandths, explaining each place as one tenth of the place to its left.",
+ standards:["6.NS.B.3","5.NBT.A.3","6.NS.B.4"],
+ vocab:[["Tenth","One of ten equal parts of a whole: 0.1."],["Hundredth","One of a hundred equal parts: 0.01."],["Thousandth","One of a thousand equal parts: 0.001."],["Decimal point","The marker showing where the whole numbers end. It separates; it does not divide."]],
+ materials:["Hundredths grids, several per student","Base-ten blocks if available, with the flat redefined as one whole","Place-value discs from Unit 1","Metre sticks marked in cm and mm"],
+ warmup:{mins:5,text:"Hold up a metre stick. Ask what one centimetre is as a fraction of a metre, then as a decimal. Then ask about one millimetre. Write 0.01 m and 0.001 m on the board. Ask: how many millimetres in a centimetre — and does that number look familiar from Unit 1?"},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · re-defining the whole",
+   moves:["Declare the base-ten flat to be one whole rather than one hundred.","Establish what the rod and the small cube are now worth: one tenth and one hundredth.","Build 1.34 with one flat, three rods and four cubes.","Use the metre stick to find a physical thousandth and confirm nothing on the table is small enough."],
+   say:[["Teacher","Today the flat is one. Not one hundred. One. So what is the rod worth?"],["Expected","A tenth."],["Teacher","And the little cube?"],["Expected","A hundredth."],["Teacher","Build one point three four."],["Teacher","Now find me a thousandth in this kit."],["Expected","There isn't one — you'd have to cut the little cube into ten."],["Teacher","Correct. The pattern keeps going even when the blocks run out. That is what the place-value system promises."]],
+   watch:["Students who cannot let go of the flat being one hundred. Make the redefinition explicit and written on the board; the difficulty is not conceptual weakness but a reasonable objection to changing the rules mid-year."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · area and columns",
+   moves:["Shade 0.4, then 0.40, on two hundredths grids and compare them.","Shade 0.04 and put it beside 0.4.","Extend the Unit 1 place-value chart rightwards past the decimal point.","Write 2.305 into the chart and read it aloud as 'two and three hundred five thousandths'."],
+   say:[["Teacher","Shade four tenths, then shade forty hundredths. What do you notice?"],["Expected","They're the same amount."],["Teacher","So 0.4 and 0.40 are equal. The extra zero renamed the pieces, exactly like folding a fraction strip."],["Teacher","Now 0.04. Is that the same?"],["Expected","No, it's much smaller — four little cells instead of four columns."],["Teacher","One zero, enormous consequence. Position is doing the work, same as Unit 1."]],
+   readaloud:["Say the picture aloud: 'Two identical squares each divided into a ten by ten grid. In the left square, four full columns are shaded, forty cells. In the right square, four single cells in the top row are shaded. The left shading is ten times the right.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · reading and writing",
+   moves:["Write decimals in expanded form: 2.305 = 2 + 0.3 + 0.005.","Write the same in fraction form: 2 + 3/10 + 5/1000.","Practise reading aloud with the place name at the end, using 'and' for the decimal point.","Write from dictation: four and sixteen hundredths, nine thousandths, twelve and five tenths."],
+   say:[["Teacher","In Unit 1 you were told never to say 'and' when reading whole numbers. Here is why. 'And' is the decimal point, and now it has a job."],["Teacher","Read 2.305 properly."],["Expected","Two and three hundred five thousandths."],["Teacher","Not 'two point three oh five'?"],["Expected","That's fine for talking, but it doesn't say what it's worth."],["Teacher","Exactly. One is a way of saying the digits. The other is a way of saying the number."]],
+   watch:["Students who write 'nine thousandths' as 0.9 or 0.09. Ask which column the last digit must land in, then count the columns out loud from the decimal point. The place name names the final column — that is the whole convention."]}
+ ],
+ guided:[["Write 0.7 as a fraction.","7/10"],["Which is larger, 0.06 or 0.6?","0.6 — ten times larger"],["Write four and twenty-three hundredths.","4.23"],["What is the value of the 5 in 3.152?","5 hundredths, or 0.05"]],
+ worksheet:[
+  {t:"A · Value of the digit",d:"Write the value of the underlined digit.",items:["3.<b>4</b>7","0.0<b>9</b>","12.5<b>0</b>6","<b>8</b>.234","5.6<b>3</b>1","0.<b>7</b>05"]},
+  {t:"B · Three forms",d:"Write each as a decimal, a fraction, and in words.",items:["0.6","0.25","1.08","0.004","2.35","0.750"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why 0.5 and 0.50 are equal but 0.5 and 0.05 are not. Use a grid picture.","Leo says 0.234 is bigger than 0.4 because it has more digits. Explain his mistake and give him a rule that actually works.","Write a decimal between 0.3 and 0.4. Then write one between your answer and 0.4. How long could you keep going?"]}],
+ exit:["Write the value of the 3 in 5.038.","Write 'six and four hundredths' as a decimal.","Explain why 0.7 is larger than 0.07."],
+ crit:"Mastery: all three correct with place-value language in item 3. Reteach if a student judges decimal size by digit count — this misconception is durable and will corrupt every comparison and every operation for the rest of the unit.",
+ support:["Keep the redefined base-ten blocks out all lesson, and re-state the flat-is-one rule at the start of every stage.","Restrict to hundredths before extending to thousandths.","Provide a pre-labelled decimal place-value chart rather than a blank one."],
+ extend:["How many thousandths are in 0.25? Justify without dividing.","Extend the chart to ten-thousandths and predict the pattern. Where does it stop?"],
+ access:["Touch: base-ten blocks give three physically distinct sizes; the thousandth's absence is itself informative and worth naming aloud.","Vision: grids are printed with a heavier line at the halfway point so quantity can be judged without counting every cell.","Language: reading decimals correctly is a language skill as much as a maths one — model it and give repeated speaking practice, not just written work.","Memory: the Unit 1 'and' rule is deliberately overturned today; say clearly that the rule is changing rather than letting students think they misremembered."]
+},
+{
+ day:12, short:"Compare & round", title:"Comparing, ordering and rounding decimals",
+ objective:"Compare and order decimals to thousandths, and round to a given place using a number line.",
+ standards:["6.NS.B.3","5.NBT.A.4","6.NS.B.4"],
+ vocab:[["Trailing zero","A zero at the right-hand end of a decimal. It changes the name, not the value."],["Round","To replace a number with the nearest value at a chosen place."],["Midpoint","The halfway value that decides which way a number rounds."],["Ascending","Smallest first."]],
+ materials:["Hundredths grids","Blank number lines","Digit cards 0–9","Rulers"],
+ warmup:{mins:5,text:"Post 0.5, 0.45, 0.405 and ask students to order them smallest to largest in thirty seconds, silently, on paper. Collect the different orderings by show of hands without saying which is right. The disagreement is the lesson's starting point."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · shading to compare",
+   moves:["Shade 0.5, 0.45 and 0.405 on three grids, using a tenth of a cell for the thousandths.","Lay the grids side by side and order them by visible area.","Rewrite each with the same number of decimal places and shade again.","Confirm the ordering matches."],
+   say:[["Teacher","Shade all three. When you have finished, put them in order by looking, not by thinking about the digits."],["Expected","0.405, then 0.45, then 0.5."],["Teacher","Now write all three with three decimal places. What do they become?"],["Expected","0.500, 0.450, 0.405."],["Teacher","Now the digits agree with the picture. Adding the zeros did not change any value — it just made them comparable, exactly like a common denominator."]],
+   watch:["Students who shade 0.405 as forty-five cells, dropping the zero. Ask them to say the number aloud using place names first; the reading forces the zero to be accounted for."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · number line",
+   moves:["Place 0.5, 0.45 and 0.405 on a line from 0.4 to 0.5.","Mark the midpoint of every rounding interval before deciding anything.","Round 3.47 to the nearest tenth, then 3.462 to the nearest hundredth.","Round 2.5 and 2.45 and discuss the midpoint convention explicitly."],
+   say:[["Teacher","Zoom the line in. From 0.4 to 0.5, split into ten. Where does 0.45 sit?"],["Expected","Right in the middle."],["Teacher","And when a number sits exactly at the midpoint, what do we do?"],["Expected","Round up."],["Teacher","That is a convention, not a mathematical fact. Someone decided it, and everyone agreed. Say so when you use it."]],
+   readaloud:["Say the picture aloud: 'A number line runs from three point four on the left to three point five on the right, with nine evenly spaced ticks between them marking the hundredths. A dashed line marks three point four five at the centre. The value three point four seven is marked between the dashed line and the right-hand end.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · comparison",
+   moves:["Compare left to right, one place at a time, and stop at the first difference.","Pad with trailing zeros to equalise the number of places.","Round to a stated place by identifying the place, then the digit to its right.","Order five decimals ascending and write the chain with inequality signs."],
+   say:[["Teacher","Compare from the left, and stop the moment two digits differ. Everything to the right of that is irrelevant."],["Teacher","Why the left and not the right?"],["Expected","Because the left digits are worth more."],["Teacher","And for rounding, you only ever look at one digit — the one immediately right of your target place. Not all of them."]],
+   watch:["Students who round 3.47 to the nearest tenth by first rounding to hundredths, getting 3.5 via 3.47 to 3.5 by way of 3.47 to 3.47. Chained rounding creates errors in other cases; require a single look at the deciding digit."]}
+ ],
+ guided:[["Order 0.3, 0.303, 0.33 ascending.","0.3 &lt; 0.303 &lt; 0.33"],["Round 4.68 to the nearest tenth.","4.7"],["Round 12.349 to the nearest hundredth.","12.35"],["Which is larger, 0.08 or 0.079?","0.08 — as 0.080 against 0.079"]],
+ worksheet:[
+  {t:"A · Compare",d:"Write &lt;, &gt; or =.",items:["0.6 __ 0.60","0.45 __ 0.5","2.03 __ 2.3","0.109 __ 0.11","1.250 __ 1.25","0.07 __ 0.070"]},
+  {t:"B · Round",d:"Round each to the place stated.",items:["3.472 to tenths","0.865 to hundredths","12.049 to tenths","7.995 to hundredths","0.5049 to thousandths","24.96 to units"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Order 0.7, 0.07, 0.707, 0.077 ascending and explain the strategy you used.","A number rounds to 4.6 when rounded to the nearest tenth. What is the smallest it could be, and the largest? Explain both boundaries.","Explain why adding a zero to the end of 0.4 changes nothing, but adding one to the front of the 4 changes everything."]}],
+ exit:["Which is larger, 0.35 or 0.4?","Round 6.284 to the nearest tenth.","Explain why 0.4 and 0.400 are equal."],
+ crit:"Mastery: all three correct, and item 3 explains that the extra zeros rename without resizing. Reteach if a student still uses digit count to judge size; this is the same misconception as day 11 and needs the grid picture again rather than a repeated rule.",
+ support:["Require padding with trailing zeros as a written first step on every comparison.","Provide pre-marked number lines with midpoints already drawn.","Restrict to two decimal places before extending to three."],
+ extend:["Find a decimal between 0.7 and 0.71. Then between your answer and 0.71. How many exist?","A number rounds to 5 at every place from units to thousandths. What could it be? How many answers are there?"],
+ access:["Vision: number lines carry the midpoint as a distinct dashed style so the deciding boundary is visible without colour.","Language: 'round up' and 'round down' describe direction on the line, not the size of the digit — make the line the reference so the phrases stay concrete.","Attention: the pad-with-zeros step is written every time; consistency removes the decision of whether to do it.","Memory: the midpoint convention is named as a human agreement, which makes it easier to recall as a choice rather than a fact to be derived."]
+},
+{
+ day:13, short:"+ and − decimals", title:"Adding and subtracting decimals",
+ objective:"Add and subtract decimals to thousandths by aligning place values, and justify the alignment with a grid model.",
+ standards:["6.NS.B.3","5.NBT.B.7"],
+ vocab:[["Align","To line up the decimal points so like places sit above like places."],["Regroup","To trade ten of one place for one of the next left, or the reverse."],["Sum","The total."],["Estimate","A rounded check made before calculating."]],
+ materials:["Hundredths grids, four per student","Base-ten blocks with the flat as one","Squared paper for column arithmetic"],
+ warmup:{mins:5,text:"Write 3.4 + 0.25 in column form, deliberately right-aligned as 3.4 over 0.25 with the 4 above the 5. Ask the class to check it before anyone calculates. Let someone object. Ask them to explain the objection using the words 'tenths' and 'hundredths'."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · combining like pieces",
+   moves:["Build 0.4 and 0.25 with blocks and combine them, sorting by piece type.","Trade ten hundredths for one tenth where needed: 0.45 + 0.37.","Model a subtraction requiring regrouping: 0.5 − 0.28.","Say each trade aloud in Unit 1 language."],
+   say:[["Teacher","Combine them. Sort as you go — rods with rods, cubes with cubes."],["Teacher","Why can't you put a rod and a cube in the same pile?"],["Expected","They're different sizes."],["Teacher","That is the entire reason for lining up decimal points. It is not about the dot. It is about only adding pieces of the same size."],["Teacher","Now 0.5 minus 0.28. What do you need to do first?"],["Expected","Trade a tenth for ten hundredths."]],
+   watch:["Students who add 3.4 + 0.25 as 3.65 by right-aligning. Hand them the blocks: they will physically be unable to combine four rods with five cubes into anything sensible, which is more convincing than the correction."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · grid overlay",
+   moves:["Shade 0.4 from the top of a grid and 0.25 from the bottom of the same grid.","Count the total shaded: 65 cells, or 0.65.","Draw a subtraction as unshading: 0.7 − 0.28.","Draw a sum crossing one whole: 0.8 + 0.45, using two grids."],
+   say:[["Teacher","Shade the first from the top and the second from the bottom. Do they overlap?"],["Expected","No, sixty-five cells altogether."],["Teacher","Now 0.8 plus 0.45. Watch the first grid fill."],["Expected","It fills up and spills into the second one."],["Teacher","That spill is a regroup. Ten tenths became one whole, exactly like ten place-value discs trading up."]],
+   readaloud:["Say the picture aloud: 'A ten by ten grid. Four full rows are shaded from the top, forty cells. Twenty-five cells are shaded from the bottom, filling two full rows and half of a third. Sixty-five of the hundred cells are shaded in total, and none are shaded twice.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · column form",
+   moves:["Set out columns with decimal points vertically aligned and pad with zeros.","Add and subtract with regrouping, including whole numbers written as 5.000.","Estimate first by rounding to the nearest whole or tenth.","Work a three-term sum: 2.5 + 0.75 + 1.125."],
+   say:[["Teacher","Pad with zeros so every column is occupied. An empty column is where errors go to hide."],["Teacher","Estimate before you calculate. Two and a half plus three quarters plus one and a bit — what should we expect?"],["Expected","Somewhere around four and a half."],["Teacher","So if you get 4.375, you are in the right place. If you get 43.75, the estimate has just saved you."]],
+   watch:["Students who write a whole number without a decimal point and then misalign it. Require 5 to be written as 5.000 in every column calculation this week; the habit costs nothing and prevents the most common error."]}
+ ],
+ guided:[["0.4 + 0.25","0.65"],["3.6 − 1.45","2.15"],["5 − 2.38","2.62"],["1.2 + 0.85 + 0.075","2.125"]],
+ worksheet:[
+  {t:"A · Add",d:"Set out in columns. Estimate first.",items:["4.7 + 2.35","0.86 + 1.9","12.05 + 3.478","6 + 0.75","0.9 + 0.99","23.4 + 1.06"]},
+  {t:"B · Subtract",d:"Set out in columns. Estimate first.",items:["5.6 − 2.34","8 − 3.75","10.2 − 0.68","4.05 − 1.9","7.301 − 2.45","15 − 6.08"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A runner covers 3.7 km, then 2.45 km, then 1.8 km. How far in total, and how much short of 10 km?","Explain why 3.4 + 0.25 is not 3.65, using the words tenths and hundredths.","A shop charges 4.99 and you pay with a 20. Show two ways of finding the change, and say which you would use at the till."]}],
+ exit:["2.7 + 1.45","6 − 2.35","Explain why decimal points are lined up rather than the last digits."],
+ crit:"Mastery: both correct and item 3 mentions matching place values. Reteach if a student right-aligns — the blocks, not a restated rule, are what fix this, because the rule has demonstrably been heard already.",
+ support:["Provide squared paper with the decimal-point column pre-marked in every calculation.","Require padding with zeros as a checked step before any arithmetic.","Restrict to two decimal places until alignment is automatic."],
+ extend:["Find three decimals with one, two and three places that add to exactly 5.","Explain why 0.1 + 0.2 causes trouble for a calculator, if the student is curious enough to have noticed it."],
+ access:["Touch: sorting blocks by size before combining is the same action as aligning columns — name the connection explicitly so the physical routine transfers.","Vision: squared paper with a marked decimal column removes the visual tracking demand from the arithmetic.","Motor: pre-printed column frames let students who find writing effortful spend the effort on the calculation.","Attention: the estimate-first rule gives a built-in stopping point and check, which reduces the cost of a lapse mid-calculation."]
+},
+{
+ day:14, short:"× decimals", title:"Multiplying decimals",
+ objective:"Multiply decimals and explain the position of the decimal point using an area model rather than a digit-counting rule.",
+ standards:["6.NS.B.3","5.NBT.B.7","6.EE.A.2"],
+ vocab:[["Area model","A rectangle whose side lengths are the factors and whose area is the product."],["Partial product","One region of the area model."],["Decimal places","The count of digits after the point — and, on the grid, the number of times the cell was cut."],["Estimate","The rounded check that catches a misplaced point."]],
+ materials:["Hundredths grids","Grid paper","Coloured pencils","Calculators for the pattern investigation only"],
+ warmup:{mins:5,text:"Write 0.4 × 0.7. Ask for predictions and record them. Both 2.8 and 0.28 will appear, and possibly 0.028. Say: three answers, one is right, and by the end of the lesson you will be able to say which without a calculator and without a rule."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · shading two ways",
+   moves:["On a hundredths grid, shade 4 rows one way for 0.4.","Shade 7 columns the other way for 0.7.","Count the doubly-shaded cells: 28.","Name each cell's value: one hundredth. So the answer is 0.28."],
+   say:[["Teacher","Shade four rows across for four tenths. Now seven columns down for seven tenths."],["Teacher","How many cells got shaded twice?"],["Expected","Twenty-eight."],["Teacher","And what is one cell worth?"],["Expected","A hundredth."],["Teacher","So twenty-eight hundredths. Not two point eight. The cells tell you the place, and you can count them."]],
+   watch:["Students who shade the second factor within the first shaded region only. Same problem as day 7. The second shading must cross the whole square, or the denominator is lost."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · partial products",
+   moves:["Draw a rectangle 1.4 by 2.3 and split it into four regions at the whole-number boundaries.","Compute each partial product: 1×2, 1×0.3, 0.4×2, 0.4×0.3.","Total them: 3.22.","Estimate 1 × 2 and check the answer is in the right neighbourhood."],
+   say:[["Teacher","Four regions again — the same picture as the mixed numbers on day eight."],["Teacher","What is 0.4 times 0.3, from yesterday's grid?"],["Expected","0.12."],["Teacher","Add the four regions. And estimate first: one point four is about one, two point three is about two, so expect about three."],["Expected","3.22, which is about three."]],
+   readaloud:["Say the picture aloud: 'A rectangle is split by one vertical and one horizontal line into four regions. The largest, upper-left, is one by two. To its right is one by zero point three. Below is zero point four by two. The small corner region is zero point four by zero point three.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · place counting",
+   moves:["Multiply ignoring the points, then place the point using the total number of decimal places.","Justify the count against the grid: each factor's places cut the cell smaller.","Estimate first on every problem: 3.2 × 4.7 is about 3 × 5.","Test the rule on 0.5 × 0.2 and confront the trailing-zero case, 0.10."],
+   say:[["Teacher","Multiply as whole numbers, then count decimal places in the question and put that many in the answer."],["Teacher","Why does that work? Point at the grid."],["Expected","Each decimal place cuts the pieces into ten, so two places means hundredths."],["Teacher","Now try 0.5 times 0.2. What does the rule give?"],["Expected","0.10."],["Teacher","And is that wrong?"],["Expected","No, it's 0.1 — the zero just doesn't need to be there."],["Teacher","So the rule is right and the answer needs tidying. Those are two different things."]],
+   watch:["Students who count decimal places in the answer of the whole-number multiplication rather than in the original factors. The estimate catches it every time, which is why it is required in writing."]}
+ ],
+ guided:[["0.3 × 0.6","0.18"],["1.2 × 0.4","0.48"],["2.5 × 1.4","3.5"],["0.5 × 0.2","0.10 = 0.1"]],
+ worksheet:[
+  {t:"A · Multiply",d:"Estimate first, then calculate. Write both.",items:["0.6 × 0.4","1.5 × 0.8","2.3 × 1.2","0.25 × 0.4","4.6 × 0.5","3.05 × 1.2"]},
+  {t:"B · Powers of ten",d:"Use the shift pattern from Unit 1.",items:["3.4 × 10","0.85 × 100","2.06 × 1000","0.7 × 10","12.5 × 100","0.004 × 1000"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A room is 3.5 m by 4.2 m. Find its area and show your estimate beside the answer.","Explain why 0.4 × 0.7 is smaller than both factors, using the grid picture.","Petrol costs 1.65 per litre. Estimate the cost of 38 litres, then calculate it. How close was your estimate, and would it have been good enough at the pump?"]}],
+ exit:["0.4 × 0.6","1.5 × 2.4","Explain why multiplying two decimals under 1 gives an answer smaller than both."],
+ crit:"Mastery: both correct with the decimal point placed correctly, and item 3 refers to taking part of a part. Reteach if the point is misplaced by a factor of ten — require the written estimate on every problem, since that check catches this error without any new teaching.",
+ support:["Provide pre-gridded squares for the tenths-by-tenths cases.","Require the estimate in writing before the calculation on every problem.","Restrict to one decimal place per factor before mixing."],
+ extend:["Investigate what happens when a factor is greater than one. Does the product still shrink? State the condition precisely.","Predict the number of decimal places in 0.25 × 0.004 before calculating, then check."],
+ access:["Vision: two-directional hatching rather than two colours keeps the overlap readable in greyscale.","Touch: the shaded grid can be traced with a finger to count the overlap region row by row.","Memory: the day 7 area model returns unchanged; naming it as the same picture reduces this to one idea rather than two.","Attention: the estimate is a required written step, which gives a natural checkpoint partway through every problem."]
+},
+{
+ day:15, short:"× ÷ powers of 10", title:"Multiplying and dividing decimals by powers of ten",
+ objective:"Multiply and divide decimals by powers of ten by shifting digits, and explain why the digits move rather than the point.",
+ standards:["6.NS.B.3","5.NBT.A.2","6.EE.A.1"],
+ vocab:[["Power of ten","10, 100, 1000 — written as 10¹, 10², 10³."],["Shift","Digits move across the place-value chart; the point stays where it is."],["Exponent","The count of columns the digits move."],["Metric conversion","The practical use: m to cm, kg to g, L to mL."]],
+ materials:["Place-value charts extended past the decimal point","Digit cards","Metre sticks and measuring jugs","Unit 1 shift-machine reference if students kept it"],
+ warmup:{mins:5,text:"Write 2.34 × 10 and ask for the answer. Then ask which moved — the digits or the decimal point. Take a vote. Say that both descriptions give the right answer but only one of them is true, and today settles which."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · physical shifting",
+   moves:["Place digit cards for 2.34 on a chart with a fixed decimal point marked on the chart, not on the cards.","Multiply by ten by physically sliding every card one column left.","Multiply by 100 by sliding two columns; note the empty column needs a zero.","Divide by ten by sliding right, and watch a digit cross the point."],
+   say:[["Teacher","The decimal point is printed on the chart. It is not on a card. It cannot move."],["Teacher","Multiply by ten. Slide every card one column to the left."],["Expected","23.4."],["Teacher","So what actually happened?"],["Expected","The digits moved and the point stayed."],["Teacher","Right. Saying 'move the point' gives the same answer and describes the wrong thing. It also stops working the moment the columns are unlabelled."]],
+   watch:["Students who move only some digits, usually leaving the whole-number part fixed. Every digit moves the same distance; the number keeps its shape. Have them slide the whole row with one hand."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · chart movement",
+   moves:["Draw the chart and record 2.34 × 10, × 100, × 1000 as three rows.","Record ÷ 10, ÷ 100 as two more rows going the other way.","Mark the zeros that appear as placeholders in each case.","Connect to metric conversions: 2.34 m = 234 cm = 2340 mm."],
+   say:[["Teacher","Look down the multiply column. What is happening to the number of places after the point?"],["Expected","It's going down by one each time."],["Teacher","And the exponent?"],["Expected","Going up by one."],["Teacher","So the exponent counts columns. Same as Unit 1, and now it works to the right of the point as well."],["Teacher","Metres to centimetres — how many columns?"],["Expected","Two, because a hundred centimetres in a metre."]],
+   readaloud:["Say the picture aloud: 'A place-value chart with a fixed vertical line marking the decimal point. In the first row, the digits two, three and four sit in the units, tenths and hundredths columns. In each row below, the same three digits appear one column further left, with zeros filling the columns they vacated.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · exponent rule",
+   moves:["Write × 10ⁿ as a shift of n columns left, ÷ 10ⁿ as n columns right.","Practise conversions: 0.45 kg to g, 1250 mL to L, 3.6 km to m.","Estimate to check direction: does the answer get bigger or smaller?","Combine with day 14: 0.4 × 30 as 0.4 × 3 × 10."],
+   say:[["Teacher","Before you shift, say whether the answer should get bigger or smaller. Then check the direction you shifted."],["Teacher","Grams are smaller than kilograms, so a mass in grams has a larger number. Does 0.45 kg become 450 g or 0.0045 g?"],["Expected","450 g."],["Teacher","The size check caught it before the arithmetic even started. That is the check doing its job."]],
+   watch:["Students who shift the wrong way on division, giving 2.34 ÷ 10 as 23.4. The bigger-or-smaller question, asked before every problem, prevents this more reliably than any correction afterwards."]}
+ ],
+ guided:[["3.4 × 100","340"],["0.07 × 1000","70"],["56.2 ÷ 10","5.62"],["Convert 2.5 km to metres.","2500 m"]],
+ worksheet:[
+  {t:"A · Shift",d:"State whether the answer gets bigger or smaller first.",items:["4.6 × 10","0.35 × 100","12.7 ÷ 10","0.8 × 1000","250 ÷ 100","0.04 × 10"]},
+  {t:"B · Metric conversions",d:"Convert each, and say how many columns you shifted.",items:["3.2 m to cm","0.75 kg to g","4500 mL to L","65 cm to m","1.08 km to m","250 g to kg"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why saying 'move the decimal point' gives right answers but describes the wrong thing.","A recipe needs 0.35 kg of flour. Your scale reads in grams. What should it show? Show your reasoning.","Why does multiplying by 1000 add three zeros to a whole number, but not to 2.34? Explain what is actually happening in both cases."]}],
+ exit:["0.6 × 100","4.5 ÷ 10","Explain what actually moves when you multiply by ten."],
+ crit:"Mastery: both correct and item 3 says the digits move, not the point. Reteach if the direction is reversed on division — require the bigger-or-smaller sentence in writing before each answer, which fixes it without new content.",
+ support:["Provide a fixed-point chart with digit cards for physical shifting throughout the lesson.","Restrict to multiplying by ten and one hundred before extending to thousands and to division.","Give a conversion reference table so the column count is the only thing being worked out."],
+ extend:["What is 2.34 × 10⁵? Predict the number of digits before calculating.","Explain why dividing by 100 and multiplying by 0.01 are the same move."],
+ access:["Touch: physically sliding cards along a chart with a fixed printed point makes the true motion unmistakable and repeatable.","Vision: the fixed decimal point is a heavy printed line on the chart rather than a small dot.","Language: 'shift' is used consistently rather than alternating with 'move' so the vocabulary stays stable across Units 1 and 2.","Memory: this is the Unit 1 shift machine extended rightwards — say so explicitly, since recognising it as familiar halves the load."]
+},
+{
+ day:16, short:"÷ by whole number", title:"Dividing decimals by whole numbers",
+ objective:"Divide a decimal by a whole number using sharing and long division, keeping the decimal point aligned in the quotient.",
+ standards:["6.NS.B.2","6.NS.B.3","5.NBT.B.7"],
+ vocab:[["Dividend","The amount being shared."],["Divisor","The number of shares."],["Quotient","The size of each share."],["Trailing zero","A zero added to the dividend so the division can continue past the last digit."]],
+ materials:["Base-ten blocks with the flat as one","Hundredths grids","Squared paper"],
+ warmup:{mins:5,text:"Write 7.2 ÷ 4 and ask for an estimate only. Someone will say 'about 2' and someone 'about 1.8'. Ask how they got each. Do not calculate. Say: the estimate is the safety net for the decimal point, and you will need it in a moment."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · sharing with trading",
+   moves:["Build 7.2 with seven flats and two rods and share among four.","Discover that seven flats do not share evenly: one flat is left over.","Trade the leftover flat for ten rods, giving twelve rods to share.","Each share is one flat and three rods: 1.8."],
+   say:[["Teacher","Seven wholes shared four ways. How many whole ones each?"],["Expected","One each, with three left over."],["Teacher","Trade those three for tenths. How many tenths do you now have altogether?"],["Expected","Thirty plus the two we started with — thirty-two."],["Teacher","Thirty-two tenths shared four ways?"],["Expected","Eight tenths each."],["Teacher","One and eight tenths. And the estimate said about two, so we are in the right place."]],
+   watch:["Students who leave a remainder as a whole-number remainder instead of trading down. Ask what the remainder is made of — it can always be traded into smaller pieces, which is what the decimal system exists to allow."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · sharing a grid",
+   moves:["Draw 7.2 as seven full grids plus two columns of an eighth grid.","Circle four equal shares across the drawing.","Show the trade visually: one full grid becoming ten columns.","Repeat with 1.35 ÷ 5, where the whole-number part is zero from the start."],
+   say:[["Teacher","Circle four equal shares. You will need to break one of the wholes to do it."],["Teacher","Now 1.35 divided by 5. What is different?"],["Expected","There's only one whole, and it doesn't even share once."],["Teacher","So the answer starts with a zero in the units place. Write that zero — it is doing real work as a placeholder."]],
+   readaloud:["Say the picture aloud: 'Seven full squares are drawn in a row, followed by a partial square with two of its ten columns shaded. Below, the same amount is divided into four equal groups, each consisting of one full square and eight columns of another.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · long division",
+   moves:["Set out the bus-stop division with the decimal point in the quotient directly above the point in the dividend.","Divide place by place, carrying remainders rightwards.","Add trailing zeros to continue: 3 ÷ 8 becomes 3.000 ÷ 8.","Check every answer against an estimate."],
+   say:[["Teacher","The point in the answer goes directly above the point in the question. Write it before you divide anything."],["Teacher","Three divided by eight. There are no decimal places in three, so how do we continue?"],["Expected","Write it as 3.000."],["Teacher","And does that change the value?"],["Expected","No, trailing zeros don't."],["Teacher","So you can always keep dividing. That is the freedom decimals gave you that whole-number remainders did not."]],
+   watch:["Students who omit the placeholder zero in the quotient, writing 1.35 ÷ 5 as 2.7 instead of 0.27. The estimate catches this immediately, which is why it stays a required step."]}
+ ],
+ guided:[["7.2 ÷ 4","1.8"],["1.35 ÷ 5","0.27"],["9.6 ÷ 8","1.2"],["3 ÷ 8","0.375"]],
+ worksheet:[
+  {t:"A · Divide",d:"Estimate first, then calculate.",items:["8.4 ÷ 4","2.5 ÷ 5","14.7 ÷ 3","0.96 ÷ 6","5.25 ÷ 7","10.08 ÷ 8"]},
+  {t:"B · Keep going",d:"Add trailing zeros as needed. Give an exact answer.",items:["7 ÷ 4","9 ÷ 8","3 ÷ 5","21 ÷ 8"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Four friends split a 27.60 bill. How much each? Show your estimate first.","Explain why 1.35 ÷ 5 begins with a zero in the units place, and what that zero is doing.","A 4.5 m plank is cut into 6 equal pieces. How long is each? Would your answer be practical to measure with a normal ruler?"]}],
+ exit:["6.4 ÷ 4","2.7 ÷ 6","Explain why you can add zeros to the end of the dividend and keep dividing."],
+ crit:"Mastery: both correct with the point aligned, and item 3 explains that trailing zeros do not change the value. Reteach if the quotient's placeholder zero is dropped — the estimate step, done in writing, is the fix rather than more division practice.",
+ support:["Provide squared paper with the division frame and the decimal point column pre-marked.","Keep blocks available so trading stays physical.","Restrict divisors to 2, 4 and 5 before extending."],
+ extend:["Which divisors give a decimal that terminates, and which repeat? Investigate 1 ÷ n for n up to 12 and look for the pattern in the denominators.","Explain why dividing by 4 twice is the same as dividing by 16."],
+ access:["Touch: trading a flat for ten rods is the same physical move as Unit 1's disc trading, one place further right.","Vision: pre-marked division frames keep the column alignment visible without needing to be maintained by hand.","Motor: pre-printed frames reduce the writing demand so effort goes into the division decisions.","Attention: the estimate before and the check after give two fixed anchor points around a long procedure."]
+},
+{
+ day:17, short:"÷ by decimal", title:"Dividing by a decimal",
+ objective:"Divide by a decimal by shifting both numbers to make the divisor whole, and explain why shifting both leaves the answer unchanged.",
+ standards:["6.NS.B.3","6.NS.B.2","6.RP.A.3"],
+ vocab:[["Equivalent division","A division with the same answer but easier numbers: 4.8 ÷ 0.6 equals 48 ÷ 6."],["Scaling both","Multiplying dividend and divisor by the same power of ten."],["Divisor","The group size — the number you are counting copies of."],["Quotient","How many groups fit."]],
+ materials:["Metre sticks","Hundredths grids","Squared paper","String or ribbon cut to 4.8 m for the demonstration"],
+ warmup:{mins:5,text:"Write 4.8 ÷ 0.6 and 48 ÷ 6 side by side. Ask which is easier, then ask whether they have the same answer. Take a vote and record it. Say: if they do, one of these problems just became free."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · measuring out",
+   moves:["Measure a 4.8 m ribbon and cut 0.6 m pieces, counting: eight pieces.","Re-measure the same ribbon in centimetres: 480 cm cut into 60 cm pieces.","Confirm the count is still eight.","Try 1.2 ÷ 0.4 with a shorter ribbon and both units."],
+   say:[["Teacher","Cut the ribbon into sixty-centimetre pieces. How many did you get?"],["Expected","Eight."],["Teacher","Now measure everything in centimetres instead of metres. Did the number of pieces change?"],["Expected","No — same ribbon, same cuts."],["Teacher","So changing the unit changed both numbers by a hundred and changed the answer by nothing. The answer counts pieces, and the pieces did not move."]],
+   watch:["Students who scale only the divisor. Go back to the ribbon: if only the piece size changed and the ribbon did not, you would clearly get a different number of pieces. The physical version makes the asymmetry obvious."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · same picture, new labels",
+   moves:["Draw a bar of 4.8 marked into 0.6 segments and count them.","Relabel the same drawing as 48 marked into 6s and recount.","Note the drawing did not change, only the labels.","Draw 2.5 ÷ 0.05 and decide how many places to shift."],
+   say:[["Teacher","I am not redrawing anything. I am only rewriting the labels. How many segments?"],["Expected","Still eight."],["Teacher","2.5 divided by 0.05. How many places must you shift to make the divisor whole?"],["Expected","Two."],["Teacher","Then shift both. 250 divided by 5."],["Expected","Fifty."],["Teacher","And does fifty feel right? Small groups, so many of them. Yes."]],
+   readaloud:["Say the picture aloud: 'A single horizontal bar is divided into eight equal segments. Above the bar it is labelled four point eight, with each segment labelled zero point six. Below the same bar it is labelled forty-eight, with each segment labelled six.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · procedure",
+   moves:["Write the shift as a fraction: 4.8/0.6 × 10/10 = 48/6.","Count the divisor's decimal places to decide the shift; apply it to both.","Work 7.5 ÷ 0.25, 0.36 ÷ 0.4, 9 ÷ 0.03.","Size-check every answer against whether the divisor is under or over one."],
+   say:[["Teacher","Look at the divisor only. How many places does it need to become whole? Shift both that many."],["Teacher","Before you calculate 9 divided by 0.03 — bigger or smaller than nine?"],["Expected","Much bigger, the groups are tiny."],["Teacher","So if you get 0.3, you know instantly. The size check is not politeness, it is the error trap."]],
+   watch:["Students who shift by the dividend's decimal places rather than the divisor's. Only the divisor needs to become whole; that is the entire purpose of the move, so it is the divisor that sets the count."]}
+ ],
+ guided:[["4.8 ÷ 0.6","8"],["7.5 ÷ 0.25","30"],["0.36 ÷ 0.4","0.9"],["9 ÷ 0.03","300"]],
+ worksheet:[
+  {t:"A · Divide",d:"State bigger or smaller first, then calculate.",items:["6.4 ÷ 0.8","2.4 ÷ 0.6","0.45 ÷ 0.9","12 ÷ 0.4","3.6 ÷ 0.12","0.8 ÷ 0.05"]},
+  {t:"B · Equivalent divisions",d:"Rewrite each as a whole-number division, then answer.",items:["5.6 ÷ 0.7","1.44 ÷ 1.2","8 ÷ 0.16","0.9 ÷ 0.15"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Ribbon costs 0.25 per metre. How much can you buy for 9? Show the division and the size check.","Explain why multiplying both numbers by ten does not change the answer to a division.","Without calculating, decide which is larger: 8 ÷ 0.5 or 8 ÷ 2. Explain how you knew."]}],
+ exit:["3.6 ÷ 0.4","0.75 ÷ 0.25","Explain why shifting both numbers leaves the answer unchanged."],
+ crit:"Mastery: both correct and item 3 refers to the answer counting groups, which the shift does not change. Reteach if only one number is shifted — the ribbon demonstration is the fix, since the physical count is undeniable.",
+ support:["Require the equivalent whole-number division to be written out before any calculation.","Restrict to divisors with one decimal place before extending.","Provide the size-check sentence as a printed prompt on the worksheet."],
+ extend:["Explain why 4.8 ÷ 0.6 and 48 ÷ 6 and 480 ÷ 60 all give eight. How far can the chain go?","When is dividing by a decimal the same as multiplying by a whole number? Give the condition and two examples."],
+ access:["Touch: cutting a real ribbon in two different units is the whole argument in physical form, and it is memorable.","Vision: the relabelled-bar diagram uses one drawing with two label rows, so the point is that nothing visual changed.","Language: 'equivalent division' is introduced with the plain version, 'the same question in different units', beside it.","Attention: the bigger-or-smaller sentence gives a quick early success on each problem before the longer calculation begins."]
+},
+{
+ day:18, short:"Fractions ↔ decimals", title:"Converting between fractions and decimals",
+ objective:"Convert fractions to decimals by division and decimals to fractions by place value, and recognise the common benchmark equivalents on sight.",
+ standards:["6.NS.B.3","6.NS.B.2","6.RP.A.3c"],
+ vocab:[["Terminating decimal","A decimal that ends: 0.75."],["Repeating decimal","A decimal that never ends but cycles: 0.333…"],["Benchmark equivalent","A pair worth knowing instantly: 1/2 = 0.5, 1/4 = 0.25, 1/5 = 0.2."],["Denominator","The divisor, when a fraction is read as a division — as established on day 1."]],
+ materials:["Hundredths grids","Calculators, for the terminating-versus-repeating investigation only","Blank benchmark reference cards"],
+ warmup:{mins:5,text:"Post 3/5, 0.6, 60% and ask what these three have in common. Percentage has not been taught yet, and that is deliberate — note that the third one is Unit 4's business and set it aside. Focus on why the first two are the same number written two ways."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · shading both ways",
+   moves:["Shade 3/5 on a hundredths grid by finding what one fifth is in cells.","Read the shaded cells as a decimal: 60 cells is 0.60.","Shade 0.35 and write it as a fraction over 100, then simplify to 7/20.","Build a reference card for the benchmarks: halves, quarters, fifths, tenths."],
+   say:[["Teacher","Three fifths on a hundred-cell grid. How many cells is one fifth?"],["Expected","Twenty."],["Teacher","So three fifths is sixty cells, which is sixty hundredths, which is nought point six. The grid did the conversion."],["Teacher","Now the other direction. 0.35 is thirty-five cells. As a fraction?"],["Expected","35 over 100, which simplifies to 7 over 20."]],
+   watch:["Students who convert 3/5 to 0.35 by writing the digits in order. Ask what 0.35 is on the grid — thirty-five cells — and compare it with the sixty they just shaded. The pictures cannot both be right."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · number line placement",
+   moves:["Place 1/2, 1/4, 3/4, 1/5, 3/5 on a 0-to-1 line with the decimal labels beneath.","Add 1/3 and discover it does not land on a tidy tenth or hundredth.","Divide 1 ÷ 3 by hand far enough to see the repeat.","Mark 1/3 as approximately 0.333 and discuss what the dots mean."],
+   say:[["Teacher","Every fraction so far landed on a neat decimal. Try one third."],["Expected","It keeps going — 0.3333."],["Teacher","Does it ever stop?"],["Expected","No."],["Teacher","So one third is not 0.33. It is very close to 0.33, and those are different claims. Write the dots and mean them."]],
+   readaloud:["Say the picture aloud: 'A number line from zero to one. Marks appear at one quarter labelled nought point two five, at one third labelled nought point three three three continuing, at one half labelled nought point five, at three fifths labelled nought point six, and at three quarters labelled nought point seven five.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · division and place value",
+   moves:["Convert fraction to decimal by dividing numerator by denominator, as established on day 1.","Convert decimal to fraction by reading the place name and simplifying.","Investigate which denominators terminate, using a calculator, and look for a pattern in their factors.","Commit the benchmark set to memory with a short recall drill."],
+   say:[["Teacher","A fraction bar is a division sign. You have known that since day one, and it is the entire conversion method."],["Teacher","Try eighths, ninths, elevenths, twentieths. Which terminate?"],["Expected","Eighths and twentieths do; ninths and elevenths repeat."],["Teacher","Look at the factors of the denominators that terminated."],["Expected","They're only made of twos and fives."],["Teacher","And twos and fives are the factors of ten. That is not a coincidence."]],
+   watch:["Students who write 0.5 as 5/100. The place name is tenths, not hundredths — one digit means tenths. Reading the decimal aloud correctly, as taught on day 11, prevents this every time."]}
+ ],
+ guided:[["Convert 3/4 to a decimal.","0.75"],["Convert 0.45 to a fraction in simplest form.","9/20"],["Convert 5/8 to a decimal.","0.625"],["Convert 2/3 to a decimal.","0.666… — it repeats, so write the dots"]],
+ worksheet:[
+  {t:"A · Fraction to decimal",d:"Divide. State whether it terminates or repeats.",items:["1/4","3/5","7/8","2/9","11/20","5/6"]},
+  {t:"B · Decimal to fraction",d:"Give each in simplest form.",items:["0.8","0.25","0.06","1.5","0.375","0.44"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Order these from smallest to largest: 0.7, 3/5, 0.65, 2/3. Show how you made them comparable.","Explain why 1/3 is not exactly 0.33, and say what it is exactly.","Which denominators under 20 give terminating decimals? State the pattern you found and explain why it involves the factors of ten."]}],
+ exit:["Convert 3/8 to a decimal.","Convert 0.6 to a fraction in simplest form.","Explain why some fractions give decimals that never end."],
+ crit:"Mastery: both conversions correct and item 3 mentions the division not terminating. Reteach if a student writes the fraction's digits directly as a decimal — that means day 1's fraction-as-division has not held, and it is worth going back rather than patching here.",
+ support:["Provide the benchmark reference card and permit its use throughout.","Restrict to denominators that divide into 100 before introducing repeating decimals.","Allow the grid method for every conversion instead of long division."],
+ extend:["Convert 1/7 to a decimal and find the length of the repeating cycle. Try 1/11 and 1/13.","Explain why a fraction in simplest form terminates exactly when its denominator has only 2s and 5s as factors."],
+ access:["Vision: the hundredths grid gives a conversion route that needs no long division at all, which keeps the concept accessible when the procedure is not.","Memory: the benchmark card is a permanent aid, not a crutch to withdraw; these five equivalents are worth automating.","Language: 'terminating' and 'repeating' are new words for ideas students can already see — introduce the word after the observation, never before.","Attention: the calculator investigation is bounded to six denominators so the pattern surfaces before attention runs out."]
+},
+{
+ day:19, short:"Word problems", title:"Multi-step problems with fractions and decimals",
+ objective:"Solve multi-step word problems mixing fractions and decimals, choosing a representation and justifying the operation before calculating.",
+ standards:["6.NS.A.1","6.NS.B.3","6.RP.A.3","6.EE.A.2"],
+ vocab:[["Multi-step","A problem needing two or more operations, where the first answer feeds the second."],["Bar model","The diagram from Unit 1 that makes the structure visible before any arithmetic."],["Unit","One equal part of a bar. Find one unit first."],["Justify","To say why an operation is the right one, before doing it."]],
+ materials:["Blank bar-model paper","Highlighters for marking the question","Calculators, permitted only after the model is drawn"],
+ warmup:{mins:5,text:"Post: 'Maya spent 2/5 of her money on a book and 0.25 of it on lunch.' Ask only what you would need to know to find how much she has left, and whether the two fractions can be compared as written. Do not solve. Collect the observation that one is a fraction and one a decimal, and that they must be made comparable first."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · building the structure",
+   moves:["Build Maya's money as a strip of twenty equal segments, chosen because twenty works for both fifths and quarters.","Remove 2/5 of the segments, then 0.25 of the original.","Count what remains and express it as a fraction and a decimal.","Rebuild with a stated total of 60 and find the actual amounts."],
+   say:[["Teacher","Why twenty segments and not ten?"],["Expected","Because a quarter of ten isn't a whole number of segments."],["Teacher","Good — you chose the unit to fit both fractions. That is a decision, and it is the hardest part of the problem."],["Teacher","Take away two fifths. How many segments is that?"],["Expected","Eight."],["Teacher","And a quarter?"],["Expected","Five."],["Teacher","Seven left out of twenty. Now put 60 on the whole strip and tell me what one segment is worth."]],
+   watch:["Students who take a quarter of what remains rather than a quarter of the original. Both readings are grammatically possible, which is why the model must be drawn before calculating. Ask them to point at what 'of it' refers to."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · bar model",
+   moves:["Draw the bar, mark both portions, brace the remainder.","Label one unit once the total is known.","Model a second problem where the fraction applies to a remainder, so the two readings can be compared side by side.","Model a rate-style problem: 2.5 kg at 3.60 per kg."],
+   say:[["Teacher","Draw the bar before you write a single number. The bar decides which operation you need."],["Teacher","Here is the same problem with 'a quarter of what was left'. Draw both and put them side by side."],["Expected","The second one takes a quarter of a smaller amount, so the answers differ."],["Teacher","One sentence, two meanings, two answers. The model is how you find out which you have."]],
+   readaloud:["Say the picture aloud: 'A single bar is divided into twenty equal segments. The first eight are shaded and labelled book. The next five are shaded differently and labelled lunch. A brace beneath the final seven segments is labelled with a question mark.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · calculation and check",
+   moves:["Write the calculation chain from the model, one line per step.","Convert between fraction and decimal wherever it simplifies the arithmetic.","Estimate the final answer before calculating it.","Re-read the original question and confirm the right quantity is being reported."],
+   say:[["Teacher","Every model line becomes one calculation line. If you cannot write the line, the model is not finished."],["Teacher","Last step, always: read the question again. What did it actually ask for?"],["Expected","How much she has left, not how much she spent."],["Teacher","The most common lost mark in this unit is a correct calculation answering a question nobody asked."]],
+   watch:["Students who calculate correctly and then report the intermediate value. Underlining the question before starting, and re-reading it at the end, catches this reliably — make both steps explicit requirements."]}
+ ],
+ guided:[["Maya has 60. She spends 2/5 on a book and 0.25 on lunch. How much is left?","One unit of 20 is 3; book 24, lunch 15, left 21"],["3.5 kg of apples at 2.40 per kg. Total cost?","8.40"],["A tank holds 4 1/2 L. It is 2/3 full. How many litres?","3 L"],["A 12.6 m rope is cut into 0.7 m pieces. How many pieces?","18"]],
+ worksheet:[
+  {t:"A · One step at a time",d:"Draw a model for each before calculating.",wide:true,
+   items:["A jug holds 2.4 L. You pour out 3/4 of it. How much is left?","A shop sells rice at 1.80 per kg. How much for 2 1/2 kg?","A journey is 24 km. You have travelled 5/8 of it. How far remains?","A recipe needs 0.75 L of stock. You are making 1 1/2 batches. How much stock?"]},
+  {t:"B · Two steps",d:"Show every step. Estimate before you calculate.",wide:true,
+   items:["Sam earns 45. He saves 1/3 and spends 0.4 of the total on a game. How much is left?","A 3.6 m plank is cut into 4 equal pieces, then one piece is cut in half. How long is each half?","A tank is 2/5 full and holds 18 L at that level. How much does it hold when full, and how much more is needed?"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain the difference between 'a quarter of the money' and 'a quarter of what was left', using one worked example.","Write a two-step problem of your own whose answer is 7.5, using one fraction and one decimal. Then solve it.","Why is it worth converting a fraction to a decimal, or the reverse, before calculating? Give an example where each direction is the better choice."]}],
+ exit:["A 5 L container is 3/5 full. How many litres?","2.5 kg at 4.20 per kg. Total cost?","Explain why drawing the model before calculating is worth the time."],
+ crit:"Mastery: both correct and item 3 refers to the model showing the structure or operation. Reteach if a student calculates correctly but reports the wrong quantity — that is a reading habit rather than a mathematical gap, and the underline-and-re-read routine is the intervention.",
+ support:["Provide pre-drawn bar frames with segments already marked.","Reduce to single-step problems and build up.","Permit the calculator for all arithmetic so the effort goes into the modelling decision."],
+ extend:["Write a problem where converting the decimal to a fraction is clearly the better route, and one where the reverse is true. Explain both choices.","A problem gives the remainder rather than the total. Draw the model and explain what changes about the solving order."],
+ access:["Vision: bar models are labelled inside each segment, and the brace for the unknown uses a distinct line style rather than colour.","Language: word problems carry the heaviest reading load in the unit; read every problem aloud before independent work and keep vocabulary consistent across items.","Attention: the underline-the-question routine gives a fixed first action, which reduces the cost of a slow start.","Motor: calculators are permitted after the model is drawn so writing effort is spent on the structure, not the arithmetic."]
+},
+{
+ day:20, short:"Review", title:"Review stations and unit assessment",
+ objective:"Consolidate fraction and decimal operations across all seven tools, and self-identify which topics need more work before the unit assessment.",
+ standards:["6.NS.A.1","6.NS.B.2","6.NS.B.3","6.NS.B.4"],
+ vocab:[["Self-assessment","Judging your own accuracy honestly, which is a skill and is being assessed today."],["Station","A short focused task at one tool, then rotate."],["Benchmark","The equivalents worth knowing on sight, revisited from day 18."],["Justify","Say why, not just what — required at every station."]],
+ materials:["All manipulatives from the unit","Station cards, one per tool","Self-assessment grid, one per student","Assessment papers"],
+ warmup:{mins:5,text:"Ask students to write down, privately, the one topic from this unit they would least like to see on the test. Collect the slips anonymously and tally them on the board. Say: those are the stations to visit first, and the tally is data, not a confession."},
+ stages:[
+  {k:"c",label:"Concrete",mins:15,sense:"touch · rotation",
+   moves:["Six stations, one per topic: equivalence, adding and subtracting, multiplying, dividing by fractions, decimal operations, converting.","Each station holds the physical manipulative and three graded tasks.","Students choose their own starting station based on the warm-up tally.","Every station requires one written justification, not just answers."],
+   say:[["Teacher","You choose where to start. Choose the one that worries you, not the one you already know."],["Teacher","At every station you write one sentence explaining why your method works. Answers alone do not count as finished."],["Teacher","Twelve minutes per station. Rotate when I call it, whether you finished or not — the point is coverage, not completion."]],
+   watch:["Students who visit only the stations they find easy. The private warm-up slip is the accountability tool: ask them to show which station addresses what they wrote down."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · one picture per operation",
+   moves:["On a single page, draw one diagram for each of the four operations on fractions.","Add one grid diagram for each decimal operation.","Annotate each with the sentence that explains it.","Keep the page as the revision sheet for the assessment."],
+   say:[["Teacher","One page, six pictures, six sentences. This is your revision sheet, and it is better than any set of notes you could copy."],["Teacher","If you cannot draw the picture for an operation, that is the operation to go back to. The gap shows up as a blank space, which is useful information."]],
+   readaloud:["Say the page aloud: 'Six diagrams are arranged in two rows of three. The top row shows fraction bars for addition, an area square for multiplication, and a segmented bar for division. The bottom row shows hundredths grids for decimal addition, decimal multiplication, and fraction-to-decimal conversion.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · assessment",
+   moves:["Complete the written assessment covering all twenty days.","Self-mark the first section against a displayed answer key.","Record scores by topic on the self-assessment grid.","Identify the two weakest topics and write one specific next step for each."],
+   say:[["Teacher","Self-mark honestly. Marking your own work generously only costs you later, and I will see the same gaps in the next unit anyway."],["Teacher","Write one specific next step per weak topic. 'Practise fractions' is not a next step. 'Redraw the division bar for three problems' is."]],
+   watch:["Students whose self-assessment does not match their station work. The mismatch is worth a short private conversation — it usually signals either low confidence or an unnoticed gap, and the two need opposite responses."]}
+ ],
+ guided:[["3/4 + 2/5","23/20 = 1 3/20"],["2/3 ÷ 1/6","4"],["0.45 × 0.6","0.27"],["Convert 7/8 to a decimal.","0.875"]],
+ worksheet:[
+  {t:"A · Fraction operations",d:"Give each answer in simplest form.",items:["2/3 + 3/8","5/6 − 1/4","3/4 × 2/9","5/8 ÷ 1/4","1 1/2 × 2 1/3","3 1/4 − 1 2/3"]},
+  {t:"B · Decimal operations",d:"Estimate first, then calculate.",items:["4.7 + 2.85","8 − 3.46","0.6 × 0.45","7.2 ÷ 0.8","2.34 × 100","9.6 ÷ 4"]},
+  {t:"C · Convert and compare",d:"Show your working.",items:["3/8 as a decimal","0.35 as a fraction","Order: 0.7, 2/3, 0.68","Which is larger: 5/8 or 0.6?"]},
+  {t:"D · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why dividing by a fraction less than one gives a larger answer.","A 2.5 L bottle is 3/5 full. How much is in it, and how much more will it hold?","Choose the operation you found hardest this unit. Explain what it means using a picture, as if teaching someone who missed the lesson."]}],
+ exit:["Name the topic you are most confident with and give one reason.","Name the topic you want more practice on and give one specific next step.","Complete: a fraction bar means ___."],
+ crit:"Mastery: assessment sections A and B at 80 percent or better, with the self-assessment matching actual performance within one band. Reteach in small groups by topic rather than reteaching the whole unit; the self-assessment grid tells you exactly how to form those groups.",
+ support:["Reduce to four stations covering the four operations only.","Provide worked examples at each station as reference.","Allow the assessment to be taken across two sittings if sustained concentration is the barrier rather than the mathematics."],
+ extend:["Design a station task of your own for a topic in this unit, including the manipulative and the justification prompt.","Write a problem that requires three of the unit's operations in sequence, then solve it and write the answer key."],
+ access:["Motor: stations are arranged so each can be completed seated, with materials brought to the student rather than the reverse.","Attention: twelve-minute rotations with a clear signal give predictable structure for students who find open-ended sessions difficult.","Vision: every station card carries the same layout so the format never has to be re-learned at each stop.","Language: the self-assessment grid uses picture icons alongside topic names so it can be completed without heavy reading.","Hearing: the rotation signal is both visual and audible."]
+}
+];
+</script>
+<script src="curriculum-core.js"></script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit N — Title | Grade 6 CPA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="curriculum.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+    <h1>Unit N — Title</h1>
+    <p class="sub">Two or three sentences framing what this unit is really about — the idea underneath the topic list, not a restatement of it.</p>
+    <div class="facts">
+      <span><b>15</b> instructional days</span>
+      <span><b>3</b> weeks</span>
+      <span><b>55</b> minutes per lesson</span>
+      <span><b>6.RP</b> standards</span>
+    </div>
+  </div>
+  <div class="wrap"><nav class="daynav" id="daynav" aria-label="Lesson days"></nav></div>
+</header>
+
+<main class="wrap">
+  <div class="lesson">
+    <div id="content"></div>
+    <aside class="side" id="side"></aside>
+  </div>
+  <div class="pager">
+    <button id="prev">&larr; Previous lesson</button>
+    <button id="next">Next lesson &rarr;</button>
+  </div>
+</main>
+
+<!-- ============================================================
+     OPTIONAL: unit-specific manipulatives.
+     Only needed if this unit requires a tool the core doesn't have.
+     Must appear BEFORE curriculum-core.js.
+
+<script>
+window.__EXTRA_TOOLS__={
+  fractionDivide(host){
+    // host is the mount element. Build your tool into it.
+    // Reuse the shared classes: .tool, .ctl, .btn, .btn.go, .btn.amb,
+    // .stage-area, .out, .note, .picker
+    // Respect reduced motion. Give every SVG a descriptive aria-label
+    // that matches the lesson's "say the picture aloud" script.
+  }
+};
+window.__EXTRA_NAMES__={fractionDivide:"Fraction division"};
+</script>
+     ============================================================ -->
+
+<script>
+/* ---- Unit metadata -------------------------------------------------
+   tools: day number -> array of tool ids, or "all" for a picker.
+   Core tools: placeValue · rounding · shift · stepper · power · barModel · factors
+   A day with no entry simply renders no tool.                        */
+window.UNIT={
+  number:2,
+  minutes:55,
+  tools:{
+    1:["barModel"],
+    2:["barModel"]
+  }
+};
+
+/* ---- Lesson data ---------------------------------------------------
+   One object per instructional day. Every key below is required except
+   `watch` and `readaloud` inside a stage, which are optional.
+
+   Keep the CPA discipline: concrete stage must involve a physical object,
+   pictorial must be a drawing that holds the same relationships, abstract
+   comes last. Scripts are [speaker, line] pairs; use "Expected" for the
+   student response you're planning around.                            */
+window.LESSONS=[
+{
+ day:1, short:"Nav label", title:"Full lesson title",
+ objective:"One sentence, observable, starting with a verb.",
+ standards:["6.RP.A.1"],
+ vocab:[["Term","Student-facing definition, one line."]],
+ materials:["Physical manipulative for the concrete stage","Everything else needed"],
+ warmup:{mins:5,text:"What the teacher does in the first five minutes. Best warm-ups surface a misconception rather than rehearse a skill."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · manipulation",
+   moves:["What students physically do, step by step.","Three to five moves."],
+   say:[["Teacher","The line as you'd actually say it."],
+        ["Expected","The student response you're planning around."],
+        ["Teacher","How you build on it."]],
+   watch:["The specific misconception this stage surfaces, and what to do about it."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · spatial reasoning",
+   moves:["The drawing, built from the concrete stage."],
+   say:[["Teacher","..."]],
+   readaloud:["A spoken description of the diagram, for students who can't see it. Write it so it carries the same information as the drawing, not less."]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · notation",
+   moves:["Notation, algorithm, or formula — derived from the picture, never handed over."],
+   say:[["Teacher","..."]],
+   watch:["The error that shows up once the scaffold is gone."]}
+ ],
+ guided:[["Question","Answer"]],
+ worksheet:[
+  {t:"A · Section name",d:"Instruction line.",items:["short item","short item"]},
+  {t:"B · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Longer prompts set wide:true so they get a full-width line."]}
+ ],
+ exit:["Three items maximum.","The last one should ask for an explanation, not a calculation.","Keep it under four minutes."],
+ crit:"What counts as mastery, and the specific signal that triggers reteaching.",
+ support:["Scaffolds for students who are stuck — usually 'keep the manipulative available longer'."],
+ extend:["Genuine extension, not more of the same problems."],
+ access:["Sensory and access notes specific to THIS lesson's activities. Name the channel: touch, vision, hearing, language, attention, motor, memory."]
+}
+];
+</script>
+<script src="curriculum-core.js"></script>
+</body>
+</html>

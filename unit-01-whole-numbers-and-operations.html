@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit 1 — Whole Numbers &amp; Order of Operations | Grade 6 CPA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="curriculum.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+    <h1>Unit 1 — Whole Numbers &amp; Order of Operations</h1>
+    <p class="sub">Sixth grade opens by rebuilding place value as a system rather than a set of names, then uses that system to justify why order of operations exists at all. Every lesson runs concrete, then pictorial, then abstract.</p>
+    <div class="facts">
+      <span><b>10</b> instructional days</span>
+      <span><b>2</b> weeks</span>
+      <span><b>55</b> minutes per lesson</span>
+      <span><b>6.NS · 6.EE</b> standards</span>
+    </div>
+  </div>
+  <div class="wrap"><nav class="daynav" id="daynav" aria-label="Lesson days"></nav></div>
+</header>
+
+<main class="wrap">
+  <div class="lesson">
+    <div id="content"></div>
+    <aside class="side" id="side"></aside>
+  </div>
+  <div class="pager">
+    <button id="prev">&larr; Previous lesson</button>
+    <button id="next">Next lesson &rarr;</button>
+  </div>
+</main>
+
+<script>
+/* Unit metadata. `tools` maps each day to the manipulatives it mounts.
+   Available in the shared core: placeValue, rounding, shift, stepper,
+   power, barModel, factors. Use "all" for a review-station picker. */
+window.UNIT={
+  number:1,
+  minutes:55,
+  tools:{
+    1:["placeValue"], 2:["rounding"], 3:["shift"],   4:["shift"],
+    5:["stepper"],    6:["power"],    7:["barModel"],8:["barModel"],
+    9:["factors"],   10:"all"
+  }
+};
+
+window.LESSONS=
+[
+{
+ day:1, short:"Place value", title:"Place value to the billions",
+ objective:"Read, write and represent whole numbers to 999,999,999,999, explaining each digit's value as ten times the place to its right.",
+ standards:["6.NS.B.4","5.NBT.A.1","6.EE.A.1"],
+ vocab:[["Period","A group of three digits set off by a comma: ones, thousands, millions, billions."],["Standard form","The number written with digits: 4,203,000."],["Expanded form","The number written as a sum of place values."],["Digit value","What a digit is worth in its position, not its face value."]],
+ materials:["Place-value discs to 1,000,000 (or labelled counters)","Laminated place-value charts, one per pair","Dry-erase markers","Index cards with digits 0–9"],
+ warmup:{mins:5,text:"Write 7,070,700 on the board. Ask: the digit 7 appears three times. Are the three sevens worth the same? Take two answers, do not resolve it. Tell students the lesson will settle it."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · manipulation",
+   moves:["Pairs receive place-value discs and a chart.","Build 3,450,000 with the fewest possible discs.","Trade ten 100,000-discs for one 1,000,000-disc and say the trade out loud.","Rebuild the same number using only 100,000-discs; count how many are needed."],
+   say:[["Teacher","Build three million, four hundred fifty thousand using as few discs as you can. When you finish, count your discs."],["Teacher","Now build the same number using only hundred-thousand discs. How many did that take?"],["Expected","Thirty-four and a half — you can't, you'd need half a disc."],["Teacher","So thirty-four discs gets you 3,400,000 and you still owe 50,000. That leftover is exactly why we need a smaller place."]],
+   watch:["Students who build 3,450,000 with 3 million-discs and 45 hundred-thousand-discs have it right but haven't traded down to the fewest. Ask them to trade ten hundred-thousands for a million and watch what happens to the count."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · spatial reasoning",
+   moves:["Discs are set aside; students draw the same number on a blank place-value chart.","Label the three periods and draw the comma separators as physical dividers.","Shade each occupied place and write its value beneath.","Represent 7,070,700 on the chart and mark each 7."],
+   say:[["Teacher","Your chart is a map of the discs. Each column is a disc type. Draw one dot for each disc you had."],["Teacher","Now look at the three sevens in 7,070,700. Put each one in its column and write underneath what that column is worth."],["Expected","Seven million, seventy thousand, seven hundred."],["Teacher","Same face. Three different values. The position is doing the work, not the digit."]],
+   readaloud:["Describe the chart aloud for students who cannot see it: 'The chart has twelve columns in four groups of three. Reading right to left, the groups are ones, thousands, millions, billions. The digit seven sits in the millions column, the ten-thousands column, and the hundreds column.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · notation",
+   moves:["Move from the chart to expanded form written as a sum.","Introduce expanded form with multiplication: 7,000,000 = 7 × 1,000,000.","Practise reading numbers aloud by period, without saying 'and'.","Write three numbers from dictation."],
+   say:[["Teacher","Expanded form is just the chart written on one line: 7,000,000 + 70,000 + 700."],["Teacher","Each of those is a digit times its place. Write it the second way: 7 × 1,000,000 plus 7 × 10,000 plus 7 × 100."],["Teacher","When you read the number out loud, say the period name at each comma and never say the word 'and'. 'And' is reserved for decimals later this year."]],
+   watch:["A common error is writing 4,203,000 as 4,000,000 + 200,000 + 3,000 and omitting nothing — that one is correct. Watch instead for students who insert zeros as addends (+ 0 + 0), which suggests they are copying columns rather than reading value."]}
+ ],
+ guided:[["Write 6,048,300 in expanded form.","6,000,000 + 40,000 + 8,000 + 300"],["In 5,285,000, what is the value of the 2?","200,000"],["Write the number: four billion, sixty million, five hundred.","4,060,000,500"],["Which is worth more, the 8 in 8,400,000 or the 8 in 68,000,000? Explain.","Neither — both sit in the millions place and are worth 8,000,000. A deliberate trap: students who judge by overall number size will pick the second."]],
+ worksheet:[
+  {t:"A · Say what it's worth",d:"Write the value of the underlined digit. (Underline the bold digit when printing.)",items:["3,4<b>5</b>0,000","<b>9</b>,003,120","72,<b>6</b>00,000","1<b>4</b>0,500,000","<b>8</b>05,000,000,000","6,0<b>7</b>0,700"]},
+  {t:"B · Three forms",d:"Write each number in standard form, expanded form, and words.",items:["Twelve million, four hundred thousand","9,060,050","5 × 1,000,000 + 3 × 10,000 + 7","Four hundred six billion, two million"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,items:["Rafi says 4,000,000 and 40,000,000 are the same because both start with 4. Explain his mistake using place value.","A number has 6 in the millions place and 6 in the thousands place. The rest are zeros. How many times greater is the first 6 than the second? Show how you know.","Write the largest possible number using each of the digits 3, 0, 7, 1, 9, 5 exactly once. Then write the smallest. Explain your placement strategy."]}],
+ exit:["Write 8,204,000 in expanded form.","In 3,737,000, explain why the two 7s are not worth the same.","Read this number aloud to a partner: 60,405,000."],
+ crit:"Mastery: all three correct with place-value language in item 2. Reteach if a student names digits by face value rather than position.",
+ support:["Restrict to seven digits (millions) before extending to billions.","Keep the physical discs available during the abstract stage — do not remove the scaffold on day one.","Provide a pre-labelled chart rather than a blank one."],
+ extend:["Introduce trillions and ask students to predict the period name and column count.","Ask: how many hundred-thousand discs would you need to build one billion? Justify without a calculator."],
+ access:["Tactile: use textured or raised-edge discs so column identity is felt as well as seen.","Motor: pairs may assign one student as builder and one as recorder; both must state the trade aloud.","Language: post the four period names with a visual comma cue; multilingual learners often know the value but not the English period name."]
+},
+{
+ day:2, short:"Compare & round", title:"Comparing, ordering and rounding large numbers",
+ objective:"Compare and order whole numbers to the billions, and round to any given place, justifying the choice with a number line.",
+ standards:["6.NS.B.4","5.NBT.A.3","5.NBT.A.4"],
+ vocab:[["Round","Replace a number with the nearest value at a chosen place."],["Midpoint","The halfway value that decides the direction of rounding."],["Benchmark","A convenient nearby number used for comparison."],["Ascending / descending","Increasing / decreasing order."]],
+ materials:["Digit cards 0–9, one set per pair","Adding-machine tape or a length of string for a floor number line","Clothespins or sticky notes","Place-value charts from Day 1"],
+ warmup:{mins:5,text:"Post 4,908,000 and 4,890,000. Thumbs up for the larger. Expect a split. Ask a student who chose each to point to the exact digit that decided it."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · movement",
+   moves:["Stretch a number line across the room, labelled 4,800,000 at one end and 4,900,000 at the other.","Give six students a card with a number between the endpoints; they physically stand at their position.","The class directs each student left or right until agreement.","Mark the midpoint with a clothespin and ask each standing student which endpoint they are closer to."],
+   say:[["Teacher","Walk to where your number belongs. Your classmates can coach you, but they have to say why, not just point."],["Teacher","We're putting a clip at 4,850,000. If you're standing left of the clip, which end are you closer to?"],["Teacher","That's rounding. You just did it with your feet. The clip is the only thing you needed."]],
+   watch:["Students who cluster near the middle regardless of value are reading the leading digits only. Send them back to the place-value chart to compare digit by digit."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight",
+   moves:["Draw the same number line in notebooks with the midpoint marked.","Plot 4,908,000 and 4,890,000 and settle the warm-up.","Round 4,908,000 to the nearest hundred thousand, ten thousand and million on three separate lines.","Notice that the answer changes with the target place."],
+   say:[["Teacher","Draw the two endpoints and the midpoint before you plot anything. The midpoint is the whole decision."],["Teacher","Round the same number to a different place and you get a different answer. That's not a contradiction — you changed the question."],["Expected","4,908,000 rounds to 4,900,000 to the nearest hundred thousand, but 5,000,000 to the nearest million."]],
+   readaloud:["'The number line runs from four million eight hundred thousand on the left to four million nine hundred thousand on the right. The midpoint, four million eight hundred fifty thousand, sits in the centre. Our number is plotted just right of centre.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · procedure",
+   moves:["Formalise comparison: align by place, compare leftmost differing digit.","Formalise rounding: underline the target place, look at the digit to its right.","Order a set of five numbers ascending, then descending.","Address the edge case of a 9 in the target place (4,960,000 to the nearest hundred thousand)."],
+   say:[["Teacher","The rule is a shortcut for the number line. Underline the place you're rounding to, look one digit right, five or more rounds up."],["Teacher","What happens with 4,960,000 to the nearest hundred thousand? The 9 rolls over."],["Expected","5,000,000."],["Teacher","If you can't picture why, go back and draw the line. The rule should never outrun the picture."]],
+   watch:["The most persistent error is rounding digit-by-digit from the right (4,648 → 4,650 → 4,700 → 5,000). Insist on one look at one digit."]}
+ ],
+ guided:[["Compare: 3,408,000 ☐ 3,480,000","<"],["Round 27,451,900 to the nearest million.","27,000,000"],["Round 27,451,900 to the nearest hundred thousand.","27,500,000"],["Order ascending: 6,020,000 · 6,002,000 · 6,200,000 · 6,020,900","6,002,000 · 6,020,000 · 6,020,900 · 6,200,000"]],
+ worksheet:[
+  {t:"A · Compare",d:"Write >, < or =.",items:["8,040,000 ☐ 8,400,000","902,000,000 ☐ 920,000,000","5,600,000 ☐ 5,600,000","74,000,900 ☐ 74,009,000","1,000,000,000 ☐ 999,999,999","3,050,000 ☐ 3,049,999"]},
+  {t:"B · Round",d:"Round each number to the place named.",items:["6,483,200 — nearest hundred thousand","6,483,200 — nearest million","19,650,000 — nearest million","348,912,000 — nearest ten million","9,748,000 — nearest million","2,500,000 — nearest million"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,items:["A city reports its population as 3,000,000 rounded to the nearest million. What is the smallest population it could actually have? The largest?","Nadia rounded 4,648 to 5,000 by rounding to the nearest ten, then the nearest hundred, then the nearest thousand. Explain what she did wrong and give the correct answer.","Two numbers both round to 7,200,000 to the nearest hundred thousand, but one is larger than 7,200,000 and one is smaller. Give a possible pair."]}],
+ exit:["Round 8,362,000 to the nearest hundred thousand.","Order these ascending: 4,090,000 · 4,900,000 · 4,009,000.","Explain why 2,500,000 rounds to 3,000,000 and not 2,000,000."],
+ crit:"Mastery: 3/3, with item 3 referencing the midpoint rule. Reteach with the floor line if a student rounds in stages.",
+ support:["Provide pre-drawn number lines with endpoints and midpoint already labelled.","Limit to seven-digit numbers.","Colour-code the target place and the deciding digit."],
+ extend:["Give a rounded value and ask for the full range of possible originals, written as an inequality.","Ask when rounding a rounded number gives a different answer than rounding the original."],
+ access:["Movement: the floor number line gives kinaesthetic learners a full-body representation; keep it taped down for the rest of the unit.","Vision: use high-contrast cards and state each number aloud as it is placed.","Attention: the concrete stage is deliberately social and physical — it resets focus before the notation-heavy abstract stage."]
+},
+{
+ day:3, short:"× powers of 10", title:"Multiplying by 10, 100 and 1,000",
+ objective:"Multiply whole numbers by powers of ten and explain the shift in place value, using exponent notation for the powers.",
+ standards:["6.EE.A.1","5.NBT.A.2","6.NS.B.3"],
+ vocab:[["Power of ten","10, 100, 1,000 … written as 10¹, 10², 10³."],["Exponent","The number of times the base is used as a factor."],["Shift","Movement of every digit to a higher place."],["Base","The repeated factor — here, always 10."]],
+ materials:["Place-value discs","Place-value charts (sliding-strip version if available)","Card strips with digits to physically slide left","Calculators for verification only, last five minutes"],
+ warmup:{mins:5,text:"Ask students to compute 34 × 10 and then 34 × 100 mentally. Ask what they did. Most will say 'added a zero'. Write that phrase on the board and tell them the lesson will replace it with something true."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch",
+   moves:["Build 34 with 3 ten-discs and 4 one-discs.","Multiply by ten by trading each disc for the next disc up: tens become hundreds, ones become tens.","Read the result: 340. Note that no zero was 'added' — every disc changed identity.","Repeat for × 100 with two rounds of trading."],
+   say:[["Teacher","Multiply by ten means every disc gets promoted. Trade each one for the next size up."],["Teacher","Look at your discs. Did anyone add a zero disc? There's no such thing. The zero appears because the ones column emptied."],["Teacher","Say it the true way: multiplying by ten shifts every digit one place left."]],
+   watch:["Students who physically add a zero-disc have imported the shortcut. Remove zero-discs from the set entirely for this lesson."]},
+  {k:"p",label:"Pictorial",mins:13,sense:"sight",
+   moves:["Draw 34 on a place-value chart, then redraw it one column left.","Draw arrows showing each digit's movement.","Do the same for × 100 (two columns) and × 1,000 (three columns).","Tabulate: number of zeros in the multiplier = number of columns shifted."],
+   say:[["Teacher","Draw the arrow from each digit's old column to its new one. How many columns did it move?"],["Expected","One for ten, two for a hundred, three for a thousand."],["Teacher","So the zeros in the multiplier are counting the shift. They're instructions, not decorations."]],
+   readaloud:["'On the chart, the digit three moves from the tens column to the hundreds column, and the digit four moves from the ones column to the tens column. The ones column is now empty, so we write a zero to hold it.'"]},
+  {k:"a",label:"Abstract",mins:15,sense:"symbol · notation",
+   moves:["Introduce exponent notation: 10 = 10¹, 100 = 10², 1,000 = 10³.","Connect exponent to shift count directly.","Practise 46 × 10³, 520 × 10², 7 × 10⁶.","Extend to multiplying by multiples: 34 × 300 as 34 × 3 × 100."],
+   say:[["Teacher","The exponent tells you the shift. Ten to the third means shift three places."],["Teacher","For 34 × 300, split it: multiply by 3, then shift two places. Do the hard part first, then shift."],["Expected","34 × 3 = 102, then shift two → 10,200."]],
+   watch:["When splitting 34 × 300, some students shift first and then lose track of place. Insist the multiplication is done first, shift last."]}
+ ],
+ guided:[["58 × 10","580"],["58 × 10³","58,000"],["Write 1,000,000 using an exponent.","10⁶"],["24 × 400","9,600"],["Explain why 'add a zero' fails for 3.4 × 10 (preview).","3.4 becomes 34, not 3.40 — the digits shift, the zero doesn't append."]],
+ worksheet:[
+  {t:"A · Shift",d:"Multiply.",items:["72 × 10","72 × 100","72 × 1,000","906 × 10²","45 × 10⁴","8 × 10⁶"]},
+  {t:"B · Notation",d:"Rewrite each power of ten using an exponent, or expand the exponent.",items:["10,000","10⁵","1,000","100,000,000","10²","10⁷"]},
+  {t:"C · Multiples",d:"Multiply by splitting into a single-digit factor and a power of ten.",items:["36 × 200","48 × 3,000","125 × 40","7 × 6,000","230 × 500","19 × 700"]},
+  {t:"D · Reason it out",d:"Answer in a complete sentence.",wide:true,items:["Kofi says multiplying by 10 always adds a zero to the end. Give an example where his rule gives the right answer and explain why the rule still isn't a good one to learn.","A number multiplied by 10³ gives 47,000. What was the number? Explain how you reversed the shift.","Which is greater, 62 × 10⁴ or 620 × 10³? Justify without fully computing both."]}],
+ exit:["Compute 84 × 10³.","Write 100,000 as a power of ten.","Explain in one sentence what actually happens to the digits when you multiply by 100."],
+ crit:"Mastery: 3/3 with item 3 describing a shift, not an appended zero. The language matters — it is what makes decimals work in Unit 2.",
+ support:["Keep sliding place-value strips available so the shift stays physical.","Restrict to 10, 100 and 1,000 before introducing exponent notation."],
+ extend:["Ask students to generalise: n × 10ᵏ shifts how many places? Write the rule in words.","Explore 10⁰ and ask what shift it should produce, connecting to the identity."],
+ access:["Motor: sliding strips need less fine control than drawing arrows; offer both.","Vision: verbalise every shift as it happens — 'three moves from tens to hundreds'.","Memory: the exponent-equals-shift-count link is a single rule replacing three memorised cases, which lowers load for students with working-memory difficulty."]
+},
+{
+ day:4, short:"÷ powers of 10", title:"Dividing by 10, 100 and 1,000",
+ objective:"Divide whole numbers by powers of ten, describe the shift right, and interpret remainders in place-value terms.",
+ standards:["6.NS.B.2","5.NBT.A.2","6.EE.A.1"],
+ vocab:[["Quotient","The result of a division."],["Shift right","Movement of every digit to a lower place."],["Remainder","What is left when the division is not exact."],["Inverse","The operation that undoes another."]],
+ materials:["Place-value discs","Place-value charts","Yesterday's sliding strips","Whiteboards"],
+ warmup:{mins:5,text:"Post 45,000 × 100 = 4,500,000 from yesterday. Ask: what single operation would take 4,500,000 back to 45,000? Collect the word 'divide' and the number 100."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch",
+   moves:["Build 4,500 with discs.","Divide by 10 by trading each disc down one size.","Observe that the number of discs stays the same but each is worth a tenth as much.","Try 4,503 ÷ 10 and hit the obstacle: the 3 one-discs cannot trade down."],
+   say:[["Teacher","Dividing by ten demotes every disc. Trade down one size."],["Teacher","Now try 4,503. What happens to the three ones?"],["Expected","There's nothing smaller — they're stuck."],["Teacher","Hold that. Those three are your remainder. In Unit 2 we'll build a smaller disc and they won't be stuck any more."]],
+   watch:["Some students will 'remove a zero' rather than trade. As on Day 3, the discs make the shortcut impossible to perform."]},
+  {k:"p",label:"Pictorial",mins:13,sense:"sight",
+   moves:["Chart 4,500 and redraw it one column right for ÷ 10.","Draw arrows in the opposite direction from Day 3.","Place ÷ and × diagrams side by side and name them as inverses.","Chart 4,503 ÷ 10 and circle the digit that falls off the chart as the remainder."],
+   say:[["Teacher","Put yesterday's arrows next to today's. What do you notice?"],["Expected","They point opposite ways."],["Teacher","That's what inverse means. Same shift, opposite direction."]],
+   readaloud:["'The digits move right by one column. Four moves from thousands to hundreds, five from hundreds to tens. Any digit that falls off the right edge of the whole-number chart is the remainder.'"]},
+  {k:"a",label:"Abstract",mins:15,sense:"symbol",
+   moves:["Record divisions with exponent notation: 47,000 ÷ 10³.","Practise chained operations: 3,600 × 100 ÷ 1,000.","Express remainders as 'R 3' for now, flagging the fraction form as Unit 2 work.","Check by inverse: multiply the quotient back."],
+   say:[["Teacher","Every division you write, check it by multiplying back. If the shift undoes cleanly, you're right."],["Teacher","For 3,600 × 100 ÷ 1,000, count the net shift before you compute anything. Two left, three right, so one right overall."],["Expected","360."]],
+   watch:["Chained problems invite left-to-right computation with lost track of place. Encourage counting the net shift first — it is faster and self-checking."]}
+ ],
+ guided:[["6,300 ÷ 10","630"],["6,300 ÷ 10²","63"],["82,000 ÷ 1,000","82"],["4,507 ÷ 10","450 R 7"],["500 × 1,000 ÷ 100","5,000"]],
+ worksheet:[
+  {t:"A · Shift right",d:"Divide.",items:["9,400 ÷ 10","9,400 ÷ 100","760,000 ÷ 10³","54,000 ÷ 10⁴","8,000,000 ÷ 10⁵","3,200 ÷ 10²"]},
+  {t:"B · Remainders",d:"Divide and state the remainder.",items:["4,506 ÷ 10","23,458 ÷ 100","7,109 ÷ 10","65,432 ÷ 1,000","908 ÷ 100","12,345 ÷ 10²"]},
+  {t:"C · Chains",d:"Count the net shift first, then compute.",items:["45 × 100 ÷ 10","6,000 ÷ 100 × 10","82 × 10³ ÷ 10²","900 ÷ 10 × 1,000","7 × 10⁴ ÷ 10³","5,000 × 10 ÷ 10⁴"]},
+  {t:"D · Reason it out",d:"Answer in a complete sentence.",wide:true,items:["Explain why dividing by 100 and multiplying by 100 are inverse operations, using the word 'shift'.","A number divided by 10³ gives 46 with a remainder of 200. What was the number? Show your reasoning.","Priya says 8,000 ÷ 100 is 80 because she crossed off two zeros. Her answer is right. Explain why her method will fail on 8,050 ÷ 100."]}],
+ exit:["Compute 72,000 ÷ 10².","Compute 3,405 ÷ 10 and state the remainder.","Explain what inverse operations means using a multiplication and division of your own."],
+ crit:"Mastery: 3/3. Item 2 with a correctly identified remainder is the key indicator — it is the hinge into decimal division in Unit 2.",
+ support:["Stay with ÷ 10 and ÷ 100 only; add ÷ 1,000 once the shift is secure.","Provide the paired ×/÷ arrow diagram as a permanent reference card."],
+ extend:["Ask what 10³ ÷ 10³ should equal and what that implies about 10⁰.","Give a chained expression with an unknown power to solve for."],
+ access:["Continuity: this lesson deliberately mirrors Day 3 in structure, which supports learners who rely on predictable routine.","Vision: reuse yesterday's charts so only the arrow direction is new.","Language: 'shift right' is used consistently instead of alternating with 'take away zeros'."]
+},
+{
+ day:5, short:"Order of ops", title:"Order of operations with brackets",
+ objective:"Evaluate numerical expressions using the conventional order of operations, and explain why the convention is needed.",
+ standards:["6.EE.A.1","6.EE.A.2c","5.OA.A.1"],
+ vocab:[["Expression","A mathematical phrase with numbers and operations but no equals sign."],["Evaluate","Find the single value of an expression."],["Brackets","Grouping symbols that force an operation to happen first."],["Convention","An agreed rule, not a law of nature."]],
+ materials:["Two-colour counters","Index cards printed with an ambiguous expression","Whiteboards","Sticky notes for a class vote"],
+ warmup:{mins:6,text:"Post 4 + 3 × 2 with no further comment. Students write their answer on a whiteboard and hold it up simultaneously. The room will split between 14 and 10. Do not reveal the answer. Say: 'Two rooms of mathematicians got different answers from the same expression. That is a real problem, and today we fix it.'"},
+ stages:[
+  {k:"c",label:"Concrete",mins:13,sense:"touch · grouping",
+   moves:["Give the expression a context: 4 red counters, then 3 groups of 2 blue counters.","Students build the situation physically and count the total.","Now rebuild with a different story: 4 plus 3, taken twice.","Compare the two piles — the same expression, two different physical realities."],
+   say:[["Teacher","Build it as the story says: four counters, and then three groups of two."],["Expected","Ten."],["Teacher","Now build this story: I have four and three together, and I take that twice."],["Expected","Fourteen."],["Teacher","Both stories are legitimate. The expression as written doesn't say which. So mathematicians agreed on a default — and invented a symbol to override it when the default is wrong."]],
+   watch:["The point of this stage is not the answer but the ambiguity. Resist resolving it early; students who feel the ambiguity retain the convention far better."]},
+  {k:"p",label:"Pictorial",mins:13,sense:"sight",
+   moves:["Draw both interpretations as grouped diagrams.","Circle the group that is evaluated first in each.","Introduce brackets as the drawn circle written in symbols: (4 + 3) × 2.","Establish the order: brackets → multiply and divide, left to right → add and subtract, left to right."],
+   say:[["Teacher","The circle you drew around four-plus-three is exactly what a bracket is. It's a drawing that fits on one line."],["Teacher","Without a bracket, multiplication goes first. That's the default we agreed on."],["Teacher","Multiplication and division are equal partners — you do them left to right, not multiplication first. Same for addition and subtraction."]],
+   readaloud:["'The first diagram shows four single counters beside three separate groups of two. The second shows one group containing four and three counters, and that whole group drawn twice.'"]},
+  {k:"a",label:"Abstract",mins:15,sense:"symbol · procedure",
+   moves:["Evaluate expressions one step per line, rewriting the whole expression each time.","Model 20 − 3 × 4 + 6 with the full rewrite.","Model 48 ÷ (2 + 4) × 2, addressing the left-to-right partnership directly.","Establish the non-negotiable: one operation per line, no skipping."],
+   say:[["Teacher","One operation per line. Rewrite everything else untouched. This is how you find your own mistakes."],["Teacher","In 48 ÷ (2 + 4) × 2, after the bracket you have 48 ÷ 6 × 2. Left to right — divide first."],["Expected","48 ÷ 6 = 8, then 8 × 2 = 16."],["Teacher","If you had multiplied first you'd get 48 ÷ 12 = 4. Wrong. Equal partners means left to right."]],
+   watch:["The dominant error all week is doing multiplication before division regardless of position, usually from a memorised acronym. Address it explicitly and repeatedly."]}
+ ],
+ guided:[["4 + 3 × 2","10"],["(4 + 3) × 2","14"],["20 − 3 × 4 + 6","14"],["48 ÷ (2 + 4) × 2","16"],["36 ÷ 6 × 3","18 — not 2"]],
+ worksheet:[
+  {t:"A · Evaluate",d:"Show one operation per line.",items:["7 + 4 × 5","(7 + 4) × 5","30 − 12 ÷ 4","40 ÷ 5 × 2","9 × 3 − 6 × 2","100 − (25 + 15) ÷ 8"]},
+  {t:"B · Place the brackets",d:"Insert brackets to make each statement true.",items:["6 + 2 × 3 = 24","20 − 8 ÷ 2 = 6","5 × 4 + 6 = 50","18 ÷ 3 + 3 = 3","2 + 3 × 4 − 1 = 17","10 − 4 − 3 = 9"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,items:["Tomas evaluated 36 ÷ 6 × 3 as 2. Explain his error and give the correct value.","Write two different expressions using the numbers 5, 3 and 2 exactly once each that give different answers. Show both evaluations.","Why do you think mathematicians chose multiplication to go before addition, rather than the other way round? There is no single right answer — argue for one."]}],
+ exit:["Evaluate 8 + 6 ÷ 2.","Evaluate (8 + 6) ÷ 2.","Explain why brackets exist, in your own words."],
+ crit:"Mastery: 3/3. Item 3 should reference overriding the default order. A student who computes correctly but cannot explain the purpose of brackets is not yet secure.",
+ support:["Provide expressions with the first operation pre-underlined.","Limit to two operations before moving to three.","Give a printed order-of-operations reference strip taped to the desk."],
+ extend:["Introduce nested brackets: 4 × (3 + (8 − 6)).","Give a target value and a set of numbers; students construct an expression that reaches it."],
+ access:["Simultaneous whiteboard reveal in the warm-up protects students who answer slowly from being shaped by faster peers, and makes the split visible without singling anyone out.","Attention: one-operation-per-line rewriting reduces the working-memory load that causes most errors here.","Language: 'brackets' is used throughout with 'parentheses' noted once as a synonym students will meet in textbooks."]
+},
+{
+ day:6, short:"Exponents", title:"Exponents inside expressions",
+ objective:"Write and evaluate expressions containing whole-number exponents, placing exponents correctly in the order of operations.",
+ standards:["6.EE.A.1","6.EE.A.2c"],
+ vocab:[["Base","The factor being repeated."],["Exponent","How many times the base is used as a factor."],["Squared","Raised to the power of two."],["Cubed","Raised to the power of three."]],
+ materials:["Centimetre cubes or linking cubes, 40 per pair","Square grid paper","Whiteboards","Order-of-operations reference strips from Day 5"],
+ warmup:{mins:5,text:"Write 2 × 3 and 2³ side by side. Ask students to compute both. Expect several to give 6 for both. Say nothing yet — the cubes will settle it in four minutes."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · three-dimensional",
+   moves:["Pairs build a 2 × 2 square with cubes, then a 2 × 2 × 2 cube.","Count the cubes in each: 4 and 8.","Build 3 × 3 and 3 × 3 × 3; count 9 and 27.","Hold the cube up and say its name — 'three cubed' — while holding the physical cube."],
+   say:[["Teacher","Build a square with sides of three. How many cubes?"],["Expected","Nine."],["Teacher","Now build a solid cube with edges of three. How many?"],["Expected","Twenty-seven."],["Teacher","That's why we say 'squared' and 'cubed'. The words are describing the shape in your hands, not a random label."]],
+   watch:["Students who build a 3 × 3 × 3 frame rather than a solid will count 26. Ask them to fill the centre — the hidden cube is the point."]},
+  {k:"p",label:"Pictorial",mins:13,sense:"sight",
+   moves:["Draw the square and the cube on grid paper.","Annotate each with its exponent form and its expanded product.","Build a table: 2¹, 2², 2³, 2⁴ with drawings and values.","Return to the warm-up and resolve 2 × 3 = 6 against 2³ = 8."],
+   say:[["Teacher","Under each drawing write two things: the exponent form and the repeated multiplication it stands for."],["Teacher","2³ is not two times three. It's two times two times two. The three counts the twos."],["Teacher","Say it to your partner: the exponent counts the factors."]],
+   readaloud:["'The drawing shows a square divided into a three-by-three grid of nine small squares, and beside it a cube drawn in perspective, three units along each edge, containing twenty-seven small cubes.'"]},
+  {k:"a",label:"Abstract",mins:15,sense:"symbol · procedure",
+   moves:["Insert exponents into the order of operations, immediately after brackets.","Evaluate 3 + 2³, 5 × 2², (3 + 2)².","Extend Day 3's powers of ten: 10⁴ now reads as a repeated product, not just a shift.","Rewrite the full order: brackets → exponents → × ÷ left to right → + − left to right."],
+   say:[["Teacher","Exponents come straight after brackets. They're a compressed multiplication, so they resolve before the ordinary multiplication does."],["Teacher","Evaluate 5 × 2². Which happens first?"],["Expected","The exponent — 2² is 4, then 5 × 4 = 20."],["Teacher","If you multiplied first you'd get 10² = 100. Very different. Order is doing real work here."]],
+   watch:["5 × 2² evaluated as 10² is the signature error of this lesson. Show both results side by side rather than only correcting."]}
+ ],
+ guided:[["Evaluate 4²","16"],["Evaluate 2⁵","32"],["Evaluate 3 + 4²","19"],["Evaluate (3 + 4)²","49"],["Evaluate 2 × 3² − 5","13"]],
+ worksheet:[
+  {t:"A · Evaluate the power",d:"Find each value.",items:["6²","3⁴","10³","2⁶","5³","1⁹"]},
+  {t:"B · In expressions",d:"Show one operation per line.",items:["7 + 3²","(7 + 3)²","4 × 5² − 20","100 ÷ 5² + 6","2³ + 3² − 1","(6 − 2)³ ÷ 8"]},
+  {t:"C · Write it",d:"Rewrite each repeated product using an exponent, or expand the exponent.",items:["9 × 9 × 9","4⁵","2 × 2 × 2 × 2 × 2 × 2","10 × 10 × 10 × 10","7²","3 × 3 × 3 × 3"]},
+  {t:"D · Reason it out",d:"Answer in a complete sentence.",wide:true,items:["Mira says 3² and 3 × 2 are the same because both use a 3 and a 2. Explain why she is wrong, using the words base and exponent.","Which is larger, 2⁵ or 5²? Show both values and explain why swapping the base and exponent changes the result.","A cube has edges of 4 units. Write an expression for the number of unit cubes it contains, and evaluate it."]}],
+ exit:["Evaluate 5².","Evaluate 3 + 2⁴.","Explain the difference between 4³ and 4 × 3."],
+ crit:"Mastery: 3/3. Item 3 is the diagnostic — a student who cannot articulate the difference will carry the error into Unit 5 algebra.",
+ support:["Keep cubes available through the abstract stage.","Restrict to squares and cubes before introducing higher powers.","Add exponents to the printed reference strip in a distinct colour."],
+ extend:["Investigate which numbers under 100 are both a perfect square and a perfect cube.","Ask students to predict and then test whether aᵇ ever equals bᵃ for whole numbers other than 2 and 4."],
+ access:["Touch: the cube is one of the few places where a mathematical term is literally the shape in the student's hand — a strong anchor for tactile and kinaesthetic learners.","Vision: 3D drawings are hard for some students to interpret; the physical cube is the accessible alternative, not a warm-up for the drawing.","Language: 'squared' and 'cubed' are taught alongside 'to the power of' so students can move between textbook and spoken usage."]
+},
+{
+ day:7, short:"Bar models I", title:"Bar models for part–whole problems",
+ objective:"Represent and solve one- and two-step word problems with part–whole bar models, writing the equation from the drawing.",
+ standards:["6.EE.B.7","6.RP.A.3","4.OA.A.3"],
+ vocab:[["Part–whole model","A bar split into parts that together make the whole."],["Unit","One equal segment of a bar."],["Model","A drawing that preserves the relationships in a problem."],["Unknown","The quantity the problem asks for."]],
+ materials:["Strips of card in two lengths, or connecting cubes","Rulers","Grid paper for accurate bar drawing","Pre-printed blank bar templates for support"],
+ warmup:{mins:5,text:"Read aloud: 'A school has 840 students. 360 are in sixth grade. How many are not?' Ask students to solve it mentally, then ask a different question: 'What did you picture while you solved it?' Collect two or three descriptions. Most will describe something bar-like."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · proportion",
+   moves:["Pairs build the whole with a long card strip labelled 840.","They break or fold it into a piece for 360 and the remainder.","They physically compare the two pieces and estimate before calculating.","Repeat with a three-part problem: 840 total, 360 sixth grade, 250 seventh grade."],
+   say:[["Teacher","Your strip is the whole school. Fold it so one piece is the sixth grade. Roughly — don't measure yet."],["Teacher","Is the sixth grade more or less than half? How do you know before doing any arithmetic?"],["Expected","Less than half, because 360 is less than 420."],["Teacher","That estimate is the model doing its job. The arithmetic is just confirming what you already saw."]],
+   watch:["Students who fold the strip in half regardless of the numbers are drawing a picture rather than a model. Proportion carries meaning — insist the pieces look roughly right."]},
+  {k:"p",label:"Pictorial",mins:15,sense:"sight · spatial reasoning",
+   moves:["Draw the bar on grid paper with a brace above showing the whole.","Label known parts inside the bar and the unknown with a question mark.","Model the three-part problem with the unknown in the middle.","Establish the drawing protocol: bar first, labels second, equation last."],
+   say:[["Teacher","The brace above the bar shows the whole. The labels go inside. Never write the equation before the drawing is finished."],["Teacher","Where does the question mark go in this one?"],["Expected","On the last part, because we know the whole and two parts."],["Teacher","Now the equation writes itself. Read it off your drawing: 840 minus 360 minus 250."]],
+   readaloud:["'A single horizontal bar is divided into three sections, left to right. The first is labelled 360, the second 250, and the third carries a question mark. A brace above the whole bar is labelled 840.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol",
+   moves:["Write the equation directly from the model.","Solve and label the answer back onto the drawing.","Check by re-reading the model: do the parts sum to the whole?","Practise reversing: given a bar model, write the word problem it represents."],
+   say:[["Teacher","Put your answer back into the bar. If the parts don't add to the whole, your arithmetic is wrong and the model just told you."],["Teacher","Now the harder direction. I'll show a model and you write the story."],["Teacher","If you can go both ways, the model isn't a crutch — it's a language."]],
+   watch:["Students who solve correctly but leave the model unlabelled are treating it as a warm-up ritual. Require the answer to be written back into the drawing every time."]}
+ ],
+ guided:[["A library has 1,250 books. 480 are fiction. How many are non-fiction?","770"],["A theatre holds 900 seats. 340 are sold on Friday and 275 on Saturday. How many remain unsold across both nights combined?","285"],["Three classes raised 1,860 in total. Class A raised 620 and Class B raised 540. How much did Class C raise?","700"],["Draw a bar model showing a whole of 500 split into two parts, one of which is 180.","Part = 320"]],
+ worksheet:[
+  {t:"A · One step",d:"Draw a bar model, then write and solve the equation.",wide:true,items:["A stadium seats 24,000. On Saturday 17,450 tickets were sold. How many seats were empty?","A factory produced 8,600 items in two months. It produced 3,950 in the first month. How many in the second?","A charity collected 12,400 in donations. 7,860 came from online giving. How much came from other sources?"]},
+  {t:"B · Two steps",d:"Draw the model before calculating. Label your answer on the drawing.",wide:true,items:["A school has 1,480 students. 520 are in sixth grade and 495 are in seventh grade. The rest are in eighth. How many eighth graders are there?","A farmer harvested 9,200 kg of apples. She sold 3,450 kg at market and 2,800 kg to a shop. How much is left?","A cinema sold 640 tickets on Friday, 890 on Saturday and 415 on Sunday. If the weekend target was 2,000 tickets, by how much did it fall short?"]},
+  {t:"C · Reverse the model",d:"Write a word problem that this bar model could represent, then solve it.",wide:true,items:["A bar of total 750 divided into two parts: one labelled 290, one labelled with a question mark.","A bar of total 3,600 divided into three equal parts, one labelled with a question mark.","A bar with parts 1,200 and 850, whole labelled with a question mark."]}],
+ exit:["Draw a bar model for: a train carried 480 passengers, 195 got off at the first stop. How many remained?","Solve it.","Explain why you drew the bar the way you did rather than some other shape."],
+ crit:"Mastery: a proportionally reasonable drawing with the whole braced, correct arithmetic, and an answer written back into the model. Correct arithmetic with no model is not mastery in this unit.",
+ support:["Provide pre-drawn blank bars with the brace already in place.","Use the physical card strips through the pictorial stage.","Read problems aloud and highlight the sentence that names the whole."],
+ extend:["Give problems where the whole is unknown and both parts are given as multiples of a unit.","Ask students to write a problem that a given model cannot represent, and explain why."],
+ access:["Touch: card strips give students who struggle with drawing a way to hold the relationship; a partner can transcribe the model.","Vision: grid paper makes proportional lengths achievable without fine motor precision.","Language: bar models carry the structure of a word problem without relying on English reading fluency, which makes them particularly effective for multilingual learners — the drawing is the comprehension check."]
+},
+{
+ day:8, short:"Bar models II", title:"Comparison models and multi-step problems",
+ objective:"Use comparison bar models to solve problems involving difference and multiplicative relationships between two quantities.",
+ standards:["6.EE.B.7","6.RP.A.3","6.NS.B.4"],
+ vocab:[["Comparison model","Two bars drawn one above the other, aligned at the left."],["Difference","The extra length of the longer bar."],["Times as many","A multiplicative comparison shown by repeating a unit."],["Aligned","Starting both bars at the same left edge so the difference is visible."]],
+ materials:["Two colours of card strips or connecting cubes","Grid paper","Rulers","Day 7 models for reference"],
+ warmup:{mins:5,text:"Post: 'Ben has 3 times as many cards as Ana. Together they have 480.' Ask only: how many bars will your model need, and will they be the same length? Do not solve. Collect predictions."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · comparison",
+   moves:["Build Ana's cards as one cube-train of unknown length.","Build Ben's as three trains identical to Ana's, laid end to end.","Align both at the left edge and observe the difference physically.","Count total units: four. Divide 480 by 4 physically by dealing counters into four equal piles."],
+   say:[["Teacher","Ana is one train. Ben is three trains exactly the same as Ana's. Line them up at the left."],["Teacher","How many identical trains are on the table altogether?"],["Expected","Four."],["Teacher","So 480 is four units. Deal it into four equal piles and see what one unit is worth."],["Expected","120."]],
+   watch:["Students who build Ben's bar as one long strip lose the unit structure. The repeated identical trains are the whole method — insist on separate, equal segments."]},
+  {k:"p",label:"Pictorial",mins:15,sense:"sight · spatial reasoning",
+   moves:["Draw two bars, left-aligned, Ana one unit and Ben three.","Brace the total across both bars.","Mark one unit and label it once the value is found.","Draw a second problem where the difference, not the total, is given."],
+   say:[["Teacher","Left-align always. If the bars start in different places you can't see the difference, and the difference is usually what the problem is about."],["Teacher","This next one gives you the difference instead of the total. Ben has 3 times as many as Ana, and 240 more. How many units is the difference?"],["Expected","Two units."],["Teacher","Two units is 240, so one unit is 120. Same picture, different entry point."]],
+   readaloud:["'Two bars are drawn one above the other, both starting at the same left edge. The upper bar is one unit long and labelled Ana. The lower bar is three units long and labelled Ben. A brace to the right of Ana's bar spans the two extra units of Ben's bar and is labelled with the difference.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol",
+   moves:["Write the unit equation: 4 units = 480, so 1 unit = 120.","Answer the specific question asked — total, difference, or one quantity.","Re-read the question to check which quantity was requested.","Introduce shorthand notation: 1u = 120, Ben = 3u = 360."],
+   say:[["Teacher","Find one unit first, every time. Then read the question again and answer exactly what it asked."],["Teacher","The most common lost mark on this topic is a correct unit value with the wrong final quantity reported. Underline the question before you write your answer."]],
+   watch:["Students finding one unit correctly and then reporting 120 as the answer when the question asked for Ben's total. Build the re-read into the routine."]}
+ ],
+ guided:[["Ben has 3 times as many cards as Ana. Together 480. How many does Ben have?","1u = 120, Ben = 360"],["A rope is cut into two pieces. One is 4 times the other. The longer is 96 cm more. Find both.","1u = 32, pieces 32 cm and 128 cm"],["Sam saved 5 times as much as Ravi. Together 1,320. How much more did Sam save?","1u = 220, difference = 880"],["Two numbers differ by 150. The larger is 4 times the smaller. Find them.","50 and 200"]],
+ worksheet:[
+  {t:"A · Total given",d:"Draw a comparison model, find one unit, then answer the question asked.",wide:true,items:["A bakery sold 3 times as many muffins as scones. Together it sold 640. How many scones?","Two teams scored 1,050 points in total. Team A scored 4 times as many as Team B. How many did Team A score?","A tank holds 5 times as much as a bucket. Together they hold 1,800 ml. How much does the tank hold?"]},
+  {t:"B · Difference given",d:"Draw the model. The difference is the extra units.",wide:true,items:["Layla has 6 times as many stickers as Omar, and 350 more. How many does each have?","A car costs 8 times as much as a bicycle, and 7,000 more. Find both prices.","One warehouse holds 3 times as many crates as another, and 480 more. How many crates in total?"]},
+  {t:"C · Multi-step",d:"These need more than one model or an extra operation.",wide:true,items:["A shop had 2,400 items. It sold 3 times as many on Saturday as on Friday and had 400 left. How many did it sell on Friday?","Ana, Ben and Cara share 1,800. Ben gets twice Ana's share and Cara gets 3 times Ana's share. How much does each receive?","Two numbers have a sum of 900. The larger is 5 times the smaller. If the smaller is doubled, what is the new sum?"]}],
+ exit:["A number is 4 times another. Together they are 750. Draw the model.","Find both numbers.","Explain why the two bars must start at the same left edge."],
+ crit:"Mastery: correct unit-based model, correct one-unit value, and the specific quantity requested. Report-the-wrong-quantity errors are the main thing to track across the class.",
+ support:["Pre-draw the unit segments so students only assign values.","Stay with 'total given' problems until secure; difference problems are a genuine second step.","Provide a two-line checklist: find one unit, re-read the question."],
+ extend:["Introduce three-quantity comparisons where each relates to the smallest.","Give a model and ask for two different word problems it could represent — one asking for a total, one for a difference."],
+ access:["Touch: separate cube trains make the unit structure physical, which is more reliable than drawing for students with motor or visual-processing difficulty.","Vision: use two distinct colours with different textures or patterns rather than colour alone to distinguish the bars.","Executive function: the two-step checklist (one unit, then re-read) externalises the self-monitoring this topic demands."]
+},
+{
+ day:9, short:"Factors & multiples", title:"Factors, multiples, primes, GCF and LCM",
+ objective:"Find factors and multiples of whole numbers, identify primes, and determine the greatest common factor and least common multiple of two numbers.",
+ standards:["6.NS.B.4","4.OA.B.4"],
+ vocab:[["Factor","A whole number that divides another exactly."],["Multiple","The result of multiplying a number by a whole number."],["Prime","A number with exactly two factors: itself and 1."],["Composite","A number with more than two factors."],["GCF","Greatest common factor — the largest factor two numbers share."],["LCM","Least common multiple — the smallest multiple two numbers share."]],
+ materials:["Square tiles, 36 per pair","Hundred charts","Two colours of highlighter","Grid paper"],
+ warmup:{mins:5,text:"Give each pair 12 tiles. Ask them to arrange all 12 into a complete rectangle, then find every different rectangle possible. Two minutes. Collect the dimensions on the board."},
+ stages:[
+  {k:"c",label:"Concrete",mins:13,sense:"touch · arrangement",
+   moves:["Students build every rectangle for 12: 1×12, 2×6, 3×4.","Record the dimensions — these are the factor pairs.","Repeat with 13 tiles and discover only 1×13 works.","Repeat with 36 and count the pairs."],
+   say:[["Teacher","Every rectangle you can build gives you a factor pair. That's what a factor is — a side length that works."],["Teacher","Now try thirteen. What rectangles can you build?"],["Expected","Only one long line."],["Teacher","A number that can only make one rectangle is prime. Not a definition to memorise — it's what you just found with your hands."]],
+   watch:["Students counting 3×4 and 4×3 as different rectangles. Have them physically rotate one to see they are the same arrangement."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight",
+   moves:["Sketch the rectangle arrays for 12, 18 and 24 on grid paper.","List factors of two numbers side by side; circle the shared ones in one colour.","Highlight multiples of 4 and 6 on a hundred chart in two colours; overlaps are common multiples.","Identify the largest circled factor and the first overlap."],
+   say:[["Teacher","Highlight multiples of four in one colour and six in another. Where do the colours overlap?"],["Expected","12, 24, 36."],["Teacher","The first overlap is the least common multiple. You can see it — you don't need a procedure yet."],["Teacher","Same idea for factors. Circle the ones in both lists; the biggest circle is the GCF."]],
+   readaloud:["'On the hundred chart, multiples of four are shaded in the first colour and multiples of six in the second. Squares 12, 24, 36, 48 and so on carry both shadings. The first doubly shaded square is 12.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · procedure",
+   moves:["Introduce prime factorisation using factor trees.","Find GCF by taking common prime factors; LCM by taking all primes at highest power.","Compare with the listing method and discuss when each is faster.","Apply to a context: two bells ringing at different intervals."],
+   say:[["Teacher","Listing works fine for small numbers. For 48 and 72, listing every factor takes a while — the factor tree is faster."],["Teacher","48 is 2⁴ × 3. 72 is 2³ × 3². What do they share?"],["Expected","2³ and 3 — so 24."],["Teacher","And the LCM takes every prime at its highest power: 2⁴ × 3² = 144."]],
+   watch:["Students routinely swap GCF and LCM. Anchor it in size: the GCF is never larger than the smaller number; the LCM is never smaller than the larger one. That sanity check catches most errors."]}
+ ],
+ guided:[["List all factors of 24.","1, 2, 3, 4, 6, 8, 12, 24"],["Is 51 prime?","No — 3 × 17"],["Find the GCF of 18 and 30.","6"],["Find the LCM of 4 and 6.","12"],["Find the GCF and LCM of 12 and 18.","GCF 6, LCM 36"]],
+ worksheet:[
+  {t:"A · Factors and primes",d:"List all factors. Circle the primes.",items:["16","23","36","45","29","60"]},
+  {t:"B · GCF",d:"Find the greatest common factor.",items:["12 and 20","18 and 27","24 and 36","15 and 40","48 and 72","14 and 35"]},
+  {t:"C · LCM",d:"Find the least common multiple.",items:["4 and 10","6 and 8","5 and 12","9 and 15","10 and 25","8 and 12"]},
+  {t:"D · In context",d:"Decide whether the problem needs GCF or LCM before solving. Say which and why.",wide:true,items:["Two lighthouses flash every 12 seconds and every 18 seconds. They flash together now. When will they next flash together?","A florist has 24 roses and 36 tulips and wants identical bunches with no flowers left over. What is the greatest number of bunches?","Buses to town leave every 15 minutes and buses to the coast every 25 minutes. Both leave at 9:00 a.m. When do they next leave together?","A teacher has 45 pencils and 30 erasers to divide equally among students with none left over. What is the greatest number of students?"]}],
+ exit:["List all factors of 28.","Find the GCF of 16 and 24.","Find the LCM of 6 and 9."],
+ crit:"Mastery: 3/3. If a student gives an LCM smaller than the larger number, or a GCF larger than the smaller number, reteach with the size sanity check before reteaching the method.",
+ support:["Keep tiles available; building the rectangle is a reliable factor check.","Use the hundred chart for LCM rather than factor trees.","Provide a GCF/LCM decision card with the size check written on it."],
+ extend:["Investigate when GCF × LCM equals the product of the two numbers, and whether it always does.","Find three numbers with a GCF of 1 that are not all prime."],
+ access:["Touch: rectangle-building is the most concrete definition of a factor available and works for students who find list-making difficult.","Vision: the two-colour hundred chart requires distinguishable colours — use hatching in one colour as well for students with colour-vision deficiency.","Vocabulary: GCF and LCM are acronym-heavy; post both expanded in full with the size sanity check beside them all unit."]
+},
+{
+ day:10, short:"Review & test", title:"Unit review and assessment",
+ objective:"Consolidate and demonstrate mastery of place value, powers of ten, order of operations, bar-model problem solving, and factors and multiples.",
+ standards:["6.NS.B.4","6.EE.A.1","6.EE.A.2c","6.EE.B.7"],
+ vocab:[["Cumulative","Drawing on everything from the whole unit."],["Justify","Explain why an answer is correct, not just state it."],["Strategy","The method chosen, which may differ between students."],["Self-check","Verifying an answer by a second route."]],
+ materials:["Assessment copies, one per student","Manipulatives available but not required","Rulers and grid paper","Unit vocabulary wall"],
+ warmup:{mins:8,text:"Stations review. Set four stations around the room, one per major topic, each with three problems. Pairs rotate every two minutes. No answers given yet — students note which station felt hardest, and that becomes their revision priority."},
+ stages:[
+  {k:"c",label:"Concrete",mins:10,sense:"touch · retrieval",
+   moves:["At each station, the relevant manipulative is present: discs, cubes, tiles, card strips.","Students must use the manipulative for at least one problem per station.","Pairs explain their reasoning aloud to the next pair arriving.","Teacher circulates and records which manipulative is being reached for — that signals what is still unconsolidated."],
+   say:[["Teacher","Use the material at each station for at least one problem, even if you don't think you need it. I want to see the connection, not just the answer."],["Teacher","When you rotate, tell the pair arriving one thing you noticed at that station."]],
+   watch:["A student who reaches for discs on a place-value question after ten days may still be at the concrete stage for that topic — note it and plan targeted reteaching rather than assuming the whole unit needs revisiting."]},
+  {k:"p",label:"Pictorial",mins:10,sense:"sight · organisation",
+   moves:["Students build a one-page visual summary of the unit.","Required elements: a place-value chart, a shift diagram, a worked order-of-operations expression, one bar model, one factor rectangle.","The page is kept and used as the permitted reference during the assessment.","Pairs compare pages and add anything missing."],
+   say:[["Teacher","One page, five drawings. You may use it during the test, so make it worth having."],["Teacher","Compare with your partner. If they have something you don't, add it. That's not copying — that's revision."]],
+   readaloud:["Offer a pre-structured summary template with the five regions outlined and labelled for students who find open-page organisation difficult."]},
+  {k:"a",label:"Abstract",mins:22,sense:"symbol · independent",
+   moves:["Administer the unit assessment individually.","Reference page permitted; manipulatives available on request without penalty.","Extended time and read-aloud provided per individual plans.","Collect and mark against the four unit strands separately, not as a single score."],
+   say:[["Teacher","Your summary page is allowed. Manipulatives are on the side table if you want them — using them costs you nothing."],["Teacher","Show your working. On the word problems, the model is part of the answer."]],
+   watch:["Mark by strand — place value, powers of ten, order of operations, bar models, factors — so reteaching targets the specific gap. A single percentage hides which strand failed."]}
+ ],
+ guided:[["Station 1 sample: value of the 4 in 3,472,000","400,000"],["Station 2 sample: 68 × 10³","68,000"],["Station 3 sample: 5 + 3 × 2²","17"],["Station 4 sample: GCF of 20 and 30","10"]],
+ worksheet:[
+  {t:"A · Place value and rounding",d:"Assessment section — 6 marks.",items:["Value of 7 in 47,200,000","Expanded form of 5,060,400","Round 8,472,000 to nearest hundred thousand","Order ascending: 2,090,000 · 2,900,000 · 2,009,000","Write in standard form: three billion, forty million","Compare: 610,000,000 ☐ 601,000,000"]},
+  {t:"B · Powers of ten and exponents",d:"Assessment section — 6 marks.",items:["94 × 10³","7,200 ÷ 10²","Write 100,000 as a power of ten","Evaluate 3⁴","45 × 200","36,050 ÷ 10 (state remainder)"]},
+  {t:"C · Order of operations",d:"Assessment section — 6 marks. Show one operation per line.",items:["12 + 4 × 5","(12 + 4) × 5","40 ÷ 8 × 3","6 + 2³ − 4","100 − (18 + 7) × 2","2 × 5² − 30 ÷ 6"]},
+  {t:"D · Problem solving with models",d:"Assessment section — 8 marks. A bar model is required for full marks.",wide:true,items:["A school raised 15,600 across three events. The first raised 4,850 and the second raised 6,200. How much did the third raise?","A warehouse holds 4 times as many boxes as a shop, and 1,350 more. How many boxes does each hold?","Two machines complete a cycle every 12 and every 20 minutes. They start together at 8:00 a.m. When do they next start together, and how did you decide whether to use GCF or LCM?"]}],
+ exit:["Which strand of this unit do you feel most confident in?","Which do you want more practice with?","Name one thing you can do now that you could not do two weeks ago."],
+ crit:"The exit ticket here is metacognitive, not graded. Compare student self-assessment against the strand marks — mismatches in either direction are worth a short conversation.",
+ support:["Provide the pre-structured summary template rather than a blank page.","Reduce the assessment to sections A, C and the first two items of D.","Allow oral responses for the reasoning items."],
+ extend:["Offer a challenge section: construct a single expression using exponents and brackets that evaluates to exactly 100.","Ask students to write one assessment question of their own for each strand, with a model answer."],
+ access:["The permitted summary page is a universal support, not an accommodation — it removes the memory-retrieval barrier for everyone and keeps the assessment focused on mathematics.","Manipulatives available without penalty removes the stigma that usually attaches to using them at assessment time.","Strand-level marking gives students with specific learning differences a fair picture: strength in one strand is not erased by difficulty in another."]
+}
+];
+</script>
+<script src="curriculum-core.js"></script>
+</body>
+</html>
