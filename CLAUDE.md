@@ -44,7 +44,7 @@ Everything stays in one folder. Links and shared assets break otherwise.
 In `curriculum-core.js` (promoted when a second unit reused them):
 `decimalGrid` · `rateLine`
 
-Still unit-local, in unit-05: `balanceScale` (also shipped as `balance-scale.js`)
+Still unit-local: `balanceScale` in unit-05 (also shipped as `balance-scale.js`); `angleChase` in unit-06 (also shipped as `angle-chase.js`)
 
 Still unit-local, in unit-02: `fractionModel` · `fractionDivide`
 
@@ -153,22 +153,23 @@ isn't. This is the unit's central image; budget design time for it.
 Concrete: pan balance, cups-and-counters (cup = the unknown), algebra tiles.
 Contexts: age puzzles, perimeter, cost totals.
 
-### Unit 6 — Angles & Geometric Figures (15 days)
+### Unit 6 — Angles & Geometric Figures (13 days) — resolved Sep 2026
+
+The 6.G.A.3 coordinate-plane strand moved to Unit 10, which grew from 10 to 13
+days to absorb it. Unit 6 now covers angle and area reasoning only.
 
 - Days 1–3 angles on a line and at a point, vertically opposite
 - Days 4–6 triangle angle sum, triangle types
 - Days 7–9 quadrilateral angle sum; parallelogram, trapezoid, rhombus properties
 - Days 10–12 area of triangles and parallelograms by decomposition
-- Days 13–14 polygons on the coordinate plane
-- Day 15 review and assessment
+- Day 13 review and assessment
 
-**Sequencing conflict — resolve before building.** 6.G.A.3 needs the coordinate
-plane, which is Unit 10. Either move that strand into Unit 10, or move Unit 10
-earlier in the year. Do not build days 13–14 as written until this is settled.
-New tool likely: an angle-chase visual that reveals one reasoning step at a
-time, in the shape of `stepper`.
-Concrete: protractors, torn-triangle angle sum (tear the corners, line them up),
-geoboards.
+New tool: `angleChase` — reveals one reasoning step at a time, in the shape of
+`stepper` (Unit 1). Each step names the rule that justifies it (angles on a
+line, vertically opposite, triangle sum, quadrilateral sum) rather than just
+producing the missing angle.
+Concrete: protractors, torn-triangle angle sum (tear the corners, line them
+up), geoboards.
 
 ### Unit 7 — Circles (15 days) — Opus
 
@@ -218,20 +219,25 @@ must visibly change the story the histogram tells; that is the lesson of days
 Concrete: sticky notes or cubes built into a physical dot plot on the wall,
 using data the class generates about itself.
 
-### Unit 10 — Negative Numbers & the Coordinate Plane (10 days)
+### Unit 10 — Negative Numbers & the Coordinate Plane (13 days) — grown Sep 2026
+
+Absorbed the 6.G.A.3 strand from Unit 6 (see that section) — polygons on the
+coordinate plane, so it can build on both integers and geometry in one pass.
 
 - Days 1–2 integers in context: temperature, elevation, balance
 - Days 3–4 the number line, ordering and comparing
 - Days 5–6 absolute value as distance from zero
 - Days 7–8 the coordinate plane, all four quadrants
-- Days 9 distance between points, reflections across an axis
-- Day 10 review and assessment
+- Day 9 distance between points, reflections across an axis
+- Days 10–11 polygons on the coordinate plane: plotting vertices, finding side
+  lengths and areas from coordinates
+- Day 12 composite problems mixing integers, distance and polygon area
+- Day 13 review and assessment
 
-New tool likely: an interactive coordinate plane for plotting, reflecting and
-measuring distance.
+New tool likely: an interactive coordinate plane for plotting, reflecting,
+measuring distance, and outlining a polygon from its vertices.
 Concrete: a floor-taped number line students walk along, thermometers, a
 floor-sized coordinate grid.
-See the Unit 6 sequencing conflict — if 6.G.A.3 moves here, this unit grows.
 
 ## Tool promotion rule
 
@@ -257,7 +263,7 @@ existing tools are template work; Sonnet handles them well.
 | 03 | done | built in chat |
 | 04 | done | built in chat |
 | 05 | done | built in chat |
-| 06 | Sonnet | angle-chase follows the `stepper` pattern |
+| 06 | done | built in chat |
 | 07 | **Opus** | π derivation and circle-area rearrangement |
 | 08 | Sonnet, or Opus if nets need a fold tool | decide before starting |
 | 09 | **Opus** | distribution builder |

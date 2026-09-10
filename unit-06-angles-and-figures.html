@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit 6 &mdash; Angles &amp; Geometric Figures | Grade 6 CPA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="curriculum.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+    <h1>Unit 6 &mdash; Angles &amp; Geometric Figures</h1>
+    <p class="sub">Every unknown angle in this unit comes with a reason, not just a number &mdash; torn paper corners lining up into a straight edge, a fold that maps one base angle exactly onto the other, a diagonal that turns any quadrilateral into two triangles. The coordinate-plane strand of this standard now lives in Unit 10, once integers and plotting are in place; this unit stays with reasoning about shapes themselves.</p>
+    <div class="facts">
+      <span><b>13</b> instructional days</span>
+      <span><b>3</b> weeks</span>
+      <span><b>55</b> minutes per lesson</span>
+      <span><b>6.G</b> standards</span>
+    </div>
+  </div>
+  <div class="wrap"><nav class="daynav" id="daynav" aria-label="Lesson days"></nav></div>
+</header>
+
+<main class="wrap">
+  <div class="lesson">
+    <div id="content"></div>
+    <aside class="side" id="side"></aside>
+  </div>
+  <div class="pager">
+    <button id="prev">&larr; Previous lesson</button>
+    <button id="next">Next lesson &rarr;</button>
+  </div>
+</main>
+
+<!-- Unit-specific manipulative. Must load before curriculum-core.js. -->
+<script>
+/* angleChase — Unit 6 (Angles & Geometric Figures).
+   Modelled on Unit 1's stepper: reveal one reasoning step at a time, and name
+   the rule that licenses each step, not just the number it produces.
+   Declare before curriculum-core.js. */
+window.__EXTRA_TOOLS__=Object.assign(window.__EXTRA_TOOLS__||{},(function(){
+const rm=()=>(!!window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#5B7189";
+
+/* Each scenario: an SVG-drawing function(known, unknown) and a chain of
+   {rule, work, result} steps that lead from 'known' to 'unknown'. Angles are
+   always whole numbers so the arithmetic is checkable at a glance. */
+const SCENARIOS={
+ line:{
+  label:"angles on a straight line",
+  rule:"Angles on a straight line sum to 180°.",
+  build(k){ const b=180-k; return {vals:[k,b], steps:[
+    {rule:"Angles on a straight line sum to 180°.", work:`180 − ${k}`, result:b}
+  ]};},
+  draw(k,b){
+    return `<line x1="60" y1="150" x2="640" y2="150" stroke="${INK}" stroke-width="2"/>
+      <line x1="340" y1="150" x2="470" y2="40" stroke="${INK}" stroke-width="2"/>
+      <path d="M310 150 A30 30 0 0 1 ${340+30*Math.cos(Math.PI*(1-k/180))} ${150-30*Math.sin(Math.PI*(1-k/180))}" fill="none" stroke="${T}" stroke-width="2"/>
+      <text x="290" y="135" font-family="Inconsolata" font-size="16" fill="${T}">${k}°</text>
+      <path d="M${340+30*Math.cos(Math.PI*(1-k/180))} ${150-30*Math.sin(Math.PI*(1-k/180))} A30 30 0 0 1 370 150" fill="none" stroke="${b!=null?T:A}" stroke-width="2"/>
+      <text x="385" y="135" font-family="Inconsolata" font-size="16" fill="${b!=null?T:A}">${b!=null?b+"°":"?"}</text>`;
+  }
+ },
+ point:{
+  label:"angles at a point (two crossing lines)",
+  rule:"Angles all the way around a point sum to 360°. Vertically opposite angles are equal.",
+  build(k){ const opp=k, adj=180-k, adj2=180-k; return {vals:[k,opp,adj,adj2], steps:[
+    {rule:"Vertically opposite angles are equal.", work:`the angle opposite ${k}° is also`, result:opp},
+    {rule:"Angles on a straight line sum to 180°.", work:`180 − ${k}`, result:adj},
+    {rule:"Vertically opposite angles are equal.", work:`the angle opposite ${adj}° is also`, result:adj2}
+  ]};},
+  /* two crossing lines through the centre; four sectors k, adj, opp(=k), adj2(=adj) going round */
+  draw(k,opp,adj,adj2){
+    const rad=a=>Math.PI*a/180, cx=350,cy=150,r1=110,r2=45;
+    const P=a=>[cx+r1*Math.cos(rad(a)), cy-r1*Math.sin(rad(a))];
+    const L=(a,rr)=>[cx+rr*Math.cos(rad(a)), cy-rr*Math.sin(rad(a))];
+    const a0=25,a1=a0+k,a2=a1+(180-k),a3=a2+k; // a3+ (180-k) back to a0+360
+    const pts=[a0,a1,a2,a3];
+    let s=`<line x1="${P(a0)[0]}" y1="${P(a0)[1]}" x2="${P(a2)[0]}" y2="${P(a2)[1]}" stroke="${INK}" stroke-width="2"/>
+      <line x1="${P(a1)[0]}" y1="${P(a1)[1]}" x2="${P(a3)[0]}" y2="${P(a3)[1]}" stroke="${INK}" stroke-width="2"/>
+      <circle cx="${cx}" cy="${cy}" r="3" fill="${INK}"/>`;
+    const labels=[[k,T,(a0+a1)/2],[adj!=null?adj:null,adj!=null?T:A,(a1+a2)/2],[opp!=null?opp:null,opp!=null?T:A,(a2+a3)/2],[adj2!=null?adj2:null,adj2!=null?T:A,(a3+a0+360)/2%360]];
+    labels.forEach(([v,c,ang])=>{
+      const [lx,ly]=L(ang,r2);
+      s+=`<text x="${lx}" y="${ly}" font-family="Inconsolata" font-size="15" fill="${c}" text-anchor="middle">${v!=null?v+"°":"?"}</text>`;
+    });
+    return s;
+  }
+ },
+ triangle:{
+  label:"angle sum of a triangle",
+  rule:"The angles in any triangle sum to 180°.",
+  build(a,b){ const c=180-a-b; return {vals:[a,b,c], steps:[
+    {rule:"The angles in a triangle sum to 180°.", work:`180 − ${a} − ${b}`, result:c}
+  ]};},
+  draw(a,b,c){
+    return `<polygon points="120,190 560,190 380,40" fill="none" stroke="${INK}" stroke-width="2"/>
+      <text x="155" y="175" font-family="Inconsolata" font-size="15" fill="${T}">${a}°</text>
+      <text x="500" y="175" font-family="Inconsolata" font-size="15" fill="${T}">${b}°</text>
+      <text x="370" y="65" font-family="Inconsolata" font-size="15" fill="${c!=null?T:A}">${c!=null?c+"°":"?"}</text>`;
+  }
+ },
+ quad:{
+  label:"angle sum of a quadrilateral",
+  rule:"The angles in any quadrilateral sum to 360° — a diagonal splits it into two triangles, 180° + 180°.",
+  build(a,b,c){ const d=360-a-b-c; return {vals:[a,b,c,d], steps:[
+    {rule:"A diagonal splits the quadrilateral into two triangles (180° + 180° = 360°), so the four angles sum to 360°.", work:`360 − ${a} − ${b} − ${c}`, result:d}
+  ]};},
+  draw(a,b,c,d){
+    return `<polygon points="120,190 520,150 460,40 160,60" fill="none" stroke="${INK}" stroke-width="2"/>
+      <line x1="120" y1="190" x2="460" y2="40" stroke="${MUT}" stroke-width="1" stroke-dasharray="4 4"/>
+      <text x="145" y="175" font-family="Inconsolata" font-size="14" fill="${T}">${a}°</text>
+      <text x="475" y="140" font-family="Inconsolata" font-size="14" fill="${T}">${b}°</text>
+      <text x="430" y="55" font-family="Inconsolata" font-size="14" fill="${T}">${c}°</text>
+      <text x="175" y="70" font-family="Inconsolata" font-size="14" fill="${d!=null?T:A}">${d!=null?d+"°":"?"}</text>`;
+  }
+ }
+};
+
+function angleChase(host){
+  const box=el("div","tool");
+  box.innerHTML=`<h3>Angle chase<span class="mins">tool</span></h3>
+    <p class="sense">sight · justified reasoning</p>
+    <p class="how">Every missing angle here comes with a reason, revealed one at a time. The number is never the point on its own — the rule that licenses it is.</p>
+    <div class="ctl">
+      <label for="acm">scenario</label>
+      <select id="acm">
+        <option value="line">angles on a line</option>
+        <option value="point">angles at a point</option>
+        <option value="triangle">triangle angle sum</option>
+        <option value="quad">quadrilateral angle sum</option>
+      </select>
+      <label for="aca">known angle A</label>
+      <input id="aca" type="number" value="65" min="1" max="179" aria-label="first known angle">
+      <span id="acb2"><label for="acb">known angle B</label>
+        <input id="acb" type="number" value="70" min="1" max="179" aria-label="second known angle"></span>
+      <span id="acc2" hidden><label for="acc">known angle C</label>
+        <input id="acc" type="number" value="95" min="1" max="179" aria-label="third known angle"></span>
+      <button class="btn go" id="acgo">Set up</button>
+    </div>
+    <div class="stage-area"><svg viewBox="0 0 700 220" role="img" style="width:100%;height:auto"></svg></div>
+    <div class="ctl"><button class="btn amb" id="acstep">Reveal next step</button><button class="btn sm" id="acreset">Start over</button></div>
+    <div class="steps" id="acsteps"></div>
+    <p class="note">Try changing the known angle after a full chase — the rule stays the same, only the arithmetic changes. That is what makes it a rule and not a fact about one picture.</p>`;
+  host.appendChild(box);
+  const svg=box.querySelector("svg"), stepsEl=box.querySelector("#acsteps"), $=s=>box.querySelector(s), $m=$("#acm");
+  let chain=[], shown=0, vals=[], scen=null;
+
+  function vis(){
+    $("#acc2").hidden = $m.value!=="quad";
+    $("#acb2").style.display = $m.value==="line" ? "none" : "";
+  }
+
+  function setup(){
+    scen=SCENARIOS[$m.value];
+    const a=Math.max(1,Math.min(179,+$("#aca").value||1));
+    if($m.value==="line"){ const r=scen.build(a); vals=r.vals; chain=r.steps; }
+    else if($m.value==="point"){ const r=scen.build(a); vals=r.vals; chain=r.steps; }
+    else{
+      const b=Math.max(1,Math.min(179,+$("#acb").value||1));
+      if($m.value==="triangle"){
+        if(a+b>=180){ stepsEl.innerHTML=`<div class="lbl" style="color:${A}">Those two angles already total ${a+b}°, which leaves nothing for the third. Try two smaller angles.</div>`; svg.innerHTML=""; return; }
+        const r=scen.build(a,b); vals=r.vals; chain=r.steps;
+      }else{
+        const c=Math.max(1,Math.min(179,+$("#acc").value||1));
+        if(a+b+c>=360){ stepsEl.innerHTML=`<div class="lbl" style="color:${A}">Those three angles already total ${a+b+c}°, which leaves nothing for the fourth. Try smaller angles.</div>`; svg.innerHTML=""; return; }
+        const r=scen.build(a,b,c); vals=r.vals; chain=r.steps;
+      }
+    }
+    shown=0;
+    drawKnownOnly();
+    renderSteps();
+  }
+
+  function ariaFor(shownCount){
+    const label=scen.label;
+    const known=vals.slice(0, ($m.value==="quad"?3:($m.value==="triangle"?2:1))).map(v=>v+"°").join(", ");
+    if(!shownCount)return `A diagram for ${label}. Known angle${known.includes(",")?"s":""}: ${known}. The remaining angle${$m.value==="point"?"s are":" is"} marked with a question mark.`;
+    const found=chain.slice(0,shownCount).map(s=>s.result+"°").join(", ");
+    return shownCount<chain.length
+      ? `A diagram for ${label}. Known angles: ${known}. Found so far: ${found}. One angle still marked with a question mark.`
+      : `A diagram for ${label}. Known angles: ${known}. All angles now found: ${found}. Every angle is labelled with its value.`;
+  }
+  function drawKnownOnly(){
+    svg.innerHTML = scen.draw(...vals.slice(0, $m.value==="quad"?3:($m.value==="triangle"?2:1)));
+    svg.setAttribute("aria-label", ariaFor(0));
+  }
+
+  function renderSteps(){
+    let h="";
+    for(let i=0;i<shown;i++){
+      const s=chain[i];
+      h+=`<div><span class="lbl">${s.rule}</span><br>${s.work} = <span class="fin">${s.result}°</span></div>`;
+    }
+    if(shown<chain.length){
+      h+=`<div style="color:${MUT}">${chain.length-shown} step${chain.length-shown===1?"":"s"} left. Press "Reveal next step".</div>`;
+    }else{
+      h+=`<div style="color:${T}">Chase complete. Every unknown angle now has a rule attached to it, not just a number.</div>`;
+    }
+    stepsEl.innerHTML=h;
+  }
+
+  function step(){
+    if(!chain.length||shown>=chain.length)return;
+    shown++;
+    /* redraw with all angles found so far revealed */
+    const shownVals = vals.slice(0, ($m.value==="quad"?3:($m.value==="triangle"?2:1)) + shown);
+    svg.innerHTML = scen.draw(...shownVals);
+    svg.setAttribute("aria-label", ariaFor(shown));
+    renderSteps();
+  }
+
+  $m.addEventListener("change",()=>{vis();setup();});
+  $("#acgo").addEventListener("click",setup);
+  $("#acstep").addEventListener("click",step);
+  $("#acreset").addEventListener("click",setup);
+  vis();setup();
+}
+return {angleChase};
+})());
+window.__EXTRA_NAMES__=Object.assign(window.__EXTRA_NAMES__||{},{angleChase:"Angle chase"});
+</script>
+
+<script>
+/* Core tools: placeValue, rounding, shift, stepper, power, barModel, factors,
+   decimalGrid, rateLine. This unit adds angleChase. */
+window.UNIT={
+  number:6,
+  minutes:55,
+  tools:{
+     1:["angleChase"], 2:["angleChase"], 3:["angleChase"], 4:["angleChase"],
+     5:["angleChase"], 6:["angleChase"], 7:["angleChase"], 8:["angleChase"],
+     9:["angleChase"],10:["angleChase"],11:["angleChase"],12:["angleChase"],
+    13:"all"
+  }
+};
+
+window.LESSONS=
+[
+{
+ day:1, short:"Angles on a line", title:"Angles on a straight line sum to 180°",
+ objective:"Find a missing angle on a straight line, and justify the answer by naming the rule rather than just stating the number.",
+ standards:["6.G.A.1"],
+ vocab:[["Angle","An amount of turning, measured in degrees."],["Straight line","A line has no bend in it — the angles along one side of it always total 180°."],["Adjacent angles","Angles that share a vertex and a side, sitting next to each other."],["Justify","State the rule that makes the answer certain, not just the arithmetic."]],
+ materials:["Protractors","Straight edges","Paper strips to fold and tear","Whiteboards"],
+ warmup:{mins:5,text:"Draw a straight line and mark a point on it. Draw one ray up from that point, splitting the line into two angles. Ask what the two angles must add to. Someone will say 180. Ask how they know — not what the answer is, but why it must be true. Hold the question for the folding activity."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · folding a straight edge",
+   moves:["Fold a paper strip in half to find a straight 180° edge.","Draw a ray from the fold point and measure both resulting angles with a protractor.","Add the two measurements and confirm 180.","Repeat with a differently placed ray and confirm again."],
+   say:[["Teacher","Fold your strip flat. That fold line is 180 degrees — a straight angle, however it's drawn."],["Teacher","Draw any ray from the fold point and measure both sides."],["Expected","They add to 180 every time."],["Teacher","Every time, however you draw the ray. That is what makes it a rule and not a coincidence about your particular drawing."]],
+   watch:["Students who measure carefully but do not connect the total to the straight line itself. Ask what would happen if the base were not straight — the rule depends specifically on 180 being a straight angle."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · labelled diagram",
+   moves:["Draw a straight line with one ray, one angle labelled and one unknown.","Write the equation: known + unknown = 180.","Solve for the unknown.","Draw a case with three angles on the line and set up the same total."],
+   say:[["Teacher","One known, one unknown, one equation. This is Unit 5's balance wearing a protractor."],["Teacher","Three angles on the line now. What do they total?"],["Expected","Still 180 — the line hasn't changed."],["Teacher","However many angles sit on one side of a straight line, they total 180. The rule does not count the pieces, only the line."]],
+   readaloud:["Say the picture aloud: 'A horizontal straight line with a single ray rising from a point on it, splitting the line above into two angles. The left angle is labelled sixty-five degrees; the right is marked with a question mark.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · stating the rule",
+   moves:["Write the general rule: a + b = 180 for two angles on a line.","Solve for a missing angle in written form, one line per step.","Extend to three unknowns given only their ratio.","Practise writing the justification sentence, not just the number."],
+   say:[["Teacher","Every answer today gets a sentence, not just a number. 'Angles on a straight line sum to 180 degrees, so the missing angle is...' — that sentence is what you are actually being assessed on."],["Teacher","Why does the sentence matter if the number is right?"],["Expected","Because the number could be a guess."],["Teacher","And a guess that happens to be right teaches you nothing for next time. The rule is the transferable part."]],
+   watch:["Students who write only the number. Require the rule sentence on every written answer this week; it is the habit the whole unit depends on."]}
+ ],
+ guided:[["Two angles on a line: one is 70°. Find the other.","110°"],["One is 35°. Find the other.","145°"],["Three angles on a line: 40°, 60° and x. Find x.","80°"],["Why must the two angles on a line always total 180°?","Because a straight line is itself a 180° angle, and the ray splits it without changing the total."]],
+ worksheet:[
+  {t:"A · One unknown",d:"State the rule, then find the angle.",items:["known 55°","known 122°","known 89°","known 17°","known 164°","known 93°"]},
+  {t:"B · Multiple angles",d:"Find the missing angle.",items:["30°, 50°, x on a line","x, 90°, 45° on a line","2x, x, 60° on a line — find x","3x, 2x on a line — find x"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why angles on a straight line always sum to 180°, without using a protractor in your explanation.","A student says two angles on a line could total 170°. Explain why that is impossible.","Draw a straight line split into four angles by three rays. What must the four totals be, and why?"]}],
+ exit:["Two angles on a line: one is 48°. Find the other.","State the rule you used.","Explain why the rule does not depend on how many angles the line is split into."],
+ crit:"Mastery: correct angle and the rule stated as a sentence. Reteach if only the arithmetic is given — the sentence habit is what this whole unit is built on, and it needs to be secure before day two.",
+ support:["Provide a sentence frame: 'Angles on a straight line sum to 180°, so ___.'","Restrict to two angles before three or more.","Keep protractors available for checking every answer."],
+ extend:["Three angles on a line are in the ratio 2 : 3 : 4. Find all three.","Explain why the rule would be different if the base were a curve instead of a straight line."],
+ access:["Touch: folding paper to find a straight angle gives a physical, checkable 180° reference.","Vision: the known angle and the unknown are labelled in distinct colours as well as position, and the unknown is a question mark rather than a blank.","Language: the justification sentence is a fixed frame, reducing the writing load to filling one blank.","Motor: a partner can measure with the protractor while another records, with both reasoning through the rule."]
+},
+{
+ day:2, short:"Angles at a point", title:"Angles at a point, and vertically opposite angles",
+ objective:"Find missing angles where several meet at a point, using the point-sum rule and the vertically-opposite rule together.",
+ standards:["6.G.A.1"],
+ vocab:[["Angles at a point","All the way around a single point, the angles sum to 360°."],["Vertically opposite","The two angles across a crossing point from each other — always equal."],["Crossing lines","Two straight lines through one point make four angles in two equal pairs."],["X-shape","A quick way to spot vertically opposite angles — they sit across the X from each other."]],
+ materials:["Protractors","Straight edges","Two strips of paper to cross","Whiteboards"],
+ warmup:{mins:5,text:"Cross two paper strips at their midpoints, making an X. Ask how many angles this creates and whether any of them look the same size. Let students eyeball it before measuring. Hold the observation — today makes it precise."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · measuring the X",
+   moves:["Cross two strips and measure all four angles with a protractor.","Record all four and add them: 360.","Identify the two equal pairs across from each other.","Rotate one strip and remeasure, confirming the pattern holds at a new angle."],
+   say:[["Teacher","Measure all four. What do they add to?"],["Expected","360."],["Teacher","And which two match?"],["Expected","The ones across from each other."],["Teacher","Rotate the strip and check again. Does the matching pattern survive?"],["Expected","Yes, every time."]],
+   watch:["Students who assume adjacent angles are equal rather than opposite ones. Have them trace the X shape with a finger from one angle to its match; adjacent angles sit next to each other, opposite ones sit across."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · the angle chase tool",
+   moves:["Set the angle chase tool to 'angles at a point' with one known angle.","Reveal the first step and read the vertically-opposite rule.","Reveal the second step and read the straight-line rule.","Set a new known angle and predict all three unknowns before revealing."],
+   say:[["Teacher","Before you press reveal, predict all three. Then check yourself one step at a time."],["Teacher","Why does the tool use two different rules rather than one?"],["Expected","Because opposite angles use one rule and adjacent ones use another."],["Teacher","Right — vertically opposite for the angle straight across, and the straight-line rule for the ones next door. Same picture, two separate reasons."]],
+   readaloud:["Say the picture aloud: 'Two straight lines cross at a central point, forming four angles. The top-right angle is labelled with the known value. The bottom-left angle, straight across, carries a question mark. The top-left and bottom-right angles also carry question marks.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · two rules together",
+   moves:["Write both rules as general statements.","Solve a full crossing-lines problem from one known angle.","Solve a case with three or more lines meeting at a point, using only the 360° total.","Justify each answer with the specific rule that applies to it."],
+   say:[["Teacher","Two rules, and you have to pick the right one for each angle. That choice is the actual skill today."],["Teacher","Five lines meet at a point, all angles equal. Find one."],["Expected","360 divided by 10, since five lines make ten angles."],["Teacher","Careful — count the angles, not the lines. That is where this type of problem catches people."]],
+   watch:["Students who use the straight-line rule (180) when the point has more than two lines through it. The 360° point rule is the general one; the 180° line rule is the special case of two lines only. Ask how many lines are actually there."]}
+ ],
+ guided:[["Two crossing lines, one angle is 55°. Find the vertically opposite angle.","55°"],["Find the two adjacent angles.","125° and 125°"],["Three lines meet at a point, all angles equal. Find one.","60°"],["Why are vertically opposite angles always equal?","They are both found by subtracting the same adjacent angle from 180°, on a straight line each."]],
+ worksheet:[
+  {t:"A · Crossing lines",d:"State the rule for each angle you find.",items:["known 40°, find all three others","known 78°, find all three others","known 110°, find all three others","known 25°, find all three others"]},
+  {t:"B · Multiple lines at a point",d:"Find the equal angle.",items:["4 equal angles at a point","6 equal angles at a point","3 lines, equal angles","8 equal angles at a point"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why vertically opposite angles are equal, without measuring — use the straight-line rule in your explanation.","A student says all four angles where two lines cross must be equal. Explain why this is only true in one special case.","Two lines cross. One angle is three times its adjacent angle. Find all four angles."]}],
+ exit:["Two crossing lines, one angle is 62°. Find the angle vertically opposite it.","Find one of the adjacent angles.","Explain why vertically opposite angles are equal."],
+ crit:"Mastery: both correct with the specific rule named for each. Reteach if the 180° and 360° rules are confused — count the lines through the point together, since that is the actual distinguishing feature.",
+ support:["Use the angle chase tool for every problem before writing anything by hand.","Restrict to two crossing lines before three or more.","Provide the two rules as a printed reference, side by side."],
+ extend:["Three lines cross at a point, none of the angles equal. If you know two of the six angles, can you find the rest? Try it.","Explain why the vertically-opposite rule is really just two applications of the straight-line rule."],
+ access:["Touch: physically rotating crossed strips shows the equal-pairs pattern holds at any angle, not just the one drawn.","Vision: the angle chase tool colours found angles differently from unknowns, so progress is visible at a glance.","Attention: predicting before revealing gives a check-your-own-work structure to every problem.","Language: 'vertically opposite' sounds like it refers to up-and-down; clarify it means 'across the vertex', and post the X-shape image as the memory aid."]
+},
+{
+ day:3, short:"Angle practice", title:"Mixed practice: lines and points",
+ objective:"Solve multi-step problems combining the straight-line and point rules, choosing the right rule for each unknown angle.",
+ standards:["6.G.A.1"],
+ vocab:[["Multi-step","More than one rule is needed, applied in sequence."],["Chain of reasoning","Each found angle can become the known angle for the next step."],["Diagram first","Draw and label before calculating, as in every unit so far."],["Verify","Check that all angles at any one point or line still total correctly."]],
+ materials:["Angle chase tool","Protractors","Whiteboards","Mixed problem cards"],
+ warmup:{mins:5,text:"Draw a diagram with a straight line and a crossing line together, one known angle, several unknowns. Ask only which rule applies to the angle nearest the known one — not the full solution. Establishing the first move is often the hardest part of a chain."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · building a chain by hand",
+   moves:["Construct a diagram with paper strips: one straight line, one crossing line, one known angle marked.","Find each unknown angle in turn, stating the rule used for each.","Compare the order chosen by different pairs.","Confirm all pairs reach the same final answers regardless of order."],
+   say:[["Teacher","Find them in any order you like, as long as you can always say why. Does the order matter to the final answers?"],["Expected","No — you just have to know enough at each step."],["Teacher","Right. The rules do not care what order you use them in, only that each one has what it needs before you use it."]],
+   watch:["Students who try to find an angle before they have enough information for it. Ask what is currently known before attempting any new angle; the chain has a natural order even if more than one order works."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · labelled chain diagram",
+   moves:["Draw a combined line-and-point diagram with one known angle.","Label each found angle with a number as it is discovered.","Circle which rule justified each new label.","Repeat with a diagram needing three steps instead of two."],
+   say:[["Teacher","Number them in the order you find them, and circle the rule beside each number. That record is what a chain of reasoning looks like on paper."],["Teacher","Three steps this time. Does the third one feel different from the first two?"],["Expected","Not really — same two rules, just applied again."],["Teacher","Longer chains are not harder ideas. They are the same two ideas, more times."]],
+   readaloud:["Say the picture aloud: 'A straight line crosses a second line at one point. The known sixty-degree angle sits at the top. Moving around the point, each subsequent angle is labelled with a number in the order it would be found, one through three.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · full chains",
+   moves:["Solve four multi-step diagrams, writing every step with its rule.","Verify each diagram by confirming all angles at a point sum to 360, or all angles on a line sum to 180.","Work backwards from a known final angle to check an earlier claimed value.","Compare two students' solutions using different valid orders."],
+   say:[["Teacher","Verify at the end. Add up everything around one point — does it hit 360?"],["Teacher","That check is free and it catches almost every slip in a chain like this."]],
+   watch:["Students who get one wrong angle early and carry the error through the whole chain without noticing. The verification step is not optional busywork; it is how errors get caught before the exit ticket."]}
+ ],
+ guided:[["A line and crossing line, known 70°. Find the angle vertically opposite.","70°"],["Find the two adjacent angles.","110° and 110°"],["A three-step diagram gives a final angle from a known 35°. Trace the chain.","Depends on diagram; verify all totals"],["Why verify at the end of a chain?","To catch an error made at an earlier step before it goes unnoticed."]],
+ worksheet:[
+  {t:"A · Two-step chains",d:"State the rule for each step.",wide:true,
+   items:["Diagram A: known 48°, find three unknowns.","Diagram B: known 115°, find three unknowns.","Diagram C: known 82°, find three unknowns."]},
+  {t:"B · Three-step chains",d:"Number your steps in order.",wide:true,
+   items:["Diagram D: known 55°, find four unknowns across a line and a crossing.","Diagram E: known 100°, find four unknowns across a line and a crossing."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why a longer chain of angle reasoning is not conceptually harder than a short one.","A student's chain gives a final answer that makes the point total 370° rather than 360°. What does that tell you, and what would you do?","Draw your own two-step angle diagram, label one known angle, and solve it."]}],
+ exit:["A line and crossing line, known 52°. Find any two of the three unknowns.","State the rule you used for each.","Explain how you would check your full diagram was correct."],
+ crit:"Mastery: at least two of three unknowns correct with rules stated, and item 3 describes a total check. Reteach in whichever rule the errors cluster around — this day is a diagnostic as much as a lesson.",
+ support:["Work one diagram fully as a class before independent diagrams.","Provide the angle chase tool for every diagram before hand-solving.","Reduce to two-step chains before three-step ones."],
+ extend:["Design a four-step angle chain of your own, draw it, and solve it with full justification.","Is there a diagram where the order you solve in actually does matter? Try to construct one."],
+ access:["Touch: physical paper-strip construction lets a chain be built and re-checked by hand.","Vision: numbering found angles in order gives a visible record of the chain, useful for review.","Attention: the verification step gives every problem a definite, checkable endpoint.","Memory: naming both rules explicitly at every step prevents them blurring together over a longer chain."]
+},
+{
+ day:4, short:"Triangle sum", title:"The angle sum of a triangle",
+ objective:"Show that the angles of any triangle sum to 180°, and use the rule to find a missing angle.",
+ standards:["6.G.A.1"],
+ vocab:[["Triangle angle sum","The three interior angles of any triangle always total 180°."],["Interior angle","An angle inside the shape, at one of its corners."],["Corner","Plain word for vertex — where two sides meet."],["Tear-and-line-up","Physically tearing off the three corners and placing them together, edge to edge, along a straight line."]],
+ materials:["Paper triangles, several shapes per student","Protractors","Scissors","Straight edges"],
+ warmup:{mins:5,text:"Draw three very different-looking triangles — thin, wide, right-angled. Ask whether their angle totals could be different from each other. Take a vote. Hand out paper triangles and scissors without answering, and say the tearing will settle it."},
+ stages:[
+  {k:"c",label:"Concrete",mins:13,sense:"touch · tearing the corners",
+   moves:["Tear the three corners off a paper triangle.","Arrange the three torn corners so their points meet at a single spot.","Observe that the three edges form a straight line.","Repeat with a differently shaped triangle and confirm the same result."],
+   say:[["Teacher","Tear off the three corners. Now put the three points together at one spot, edges touching."],["Expected","They make a straight line."],["Teacher","A straight line is 180 degrees — you learned that on day one. So the three angles, rearranged, make exactly a straight angle. That is why they sum to 180, for any triangle."],["Teacher","Try it again with a completely different-shaped triangle."],["Expected","Same result."]],
+   watch:["Students who tear imprecisely and get a result that looks close to straight but not exact. The imprecision is in the tearing, not the rule — measure the triangle's actual angles with a protractor as a backup confirmation."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · the angle chase tool",
+   moves:["Set the angle chase tool to 'triangle angle sum' with two known angles.","Reveal the step and read the rule.","Try several different pairs of known angles and note the rule never changes.","Draw a triangle with only one known angle and discuss what is missing."],
+   say:[["Teacher","One rule, however the triangle looks. Try a very different pair of angles."],["Teacher","What happens with only one known angle?"],["Expected","You can't find the other two individually — only their total."],["Teacher","Right. The rule gives you one equation; solving for two unknowns from one equation needs more information, which is exactly what day six adds."]],
+   readaloud:["Say the picture aloud: 'A triangle with its three interior angles marked. Two are labelled with known values; the third carries a question mark.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · applying the rule",
+   moves:["Write the general rule: a + b + c = 180.","Solve for a missing angle given the other two.","Solve for two unknowns given they are equal.","Justify every answer with the rule stated as a sentence."],
+   say:[["Teacher","Two equal unknown angles and one known — how do you split what's left?"],["Expected","Divide by two, since they're equal."],["Teacher","The rule gives you the total remaining; equal angles let you split that total fairly."]],
+   watch:["Students who add all three given numbers rather than subtracting from 180 when two are known. Reread what is being asked — usually two are given and one is missing, not the reverse."]}
+ ],
+ guided:[["Angles 50° and 60°. Find the third.","70°"],["Angles 90° and 35°. Find the third.","55°"],["One angle 40°, other two equal. Find them.","70° each"],["Why does tearing the corners and lining them up prove the rule?","The three angles rearrange into a straight line, which is 180°, for any triangle shape."]],
+ worksheet:[
+  {t:"A · Find the third angle",d:"State the rule.",items:["60°, 70°","45°, 90°","33°, 82°","100°, 45°","15°, 15°","72°, 61°"]},
+  {t:"B · Equal unknowns",d:"Find both missing angles.",items:["one angle 50°, others equal","one angle 80°, others equal","one angle 20°, others equal","one angle 100°, others equal"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain the tear-and-line-up proof in your own words, without looking at your notes.","A student claims a triangle with angles 90°, 90° and 10°. Explain why this is impossible.","Can a triangle have two angles that are each more than 90°? Explain using the rule."]}],
+ exit:["Angles 55° and 65°. Find the third.","Explain why the three angles of any triangle sum to 180°.","Could a triangle have angles 100°, 100° and −20°? Why not?"],
+ crit:"Mastery: correct answer and a genuine explanation of the tear-and-line-up proof, not just a restated rule. Reteach with the physical tearing again rather than a verbal explanation — the proof is the point of today, not a preamble to it.",
+ support:["Provide pre-torn corner sets for students whose fine motor control makes tearing difficult.","Restrict to finding a single unknown before pairs of equal unknowns.","Keep the sentence frame from day one available."],
+ extend:["Does the tear-and-line-up proof work for a triangle with an angle over 90°? Try it.","Explain why no triangle can have two right angles, using the rule rather than a picture."],
+ access:["Touch: tearing and rearranging is the entire proof, available to any student regardless of reading level.","Motor: pre-torn corners let a student with limited fine motor control do the arranging step, which is where the insight lives.","Vision: the angle chase tool's triangle is drawn with generous corner spacing so labels never overlap.","Language: 'interior angle' and 'corner' are used together so the formal term is anchored to a plain one."]
+},
+{
+ day:5, short:"Triangle types", title:"Classifying triangles by sides and angles",
+ objective:"Classify a triangle by its side lengths and by its angles, and explain why some classifications cannot combine.",
+ standards:["6.G.A.1"],
+ vocab:[["Equilateral","All three sides equal, all three angles equal (60° each)."],["Isosceles","Exactly two sides equal, and the two angles opposite them equal."],["Scalene","No sides equal, no angles equal."],["Acute, right, obtuse","Classify by the largest angle: under 90°, exactly 90°, or over 90°."]],
+ materials:["Geoboards and elastic bands, or dot paper","Rulers and protractors","Sets of paper triangles for sorting","Whiteboards"],
+ warmup:{mins:5,text:"Show five different triangles and ask students to sort them into groups, without telling them the categories. Compare groupings across the room. Some will sort by side length, some by angle. Say: both are valid systems, and today gives you the vocabulary for each."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · building and measuring",
+   moves:["Build triangles on a geoboard with all sides equal, exactly two equal, and none equal.","Measure the angles of each with a protractor.","Notice that equal sides come with equal opposite angles.","Sort the same triangles again by their largest angle: acute, right or obtuse."],
+   say:[["Teacher","Build one with all sides the same length. Measure the angles."],["Expected","All sixty."],["Teacher","Now one with just two sides equal."],["Expected","Two angles match, one is different."],["Teacher","Equal sides and equal angles travel together. That is not a coincidence — it is what 'isosceles' means."]],
+   watch:["Students who classify by eye rather than by measuring. A triangle that looks isosceles at a glance often is not; require the ruler and protractor before naming any triangle."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · sorting diagram",
+   moves:["Draw a two-way sorting grid: side classification across the top, angle classification down the side.","Place example triangles into the grid.","Identify which combinations are impossible.","Discuss why an equilateral triangle cannot also be right-angled."],
+   say:[["Teacher","Try to place an equilateral triangle in the 'right-angled' row. What happens?"],["Expected","It doesn't fit — equilateral angles are always sixty degrees."],["Teacher","So the grid has an empty cell, and that emptiness is informative. Not every combination of classifications is possible."]],
+   readaloud:["Say the grid aloud: 'A grid with three columns — equilateral, isosceles, scalene — and three rows — acute, right, obtuse. Most cells contain an example triangle. The cell for equilateral and right is empty, marked with a dash.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · naming precisely",
+   moves:["Classify triangles fully, by both side and angle type, from given measurements.","Use the angle sum rule to determine the missing angle before classifying.","Explain in writing why equilateral triangles are always acute.","Identify a triangle from a partial description and defend the choice."],
+   say:[["Teacher","A triangle can need two words: 'isosceles right-angled', for instance. Use both when both apply."],["Teacher","Why is every equilateral triangle acute?"],["Expected","Because all the angles are sixty, and that's under ninety."],["Teacher","Stated as certainty, not as something you happened to notice on one example."]],
+   watch:["Students who name a triangle by sides only or angles only, missing that a full classification often uses both. Ask for the complete name, not the first descriptor that comes to mind."]}
+ ],
+ guided:[["A triangle has sides 5, 5, 5. Classify by sides.","Equilateral"],["Angles 90°, 45°, 45°. Classify by angle and by sides.","Right-angled, isosceles"],["Sides 3, 4, 5. Classify by sides.","Scalene"],["Why can't an equilateral triangle be obtuse?","All its angles are 60°, which is well under 90°."]],
+ worksheet:[
+  {t:"A · Classify by sides",d:"State equilateral, isosceles or scalene.",items:["6, 6, 6","4, 4, 7","3, 5, 7","8, 8, 3","9, 9, 9","2, 3, 4"]},
+  {t:"B · Classify by angles",d:"Given the angles, state acute, right or obtuse.",items:["60°, 60°, 60°","90°, 30°, 60°","100°, 40°, 40°","70°, 65°, 45°","95°, 50°, 35°","30°, 30°, 120°"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why an isosceles triangle must have two equal angles, connecting it to the tear-and-line-up idea from day four.","Can a scalene triangle be right-angled? Give an example or explain why not.","Why is 'equilateral right-angled' an impossible description? Use the angle sum rule in your explanation."]}],
+ exit:["Classify a triangle with sides 5, 5, 8 by side type.","Classify a triangle with angles 100°, 40°, 40° by angle type.","Explain why equal sides and equal angles always travel together in a triangle."],
+ crit:"Mastery: both classifications correct and item 3 links equal sides to equal opposite angles. Reteach with measuring rather than by-eye sorting — the geoboard makes the connection between sides and angles directly checkable.",
+ support:["Provide the two-way sorting grid pre-drawn with a few examples filled in.","Restrict to side classification before adding angle classification.","Allow classification from a picture with visible tick marks for equal sides before requiring measurement."],
+ extend:["Is every equilateral triangle also isosceles? Explain using the definitions precisely.","Find all the empty cells in the two-way grid and explain why each combination is impossible."],
+ access:["Touch: building on a geoboard lets side lengths be compared by counting pegs rather than measuring.","Vision: the sorting grid uses text labels in every cell, not colour coding, so an empty cell reads clearly as empty.","Language: 'equilateral', 'isosceles' and 'scalene' are unfamiliar words for familiar ideas; introduce each right after the concrete demonstration that motivates it.","Motor: geoboards allow triangle construction without needing fine ruler-and-pencil control."]
+},
+{
+ day:6, short:"Isosceles reasoning", title:"Using the isosceles property to find angles",
+ objective:"Find missing angles in an isosceles triangle using the equal-sides-equal-angles property alongside the angle sum rule.",
+ standards:["6.G.A.1"],
+ vocab:[["Base angles","The two equal angles of an isosceles triangle, opposite the two equal sides."],["Apex angle","The third, usually different, angle."],["Isosceles property","Equal sides mean equal opposite angles — proved by the symmetry of the shape."],["Two unknowns, one equation","What made day four's single-known-angle case unsolvable — isosceles fixes it."]],
+ materials:["Paper isosceles triangles","Protractors","Angle chase tool","Whiteboards"],
+ warmup:{mins:5,text:"Return to day four's leftover question: a triangle with only one known angle cannot usually be solved. Post an isosceles triangle with only its apex angle known and ask whether it is now solvable. Take a vote before working it out."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · folding for symmetry",
+   moves:["Fold a paper isosceles triangle along its line of symmetry.","Observe the two base angles land exactly on top of each other.","Unfold and measure both base angles to confirm equality.","Use the fold line to explain why they must be equal, not just happen to be."],
+   say:[["Teacher","Fold along the line of symmetry. What happens to the two base angles?"],["Expected","They land exactly on each other."],["Teacher","That is the proof, not just a measurement. The fold maps one angle onto the other exactly, so they must be equal — for any isosceles triangle, not just this paper one."]],
+   watch:["Students who treat the equal-angles fact as something to measure and confirm each time rather than a property guaranteed by the shape's definition. The fold is the argument; measuring is only the check."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · setting up the equation",
+   moves:["Draw an isosceles triangle with the apex angle known and the two base angles marked equal with tick marks.","Write the equation: apex + 2 × base = 180.","Solve for the base angle.","Repeat with a base angle known instead, solving for the apex."],
+   say:[["Teacher","Tick marks show the two sides are equal, which is why the two angles opposite them get the same letter. One unknown, one equation — day four's problem, solved."],["Teacher","This time you know a base angle instead. What changes?"],["Expected","You double it and subtract from 180 for the apex."],["Teacher","Same triangle, same rule, just started from a different angle."]],
+   readaloud:["Say the picture aloud: 'An isosceles triangle with tick marks on its two equal sides. The apex angle at the top is labelled forty degrees. Both base angles at the bottom carry the same letter, b, with a question mark.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · solving both directions",
+   moves:["Solve apex-known cases: (180 − apex) ÷ 2.","Solve base-known cases: 180 − 2 × base.","Handle a case where the triangle is also right-angled and isosceles.","Justify every step with both the isosceles property and the triangle sum rule named separately."],
+   say:[["Teacher","Two rules working together today, and both need naming. Which one tells you the two base angles are equal, and which one tells you they total with the apex to 180?"],["Expected","Isosceles property for the first, triangle sum for the second."],["Teacher","Exactly separate reasons. Losing either one loses the argument."]],
+   watch:["Students who divide the apex angle by two instead of the remaining total. Rewrite the equation in full each time rather than doing the last step mentally; the full equation prevents dividing the wrong quantity."]}
+ ],
+ guided:[["Apex 50°. Find each base angle.","65° each"],["Base angle 70°. Find the apex.","40°"],["Apex 90°, isosceles. Find each base angle.","45° each"],["Why can you solve an isosceles triangle from just one angle, when a general triangle needs two?","The equal-sides property supplies a second equation — that the two base angles are equal — for free."]],
+ worksheet:[
+  {t:"A · Apex known",d:"Find both base angles.",items:["apex 60°","apex 80°","apex 20°","apex 100°","apex 44°","apex 118°"]},
+  {t:"B · Base known",d:"Find the apex angle.",items:["base 70°","base 55°","base 80°","base 42°"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain the folding proof for why base angles are equal, in your own words.","An isosceles triangle has a base angle of 90°. Explain why this is impossible.","A triangle has angles 40°, 40° and 100°. Is it isosceles? Justify from the angles alone, without seeing the sides."]}],
+ exit:["An isosceles triangle has apex 36°. Find each base angle.","An isosceles triangle has base angle 62°. Find the apex.","Explain why the two base angles of an isosceles triangle must be equal."],
+ crit:"Mastery: both correct with the isosceles property and triangle sum both named. Reteach with the folding demonstration again rather than restating the rule — this property is proved by symmetry, and the fold is the only fully convincing version of that proof at this level.",
+ support:["Provide the equation frame pre-written with blanks for the known value.","Restrict to apex-known cases before base-known cases.","Keep folded triangles available as a physical reference."],
+ extend:["A triangle is both isosceles and has an angle of 90°. Is it isosceles at the right angle, or elsewhere? Explore both cases.","Explain why an equilateral triangle is a special case of isosceles where the argument applies three times over."],
+ access:["Touch: folding along the line of symmetry is the proof itself, not an illustration of it.","Vision: tick marks on equal sides and a shared letter on equal angles are used together, not colour alone.","Attention: writing the full equation before simplifying prevents skipped steps under time pressure.","Memory: naming both rules separately at every step keeps them distinct rather than merging into one vague procedure."]
+},
+{
+ day:7, short:"Triangle practice", title:"Mixed triangle problems",
+ objective:"Solve a varied set of triangle-angle problems, selecting between the general triangle rule and the isosceles property as each requires.",
+ standards:["6.G.A.1"],
+ vocab:[["Select the rule","Decide which property applies before calculating — today's actual skill."],["General triangle","No special side relationship; only the 180° sum applies."],["Special triangle","Isosceles or equilateral; an extra property is available."],["Signal","What in the problem tells you which type you have — tick marks, stated side lengths, or a stated angle pair."]],
+ materials:["Angle chase tool","Mixed problem cards","Protractors","Whiteboards"],
+ warmup:{mins:5,text:"Post four triangle problems, some general and some isosceles, with no labels distinguishing them. Ask students to sort by which rule applies, not to solve. Compare sortings and discuss what signalled each one."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · sorting by signal",
+   moves:["Sort problem cards into 'general' and 'isosceles' piles.","Identify the specific signal in each: tick marks, a stated repeated angle, or explicit side lengths.","Build one triangle from each pile with paper or a geoboard.","Confirm the chosen rule solves each correctly."],
+   say:[["Teacher","What told you this one was isosceles?"],["Expected","Two sides marked the same."],["Teacher","And this one?"],["Expected","It says two angles are equal."],["Teacher","Different signals, same underlying fact. Learn to read for any of them."]],
+   watch:["Students who assume every triangle without explicit marks is general, missing a stated equal-angle clue in the words. The signal is not always a tick mark; sometimes it is a sentence."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · model before solving",
+   moves:["Draw the appropriate diagram for four mixed problems without solving.","Mark tick marks or angle labels according to what each problem states.","Swap with a partner and check the diagrams match the problems.","Then solve all four."],
+   say:[["Teacher","Diagram first, all four, before any arithmetic. If your partner cannot tell which type each one is from your diagram, it is not finished."]],
+   readaloud:["Say the page aloud: 'Four triangles drawn in a two-by-two grid. The upper two carry tick marks on two sides each, isosceles. The lower two have three different angle labels with no tick marks, general triangles.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · solving and justifying",
+   moves:["Solve the four modelled problems, naming every rule used.","Handle one problem requiring both the isosceles property and a straight-line rule in sequence.","Check each answer sums correctly for its triangle.","Write one sentence per problem on how the type was identified."],
+   say:[["Teacher","One sentence per problem: how did you know which rule applied? That sentence is what carries to a test with different numbers."]],
+   watch:["Students who solve correctly but cannot say how they identified the type. Ask them to explain to a partner; identifying the signal is the skill being built today, and it is invisible unless spoken aloud."]}
+ ],
+ guided:[["General triangle: 55°, 65°. Find the third.","60°"],["Isosceles, apex 48°. Find the base angles.","66° each"],["A triangle with angles x, x, 40°. Find x.","70°"],["What tells you a triangle is isosceles if there are no tick marks?","A stated pair of equal sides or equal angles in the problem's words."]],
+ worksheet:[
+  {t:"A · Identify and solve",d:"State which type, then solve.",items:["50°, 70°, find third","isosceles apex 64°","isosceles base 55°","30°, 95°, find third","x, x, 96°, find x","equilateral, find any angle"]},
+  {t:"B · Mixed with a straight line",d:"State every rule used.",wide:true,
+   items:["An isosceles triangle sits on a straight line; apex 50°, find the base angle and the angle outside the triangle on the line.","A general triangle has angles 40° and x; the line beyond the triangle makes an angle of 75° with one side. Find x."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain how you decide whether a triangle problem is general or isosceles, listing every signal you know to look for.","Write your own isosceles triangle problem and your own general triangle problem, using different signals for each.","Why does identifying the type matter before you start calculating, rather than partway through?"]}],
+ exit:["Solve: general triangle, 48° and 82°.","Solve: isosceles, apex 56°.","Explain how you knew which rule to use for each."],
+ crit:"Mastery: both correct and item 3 names a specific signal for each. Reteach by type rather than by topic — the sorting activity from the concrete stage identifies exactly which signal is being missed.",
+ support:["Provide the signal list as a permanent reference: tick marks, repeated angle values, stated equal sides.","Reduce to two problem types before mixing with straight-line combinations.","Allow the sorting step with a partner throughout."],
+ extend:["Write a problem combining an isosceles triangle, a straight line, and a crossing point, needing three different rules.","Find a triangle problem where the type is ambiguous from the diagram alone. What would resolve the ambiguity?"],
+ access:["Attention: sorting before solving splits one long task into two shorter ones with a clear boundary.","Language: the signal list stays visible during independent work — recognising the type is the skill, not recalling the list.","Vision: models are drawn in a fixed grid position so the page layout is predictable across problems.","Memory: this day deliberately combines days one through six; naming which earlier day each rule came from reduces the load to recall, not relearning."]
+},
+{
+ day:8, short:"Quadrilateral sum", title:"The angle sum of a quadrilateral",
+ objective:"Show that the angles of any quadrilateral sum to 360° by splitting it into two triangles, and use the rule to find a missing angle.",
+ standards:["6.G.A.1"],
+ vocab:[["Quadrilateral","Any four-sided shape."],["Diagonal","A line joining two non-adjacent corners."],["Splitting into triangles","The move that extends the triangle sum rule to any polygon."],["Interior angle sum","The total of all the angles inside a shape."]],
+ materials:["Paper quadrilaterals of varied shapes","Rulers","Protractors","Scissors"],
+ warmup:{mins:5,text:"Show an irregular four-sided shape, nothing like a rectangle. Ask whether its angles will still total 360°, the same as a square's. Take a vote. Say the rule you are about to find works for every four-sided shape, however irregular, and that is what makes it worth having."},
+ stages:[
+  {k:"c",label:"Concrete",mins:13,sense:"touch · splitting with a diagonal",
+   moves:["Draw one diagonal across a paper quadrilateral, splitting it into two triangles.","Cut along the diagonal and lay the two triangles down separately.","Measure or recall that each triangle's angles sum to 180.","Add the two triangle totals: 360, and confirm it matches the original quadrilateral's angle sum."],
+   say:[["Teacher","Cut along the diagonal. Two triangles. What does each one total?"],["Expected","180."],["Teacher","So together?"],["Expected","360."],["Teacher","And those two triangles are made of exactly the four original angles, just regrouped. Nothing was added or removed — the diagonal only reorganised what was already there."]],
+   watch:["Students who think the diagonal adds new angle to the total. The two new angles created by the diagonal are interior to each triangle and cancel when the triangles are put back together — they are not extra material, they are where the split happened."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · the angle chase tool",
+   moves:["Set the angle chase tool to 'quadrilateral angle sum' with three known angles.","Reveal the step and read the diagonal-split reasoning.","Try an irregular quadrilateral shape and confirm the rule still applies.","Draw a quadrilateral with a diagonal marked, labelling the resulting two triangles."],
+   say:[["Teacher","However strange the quadrilateral looks, one diagonal always splits it into two triangles. That is what makes 360 a rule and not a coincidence of squares and rectangles."]],
+   readaloud:["Say the picture aloud: 'An irregular four-sided shape with a dashed diagonal splitting it into two triangles. Three of the four corner angles are labelled with known values; the fourth carries a question mark.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · applying the rule",
+   moves:["Write the general rule: a + b + c + d = 360.","Solve for a missing angle given the other three.","Handle a case with two equal unknown angles.","Justify with the diagonal-split reasoning stated as a sentence, not just the arithmetic."],
+   say:[["Teacher","The sentence today names the diagonal, not just the number 360. 'A diagonal splits the quadrilateral into two triangles, so the angles sum to 360, and the missing angle is...' Say the whole thing."]],
+   watch:["Students who state 360 as a memorised fact without the diagonal justification. Ask them to draw the diagonal on their diagram before answering; the picture and the sentence should match."]}
+ ],
+ guided:[["Angles 80°, 90°, 100°. Find the fourth.","90°"],["Angles 70°, 120°, 60°. Find the fourth.","110°"],["Angles 90°, 90°, x, x. Find x.","90° each"],["Why does splitting with a diagonal prove the 360° rule?","It turns the quadrilateral into two triangles, each summing to 180°, and the total is unchanged by the split."]],
+ worksheet:[
+  {t:"A · Find the fourth angle",d:"State the rule with the diagonal reasoning.",items:["70°, 80°, 100°","95°, 85°, 90°","120°, 60°, 100°","45°, 135°, 90°","88°, 92°, 88°","150°, 30°, 90°"]},
+  {t:"B · Equal unknowns",d:"Find both missing angles.",items:["90°, 90°, x, x","70°, 110°, x, x","60°, 60°, x, x","100°, 80°, x, x"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain the diagonal-split proof in your own words, drawing the diagram to support your explanation.","Does it matter which diagonal you choose to split a quadrilateral? Try both and compare.","A quadrilateral has three right angles. Find the fourth and explain what shape this must be."]}],
+ exit:["Angles 85°, 95°, 100°. Find the fourth.","Explain why the quadrilateral angle sum is 360°.","Draw the diagonal that proves it, on any quadrilateral shape."],
+ crit:"Mastery: correct answer and a genuine diagonal-based explanation. Reteach with the physical cutting again — the split-and-recombine action is the actual proof, and a restated rule is not a substitute for it.",
+ support:["Provide pre-cut quadrilaterals with the diagonal already drawn.","Restrict to finding one unknown before pairs of equal unknowns.","Keep the triangle-sum rule from day four visible as a building block."],
+ extend:["Does a quadrilateral's second diagonal also split it into two triangles that sum correctly? Check both diagonals on the same shape.","Explain how you would find the angle sum of a five-sided shape, extending the diagonal-splitting idea."],
+ access:["Touch: physically cutting along the diagonal and recombining the pieces is the entire proof.","Vision: the diagonal is drawn as a distinct dashed line, separate from the shape's own sides.","Memory: this extends day four's triangle proof directly; naming that connection turns a new rule into an application of an old one.","Language: 'diagonal' is unfamiliar; anchor it with 'a line joining two corners that are not next to each other' every time it is used this lesson."]
+},
+{
+ day:9, short:"Parallelogram, trapezoid, rhombus", title:"Angle properties of special quadrilaterals",
+ objective:"Identify the angle properties of parallelograms, trapezoids and rhombuses, and use them together with the 360° rule.",
+ standards:["6.G.A.1"],
+ vocab:[["Parallelogram","Opposite sides parallel; opposite angles equal; adjacent angles sum to 180°."],["Trapezoid","At least one pair of parallel sides; angles on the same non-parallel side sum to 180°."],["Rhombus","A parallelogram with all four sides equal; diagonals bisect the angles."],["Co-interior angles","Angles between two parallel lines, on the same side of a crossing line, summing to 180°."]],
+ materials:["Paper parallelograms, trapezoids and rhombuses","Rulers and protractors","Geoboards","Whiteboards"],
+ warmup:{mins:5,text:"Show a parallelogram with one angle marked 70°. Ask what the other three must be, without measuring. Some will guess all equal; some will see the pattern. Measure to settle it, and note which guesses were closest."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · measuring special shapes",
+   moves:["Measure all four angles of a parallelogram and note the pattern.","Measure a trapezoid's angles on each pair of sides.","Measure a rhombus's angles and check the diagonals with a protractor.","Compare all three shapes' patterns side by side."],
+   say:[["Teacher","Parallelogram: what do you notice about opposite angles?"],["Expected","They match."],["Teacher","And angles next to each other?"],["Expected","They add to 180."],["Teacher","Both true, for any parallelogram. Now the trapezoid — is the same true?"],["Expected","No, only on the non-parallel sides."]],
+   watch:["Students who assume every quadrilateral with parallel sides behaves like a parallelogram. A trapezoid has only one pair of parallel sides, and only the angles along the non-parallel legs are co-interior; verify by measuring both shapes rather than assuming the pattern transfers."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · parallel-line reasoning",
+   moves:["Draw two parallel lines crossed by a third, labelling the co-interior angle pair.","Extend this to a parallelogram, showing both pairs of parallel sides.","Draw a trapezoid with only one such pair marked.","Draw a rhombus with its diagonal splitting a corner angle in half."],
+   say:[["Teacher","The parallelogram is really two pairs of parallel lines, crossed. Each crossing gives you a co-interior pair summing to 180."],["Teacher","So a parallelogram's property is not really a new rule. It is the same parallel-line reasoning, used twice."]],
+   readaloud:["Say the picture aloud: 'A parallelogram with opposite angles marked with matching tick arcs, seventy degrees at the top-left and bottom-right, and matching unmarked angles at the other two corners, each one hundred ten degrees.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · combining properties",
+   moves:["Write the parallelogram rule: opposite angles equal, adjacent angles sum to 180.","Find missing angles in parallelograms, trapezoids and rhombuses from one known angle.","Combine with the 360° total as a check.","Justify each answer with the specific shape property used."],
+   say:[["Teacher","One angle in a parallelogram is enough to find all four, because of the two properties together. Is that true for a general quadrilateral?"],["Expected","No — you need at least three."],["Teacher","So the shape's structure is doing real work, cutting down how much information you need."]],
+   watch:["Students who apply the parallelogram shortcut to a trapezoid, which does not have opposite angles equal. Confirm the shape's actual properties before applying any shortcut rule — this is why day eight's general rule remains the fallback that always works."]}
+ ],
+ guided:[["Parallelogram, one angle 65°. Find the other three.","65°, 115°, 115°"],["Trapezoid, one leg angle 70°. Find its co-interior partner.","110°"],["Rhombus, one angle 50°. Find the other three.","50°, 130°, 130°"],["Why can one angle determine all four in a parallelogram?","Opposite angles are equal and adjacent angles sum to 180°, which together fix all four from just one."]],
+ worksheet:[
+  {t:"A · Parallelograms",d:"Find all four angles from the one given.",items:["one angle 55°","one angle 100°","one angle 72°","one angle 38°","one angle 91°","one angle 150°"]},
+  {t:"B · Trapezoids and rhombuses",d:"Find the requested angle.",items:["trapezoid leg angle 65°, find its co-interior partner","rhombus one angle 80°, find the opposite angle","rhombus one angle 45°, find an adjacent angle","trapezoid leg angle 112°, find its co-interior partner"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why a parallelogram's angle properties are really the parallel-line co-interior rule used twice.","A trapezoid has one leg angle of 90°. What can you say about the shape? Explain.","A student says all rhombuses are parallelograms. Is this true? Use the angle properties to justify your answer."]}],
+ exit:["Parallelogram, one angle 48°. Find the other three.","Explain why opposite angles in a parallelogram are equal.","Explain why this does not apply to a general trapezoid."],
+ crit:"Mastery: all three found correctly, with item 3 correctly distinguishing the trapezoid from the parallelogram. Reteach by measuring the specific shape in question again — the properties are genuinely different between these shapes and should never be assumed to transfer.",
+ support:["Provide a reference card listing each shape's specific properties, with a small diagram for each.","Restrict to parallelograms before introducing trapezoids and rhombuses.","Keep protractors available to verify every claimed property before using it."],
+ extend:["Investigate whether a rhombus's diagonals always bisect its angles exactly. Measure to check.","Find a quadrilateral that is a trapezoid but not a parallelogram, and one that is both. What distinguishes them?"],
+ access:["Touch: measuring several examples of each shape prevents a property being assumed rather than verified.","Vision: tick arcs mark equal angles consistently across all diagrams this lesson, distinct from the tick marks used for equal sides in day five.","Language: 'co-interior' is technical; anchor it to the plain description 'between the parallel lines, same side' every time.","Memory: connecting the parallelogram property back to day two's crossing-line reasoning reduces three new facts to one idea applied differently."]
+},
+{
+ day:10, short:"Area of a triangle", title:"Area of a triangle by decomposition",
+ objective:"Derive the triangle area formula by relating a triangle to a rectangle, and apply it to find areas.",
+ standards:["6.G.A.1"],
+ vocab:[["Base","One side of the triangle, chosen as the reference for height."],["Height","The perpendicular distance from the base to the opposite vertex — not a slanted side."],["Decompose","Cut a shape into pieces that can be rearranged into a shape you already know the area of."],["Half the rectangle","The relationship this lesson derives: a triangle is always half of a surrounding rectangle with the same base and height."],],
+ materials:["Grid paper","Scissors","Rulers","Pre-drawn rectangles with a triangle marked inside"],
+ warmup:{mins:5,text:"Draw a rectangle on the board and a diagonal splitting it into two triangles. Ask what fraction of the rectangle each triangle is. Everyone says half. Say: that is the easy case — today extends it to triangles that are not obviously half of anything."},
+ stages:[
+  {k:"c",label:"Concrete",mins:13,sense:"touch · cutting and rearranging",
+   moves:["Cut a rectangle along one diagonal and confirm each triangle is exactly half.","Draw a triangle inside a rectangle where the apex touches the top edge, not a corner.","Cut the two corner pieces the triangle does not cover and rearrange them.","Confirm the triangle still occupies exactly half the rectangle's area, even off-centre."],
+   say:[["Teacher","This time the triangle's point is not at a corner. Is it still half the rectangle?"],["Expected","Let's check."],["Teacher","Cut the leftover corners and see if they fit into the same space the triangle doesn't cover."],["Expected","They do — it's still half."],["Teacher","Off-centre or not, the same-base-same-height triangle is always half its surrounding rectangle. That is the whole derivation."]],
+   watch:["Students who believe the half relationship only holds when the triangle looks symmetric. The off-centre case is the important one — it is what proves the rule is general rather than a special case of symmetric triangles."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · base, height and the enclosing rectangle",
+   moves:["Draw a triangle with its base and the perpendicular height marked with a dashed line.","Draw the enclosing rectangle around it, same base and same height.","Shade the triangle and label the rectangle's area as base times height.","Halve it and label the triangle's area."],
+   say:[["Teacher","The height is the dashed line — perpendicular to the base, not a slanted side of the triangle. Mark it that way every time."],["Teacher","Rectangle area first, then halve it. Two steps, and the second one is always the same."]],
+   readaloud:["Say the picture aloud: 'A triangle sits inside a rectangle of the same base and height. The base is drawn along the bottom, and a dashed vertical line marks the height from the base up to the triangle's highest point. The triangle is shaded; the two unshaded corner regions of the rectangle are marked but not shaded.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · the formula",
+   moves:["Write A = (b × h) ÷ 2.","Apply it to triangles given base and height directly.","Handle a case where the height must be identified from a diagram rather than given as a labelled number.","Check by estimating whether the answer looks like roughly half a sensible rectangle."],
+   say:[["Teacher","Identify the height before you calculate. It is not always the side that looks longest, and it is never a slanted side."],["Teacher","Estimate first. A triangle with base ten and height six — roughly what area?"],["Expected","Around thirty, since half of sixty is thirty."]],
+   watch:["Students who use a slanted side as the height. Require the height to be drawn or confirmed as perpendicular to the chosen base before any calculation; this is the single most common error in this lesson."]}
+ ],
+ guided:[["Base 8, height 5. Find the area.","20"],["Base 12, height 7. Find the area.","42"],["Base 6, height 6. Find the area.","18"],["Why is a triangle's area always half of base times height?","It is always exactly half of a rectangle sharing the same base and height, however the triangle is shaped."]],
+ worksheet:[
+  {t:"A · Find the area",d:"Show base times height, then halve.",items:["base 10, height 4","base 14, height 6","base 9, height 8","base 20, height 5","base 7, height 7","base 16, height 3"]},
+  {t:"B · Identify the height first",d:"State which measurement is the height before calculating.",wide:true,
+   items:["A triangle has a base of 9 cm, a slanted side of 11 cm, and a perpendicular height of 6 cm. Find the area.","A triangle has sides 8, 8 and 5, with a marked perpendicular height of 7.5 cm to the base of 5 cm. Find the area."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain the rectangle-derivation of the triangle area formula, including why it works even when the triangle's apex is not centred.","A triangle and a rectangle have the same base and the triangle's area is 24 cm². What is the rectangle's area?","Why is it important that the height is measured perpendicular to the base, rather than along a slanted side?"]}],
+ exit:["Base 11, height 4. Find the area.","Explain why you halve the base-times-height product.","Explain why the height must be perpendicular to the base."],
+ crit:"Mastery: correct area and a genuine explanation referencing the enclosing rectangle. Reteach with the cut-and-rearrange demonstration again for the off-centre case specifically — that is where the general proof lives.",
+ support:["Provide grid paper with the rectangle and triangle both pre-drawn, only the calculation remaining.","Restrict to triangles where the height is clearly the vertical side before introducing slanted-side distractors.","Keep the enclosing-rectangle picture visible as a permanent reference."],
+ extend:["Two triangles have the same area but different base-height pairs. Find an example and explain why this is possible.","Does the derivation still work for an obtuse triangle, where the apex sits outside the range of the base? Investigate."],
+ access:["Touch: physically cutting and rearranging the corner pieces is the derivation, not an illustration of it.","Vision: the height is always drawn as a dashed perpendicular line, visually distinct from the triangle's solid sides.","Attention: the estimate-before-calculating step gives a quick plausibility check before the full working.","Language: 'base' and 'height' are used precisely and consistently; 'height' never refers to a slanted side, and that rule is stated explicitly."]
+},
+{
+ day:11, short:"Area of a parallelogram", title:"Area of a parallelogram by decomposition",
+ objective:"Derive the parallelogram area formula by cutting and rearranging it into a rectangle, and apply it to find areas.",
+ standards:["6.G.A.1"],
+ vocab:[["Parallelogram area","Base times height, where height is the perpendicular distance between the parallel sides."],["Slant side","The side of a parallelogram that is not the base — never used for the height."],["Cut and slide","The move that turns a parallelogram into a rectangle of equal area."],["Equal area, different shape","The rectangle and the parallelogram it came from have identical area despite looking different."]],
+ materials:["Paper parallelograms","Scissors","Rulers","Grid paper"],
+ warmup:{mins:5,text:"Draw a parallelogram, clearly slanted, and ask for a guess at its area using only its base and slanted side length multiplied together. Write the guess up. Say: that guess is wrong for a specific, findable reason, and the cutting activity will show what it is."},
+ stages:[
+  {k:"c",label:"Concrete",mins:13,sense:"touch · cutting a triangle off one end",
+   moves:["Draw a perpendicular height from one vertex down to the base line of a paper parallelogram.","Cut along that height line, separating a triangle from one end.","Slide the cut triangle to the opposite end.","Observe the shape is now a rectangle with the same base and height."],
+   say:[["Teacher","Cut along the height. Slide the triangle to the other side. What shape do you have now?"],["Expected","A rectangle."],["Teacher","Did you add or remove any paper?"],["Expected","No, just moved a piece."],["Teacher","So the parallelogram and this rectangle have exactly the same area. And the rectangle's area you already know: base times height."]],
+   watch:["Students who cut along the slanted side instead of the perpendicular height. The rearranged piece will not form a clean rectangle unless the cut is perpendicular; a messy result is useful evidence that the wrong line was chosen."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · the transformation",
+   moves:["Draw the original parallelogram with the perpendicular height marked.","Draw the cut and the resulting rectangle beside it.","Label both shapes' base and height as identical.","Draw a second parallelogram, more heavily slanted, and repeat the reasoning."],
+   say:[["Teacher","Same base, same height, both times. That is why the area formula for a parallelogram looks identical to a rectangle's — because after the cut, it is one."]],
+   readaloud:["Say the picture aloud: 'A slanted parallelogram is shown with a dashed perpendicular line marking its height. Beside it, an arrow points to a rectangle of the same base and height, showing the triangular end piece relocated from the left side to the right.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · applying the formula",
+   moves:["Write A = b × h for a parallelogram, distinguishing it from the triangle's halved formula.","Apply it given base and height directly.","Identify the height correctly when only slant-side and base are labelled.","Compare with the wrong guess from the warm-up and calculate the actual area to show the difference."],
+   say:[["Teacher","No halving this time — that was the triangle's rule. A parallelogram is already a full rectangle in disguise."],["Teacher","Go back to the warm-up guess. Was multiplying the base by the slant side correct?"],["Expected","No — it should have been the perpendicular height."]],
+   watch:["Students who carry over the triangle's halving into the parallelogram formula, or who use the slant side as height here just as in day ten. Both errors are worth naming explicitly as the two most common ones in this pair of lessons."]}
+ ],
+ guided:[["Base 9, height 6. Find the area.","54"],["Base 14, height 5. Find the area.","70"],["Base 7, slant side 9, height 6. Find the area.","42 — the slant side is not used"],["Why is a parallelogram's area not halved, unlike a triangle's?","A parallelogram is already equal in area to its enclosing rectangle after the cut-and-slide; no halving step is needed."]],
+ worksheet:[
+  {t:"A · Find the area",d:"Use base times height only.",items:["base 8, height 5","base 15, height 4","base 6, height 9","base 20, height 3","base 11, height 7","base 12, height 12"]},
+  {t:"B · Spot the distractor",d:"Identify the height and ignore the slant side.",wide:true,
+   items:["A parallelogram has base 10 cm, slant side 13 cm, and height 8 cm. Find the area.","A parallelogram has base 6 cm, height 9 cm, and slant side 10.8 cm. Find the area."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain the cut-and-slide derivation in your own words, describing exactly where the cut is made and why.","Why does a triangle's area formula involve halving but a parallelogram's does not? Connect the two derivations.","A parallelogram and a rectangle have the same base and height. Explain why their areas must be equal even though their shapes differ."]}],
+ exit:["Base 13, height 4. Find the area.","A parallelogram has base 8, slant side 10, height 6. Find the area, stating which value you used.","Explain why the cut must be perpendicular to the base."],
+ crit:"Mastery: correct area, the slant side correctly ignored, and a genuine cut-and-slide explanation. Reteach with the physical cutting again if the slant side is used — this error persists more than most and needs the hands-on correction, not a verbal one.",
+ support:["Provide parallelograms with the height pre-marked as a dashed line and the slant side clearly a different style.","Restrict to parallelograms where height and slant side are visually very different lengths before making them close.","Keep the day ten triangle formula visible for comparison and contrast."],
+ extend:["Explain why a rectangle is a special case of a parallelogram where the cut-and-slide move does nothing at all.","A parallelogram is cut and rearranged into a different rectangle depending on which side is chosen as the base. Do both give the same area? Explain why they must."],
+ access:["Touch: the cut-and-slide is the derivation, not a diagram of it, and should be done by hand by every student at least once.","Vision: height is always a dashed perpendicular line; the slant side is drawn solid and never labelled as height.","Attention: contrasting this lesson directly against day ten's halving rule helps prevent the two formulas blurring together.","Memory: naming the shared 'perpendicular height, never the slant side' rule across both lessons treats it as one recurring idea."]
+},
+{
+ day:12, short:"Area practice", title:"Mixed area and angle problems",
+ objective:"Solve mixed problems combining angle reasoning and area formulas from across the unit, choosing the right tool for each part.",
+ standards:["6.G.A.1"],
+ vocab:[["Composite problem","One needing more than one topic from the unit."],["Decompose the shape","Split an irregular figure into triangles and parallelograms with known area formulas."],["Which formula","The decision point in every area problem — triangle, parallelogram, or a general quadrilateral needing a diagonal split."],["Full justification","Every angle rule and every area formula named, not just calculated."]],
+ materials:["Mixed problem cards","Grid paper","Angle chase tool","Rulers and protractors"],
+ warmup:{mins:5,text:"Show an irregular pentagon-like shape and ask how you would find its area, given only the area formulas for triangles and parallelograms. Someone will suggest splitting it up. Say: that instinct is the whole of today's lesson."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · decomposing an irregular shape",
+   moves:["Cut an irregular polygon shape into a triangle and a parallelogram.","Measure the base and height needed for each piece.","Calculate each area separately.","Add them for the total, and compare with a rough grid-square estimate."],
+   say:[["Teacher","Split it into shapes you already have formulas for. How many pieces did you need?"],["Expected","Two — one triangle, one parallelogram."],["Teacher","Calculate each, then add. And check against a grid-square estimate — does the total look about right?"]],
+   watch:["Students who try to find one formula for the whole irregular shape. There isn't one; decomposition into known shapes is the actual method, not a workaround."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · combined diagrams",
+   moves:["Draw a diagram needing an angle found before an area can be calculated.","Solve the angle first, using it to determine a height or a missing measurement.","Draw a composite shape and mark the decomposition lines.","Label every piece's base and height before calculating."],
+   say:[["Teacher","This one needs an angle before it needs an area. Read the whole problem before deciding where to start."]],
+   readaloud:["Say the page aloud: 'A triangle sits beside a parallelogram, sharing one edge. The triangle's apex angle is unknown but its two base angles are given as isosceles. Once found, the apex angle helps determine the triangle's height for the area calculation.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · full solutions",
+   moves:["Solve four composite problems mixing angle rules and area formulas.","Justify every step with the specific rule or formula used.","Estimate before calculating on every area question.","Check the final answer for plausibility against the diagram's scale."],
+   say:[["Teacher","Full justification, every step. By now that should be a habit rather than an instruction."]],
+   watch:["Students who solve the angle correctly but then use the wrong measurement for the area's height. Confirm exactly what the perpendicular height is in each specific diagram before calculating; this unit has built that check into every area lesson and it does not stop mattering here."]}
+ ],
+ guided:[["Isosceles triangle apex 40°, base 10, height 12. Find the base angles and the area.","70° each; area 60"],["Irregular shape split into a triangle (base 6, height 4) and a parallelogram (base 6, height 5). Find the total area.","12 + 30 = 42"],["Parallelogram angle 65°, base 8, height 5. Find the adjacent angle and the area.","115°; area 40"],["Why decompose an irregular shape rather than seek a single formula?","No single formula covers every irregular shape, but triangles and parallelograms combine to cover any polygon."]],
+ worksheet:[
+  {t:"A · Angle then area",d:"Find the angle first, then the area.",wide:true,
+   items:["An isosceles triangle has apex 36°, base 14 cm, height 18 cm. Find the base angles and the area.","A parallelogram has one angle 72°, base 9 cm, height 7 cm. Find the other three angles and the area."]},
+  {t:"B · Decompose and total",d:"Split into known shapes and find the total area.",wide:true,
+   items:["An irregular shape splits into a triangle (base 8, height 5) and a rectangle (6 by 5). Find the total area.","A shape splits into two parallelograms: one base 10 height 4, the other base 6 height 7. Find the total area."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Describe, step by step, how you would find the area of an irregular six-sided shape using only triangles and parallelograms.","A student calculates a triangle's area using a slanted side as the height. Explain the error and how to identify it in future.","Design your own composite problem needing both an angle rule and an area formula, then solve it."]}],
+ exit:["Isosceles triangle apex 44°, base 9, height 10. Find the base angles and the area.","State every rule and formula used.","Explain how you would find the area of an irregular shape with more than four sides."],
+ crit:"Mastery: both parts correct with all rules and formulas named. Reteach the specific piece that failed — angle reasoning or area calculation — rather than the whole combined problem, since this day diagnoses which of the two needs more work.",
+ support:["Work one fully combined problem as a class demonstration before independent problems.","Provide the angle chase tool and area formula reference together on every problem.","Reduce to problems needing only one topic before combining two."],
+ extend:["Find the area of a regular hexagon by decomposing it into triangles from its centre. What do you notice about the triangles?","Design a composite shape whose area calculation requires three different formulas from this unit."],
+ access:["Touch: physically cutting an irregular shape into known pieces is the method itself, not preparation for it.","Vision: decomposition lines are drawn distinctly from the shape's own outline, using a dashed style consistent with every other lesson in the unit.","Attention: the estimate-before-calculating step, established across the whole unit, gives a checkpoint on every area question here too.","Memory: this day deliberately draws on every previous lesson; naming the specific day a rule came from helps organise the review rather than presenting it as new content."]
+},
+{
+ day:13, short:"Review", title:"Review stations and unit assessment",
+ objective:"Consolidate angle reasoning and area formulas across the unit, and self-identify which topics need more work before the assessment.",
+ standards:["6.G.A.1"],
+ vocab:[["Self-assessment","Judging your own accuracy honestly — a skill, and one being assessed today."],["Station","A short focused task at one topic, then rotate."],["Justify","Say why, not just what — required at every station."],["Next step","A specific action, not a topic name."]],
+ materials:["Angle chase tool","All manipulatives from the unit","Station cards, one per topic","Self-assessment grid","Assessment papers"],
+ warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: those are the stations to visit first, and the tally is data, not a confession."},
+ stages:[
+  {k:"c",label:"Concrete",mins:15,sense:"touch · rotation",
+   moves:["Five stations: lines and points, triangle angles, quadrilateral angles, triangle area, parallelogram area.","Each station holds its manipulative and three graded tasks.","Students choose a starting station from the warm-up tally.","Every station requires one written justification, not just answers."],
+   say:[["Teacher","Start where you are least confident, not where you are quickest."],["Teacher","One sentence per station explaining why your method works. Answers alone do not count as finished."],["Teacher","Twelve minutes per station. Rotate on the signal whether or not you have finished."]],
+   watch:["Students who visit only easy stations. The private warm-up slip is the accountability tool — ask them to show which station addresses what they wrote."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · one diagram per topic",
+   moves:["On a single page, draw one diagram for each of the five station topics.","Annotate each with its rule or formula.","Keep the page as the revision sheet.","Identify any diagram that could not be drawn and return to that station."],
+   say:[["Teacher","One page, five diagrams, five rules. Better than any notes you could copy."],["Teacher","A diagram you cannot draw names the topic to go back to."]],
+   readaloud:["Say the page aloud: 'Five diagrams across two rows. A straight line split by a ray; two crossing lines; a triangle with two known angles; a quadrilateral split by a diagonal; and a parallelogram beside its rearranged rectangle.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · assessment",
+   moves:["Complete the written assessment covering all thirteen days.","Self-mark section A against a displayed key.","Record scores by topic on the self-assessment grid.","Identify two weakest topics and write one specific next step for each."],
+   say:[["Teacher","Self-mark honestly. Marking generously only costs you later."],["Teacher","One specific next step per weak topic. 'Practise angles' is not a step. 'Redo the isosceles apex problems with the folding proof' is."]],
+   watch:["Students whose self-assessment does not match their station work. The mismatch signals either low confidence or an unnoticed gap, and those need opposite responses."]}
+ ],
+ guided:[["Two angles on a line, one 58°. Find the other.","122°"],["Triangle: 40°, 75°. Find the third.","65°"],["Quadrilateral: 80°, 95°, 100°. Find the fourth.","85°"],["Triangle base 9, height 6. Find the area.","27"]],
+ worksheet:[
+  {t:"A · Angles",d:"State the rule for each.",items:["line, known 62°","point, 4 lines equal angles","triangle, 55° and 70°","isosceles, apex 46°","quadrilateral, 90°, 90°, 100°","parallelogram, one angle 58°"]},
+  {t:"B · Areas",d:"Show every step.",items:["triangle base 10, height 8","triangle base 15, height 4","parallelogram base 9, height 6","parallelogram base 12, height 5"]},
+  {t:"C · Composite",d:"Find the angle first, then the area.",wide:true,
+   items:["Isosceles triangle apex 52°, base 11 cm, height 14 cm. Find the base angles and the area.","Irregular shape splits into a triangle (base 7, height 6) and a parallelogram (base 7, height 4). Find the total area."]},
+  {t:"D · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain the tear-and-line-up proof for the triangle angle sum, in your own words.","Explain the cut-and-slide derivation for a parallelogram's area.","Choose the topic you found hardest this unit. Explain it with a diagram, as if teaching someone who missed the lesson."]}],
+ exit:["Name the topic you are most confident with and give one reason.","Name the topic you want more practice on and give one specific next step.","Complete: the angles in any triangle always sum to ___."],
+ crit:"Mastery: assessment sections A through C at 80 percent or better, with self-assessment matching actual performance within one band. Reteach in small groups by topic rather than reteaching the unit; the self-assessment grid tells you how to form those groups.",
+ support:["Reduce to three stations covering line-and-point angles, triangle angles, and one area formula.","Provide worked examples at each station as reference.","Allow the assessment across two sittings if sustained concentration is the barrier rather than the mathematics."],
+ extend:["Design a station task of your own, including the diagram and the justification prompt.","Write a problem requiring three of the unit's rules or formulas in sequence, then solve it and write the key."],
+ access:["Motor: stations are arranged so each can be completed seated, with materials brought to the student.","Attention: twelve-minute rotations with a clear signal give predictable structure.","Vision: every station card uses the same layout so the format is never re-learned.","Language: the self-assessment grid pairs picture icons with topic names so it can be completed without heavy reading.","Hearing: the rotation signal is both visual and audible."]
+}
+];
+</script>
+<script src="curriculum-core.js"></script>
+</body>
+</html>

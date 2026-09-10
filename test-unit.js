@@ -53,7 +53,13 @@ JSDOM.fromFile(FILE,{
   // day 20 station picker
   nav.children[N-1].dispatchEvent(new w.MouseEvent("click",{bubbles:true}));
   const picks=d.querySelectorAll("#toolmount .picker .btn").length;
-  ok(picks>=2,"review station picker offers this unit's tools (got "+picks+")");
+  const directMount=d.querySelectorAll("#toolmount .tool").length;
+  /* Units with more than 3 distinct tools get a multi-button picker; units
+     with 3 or fewer (a small unit reusing one or two tools all the way
+     through) get those tools mounted directly, with no picker chrome. Both
+     are correct -- check that the review day offers SOMETHING either way. */
+  ok(picks>=2 || directMount>=1,
+     "review day offers this unit's tool(s), via picker or direct mount (picker="+picks+", direct="+directMount+")");
 
   // aria-labels on every svg across all days
   let noAria=[];

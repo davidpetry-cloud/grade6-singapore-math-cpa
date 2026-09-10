@@ -1,6 +1,6 @@
 # MANIFEST — Grade 6 Singapore Math (CPA)
 
-**Bundle version:** through-u05
+**Bundle version:** through-u06
 **Built:** 2026-09-10
 
 The hub's `UNITS` array is the source of truth for what exists. This file is a
@@ -30,19 +30,22 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 
 | file | bytes | sha256 (first 16) |
 |---|---|---|
-| `CLAUDE.md` | 12,192 | `c9d88c6cf607402c` |
+| `CLAUDE.md` | 12,616 | `4db98251382a6616` |
 | `README.md` | 4,714 | `6d2d5ebf47ada6c8` |
+| `angle-chase.js` | 10,540 | `64345ee7b08fb720` |
+| `angle-chase.test.js` | 4,719 | `59cf3f33124df385` |
 | `balance-scale.js` | 9,739 | `fb82b099870cd770` |
 | `balance-scale.test.js` | 3,260 | `18d60ecff41e5566` |
 | `curriculum-core.js` | 51,921 | `bd010e838ba2a847` |
 | `curriculum.css` | 13,193 | `b67d7d1bf35ce4af` |
-| `singapore-math-6-hub.html` | 20,621 | `eb17622ce2a76059` |
-| `test-unit.js` | 3,796 | `61769ae355dc319a` |
+| `singapore-math-6-hub.html` | 20,661 | `bce1d1b14ab4ba52` |
+| `test-unit.js` | 4,235 | `760c86dcdd48f57f` |
 | `unit-01-whole-numbers-and-operations.html` | 62,096 | `fd32edf62e0a2b75` |
 | `unit-02-fractions-and-decimals.html` | 158,134 | `794f8298cbf5223b` |
 | `unit-03-ratio-and-rate.html` | 104,085 | `e5ee14b100258515` |
 | `unit-04-percentage.html` | 87,767 | `54bd3f4dc7161ce6` |
 | `unit-05-algebra.html` | 125,841 | `68ff6a91a38e9c57` |
+| `unit-06-angles-and-figures.html` | 93,992 | `f41d6652553310e8` |
 | `unit-template.html` | 5,434 | `136b856553bad138` |
 
 ## Unit status
@@ -58,7 +61,7 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 | 07 | Circles | 15 | not built |
 | 08 | Volume of Solids | 15 | not built |
 | 09 | Data Analysis & Statistics | 15 | not built |
-| 10 | Negative Numbers & Coordinate Plane | 10 | not built |
+| 10 | Negative Numbers & Coordinate Plane | 13 | not built (grew from 10 days, absorbed 6.G.A.3) |
 
 ## Test before shipping a new unit
 
