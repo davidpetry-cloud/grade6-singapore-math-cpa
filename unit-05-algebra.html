@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit 5 &mdash; Algebra | Grade 6 CPA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="curriculum.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+    <h1>Unit 5 &mdash; Algebra</h1>
+    <p class="sub">A letter is a number nobody has told you yet, and an equation is a claim you can test. This unit keeps both of those physical for as long as possible: cups hide the unknown, and a balance decides whether a claim is still true. The rule about doing the same to both sides is never asserted here &mdash; students break it on purpose and watch the beam drop.</p>
+    <div class="facts">
+      <span><b>20</b> instructional days</span>
+      <span><b>4</b> weeks</span>
+      <span><b>55</b> minutes per lesson</span>
+      <span><b>6.EE</b> standards</span>
+    </div>
+  </div>
+  <div class="wrap"><nav class="daynav" id="daynav" aria-label="Lesson days"></nav></div>
+</header>
+
+<main class="wrap">
+  <div class="lesson">
+    <div id="content"></div>
+    <aside class="side" id="side"></aside>
+  </div>
+  <div class="pager">
+    <button id="prev">&larr; Previous lesson</button>
+    <button id="next">Next lesson &rarr;</button>
+  </div>
+</main>
+
+<!-- Unit-specific manipulative. Must load before curriculum-core.js. -->
+<script>
+/* balanceScale — Unit 5 (Algebra).
+   An equation is a balance. The tool exists to make one thing visible: doing
+   something to one side only breaks it, and the beam says so before the
+   teacher does. Declare before curriculum-core.js. */
+window.__EXTRA_TOOLS__=Object.assign(window.__EXTRA_TOOLS__||{},(function(){
+const rm=()=>(!!window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#5B7189", ROSE="#C2536B";
+
+function balanceScale(host){
+  const box=el("div","tool");
+  box.innerHTML=`<h3>Balance<span class="mins">tool</span></h3>
+    <p class="sense">sight · equilibrium</p>
+    <p class="how">Cups hide the unknown; discs are ones. The beam is level exactly while the sentence is true. Every move you make is offered twice — to both sides, and to one side — so you can watch which one keeps it true.</p>
+    <div class="ctl">
+      <label for="bsr">relation</label>
+      <select id="bsr"><option value="=">equation ( = )</option><option value="&gt;">inequality ( &gt; )</option></select>
+      <label for="bsc">cups on the left</label>
+      <input id="bsc" type="number" value="1" min="1" max="6" aria-label="number of cups">
+      <label for="bsa">plus</label>
+      <input id="bsa" type="number" value="3" min="0" max="40" aria-label="units added on the left">
+      <label for="bsb">right side</label>
+      <input id="bsb" type="number" value="8" min="0" max="99" aria-label="units on the right">
+      <button class="btn go" id="bsset">Set up</button>
+    </div>
+    <div class="ctl" id="bsops">
+      <label for="bsk">by</label>
+      <input id="bsk" type="number" value="3" min="1" max="40" aria-label="amount to operate by" style="width:74px">
+      <button class="btn" data-op="sub-both">&minus; from both sides</button>
+      <button class="btn amb" data-op="sub-one">&minus; from the left only</button>
+      <button class="btn" data-op="div-both">&divide; both sides</button>
+      <button class="btn sm" data-op="undo">Undo</button>
+      <button class="btn sm" data-op="reset">Start over</button>
+    </div>
+    <div class="stage-area"><svg viewBox="0 0 700 300" role="img" style="width:100%;height:auto"></svg></div>
+    <div class="out" id="bsout"></div>
+    <p class="note">The amber button is not a trap. Press it on purpose, watch the beam drop, then undo. A rule you have seen fail is held differently from a rule you were told.</p>`;
+  host.appendChild(box);
+  const svg=box.querySelector("svg"), out=box.querySelector("#bsout"), $=s=>box.querySelector(s);
+
+  let st=null, hist=[], msg="", broken=false;
+
+  function setup(){
+    const c=Math.max(1,+$("#bsc").value||1), a=Math.max(0,+$("#bsa").value||0), b=Math.max(0,+$("#bsb").value||0);
+    st={lc:c,lu:a,rc:0,ru:b,c0:c,a0:a,b0:b,rel:$("#bsr").value};
+    hist=[];broken=false;msg="Set up. The beam is level, so the sentence is true — whatever the cups turn out to hold.";
+    draw();
+  }
+  /* the value that makes the ORIGINAL sentence true */
+  const trueX=()=>(st.b0-st.a0)/st.c0;
+  const side=(cups,units)=>cups*trueX()+units;
+
+  function op(kind){
+    if(!st)return;
+    const k=Math.max(1,+$("#bsk").value||1);
+    if(kind==="reset"){setup();return;}
+    if(kind==="undo"){
+      if(!hist.length){msg="Nothing to undo yet.";draw();return;}
+      st=hist.pop();broken=Math.abs(side(st.lc,st.lu)-side(st.rc,st.ru))>1e-9;
+      msg="Undone.";draw();return;
+    }
+    hist.push(Object.assign({},st));
+    if(kind==="sub-both"){
+      if(st.lu<k||st.ru<k){hist.pop();msg=`You cannot take ${k} off a side that does not have ${k} loose discs. Take off what is there, or divide instead.`;draw();return;}
+      st.lu-=k;st.ru-=k;
+      msg=`Took ${k} off both sides. The beam did not move — you removed the same weight twice.`;
+    }else if(kind==="sub-one"){
+      if(st.lu<k){hist.pop();msg=`The left side does not have ${k} loose discs to remove.`;draw();return;}
+      st.lu-=k;
+      msg=`Took ${k} off the left only. The beam dropped on the right. The sentence is no longer true — nothing about the cups changed, but the statement did.`;
+    }else if(kind==="div-both"){
+      if(st.lc%k||st.lu%k||st.rc%k||st.ru%k){hist.pop();msg=`Dividing by ${k} would break something into pieces. Choose a number that goes into every group evenly.`;draw();return;}
+      st.lc/=k;st.lu/=k;st.rc/=k;st.ru/=k;
+      msg=`Split both sides into ${k} equal groups and kept one group from each. Still balanced.`;
+    }
+    broken=Math.abs(side(st.lc,st.lu)-side(st.rc,st.ru))>1e-9;
+    draw();
+  }
+
+  function pan(cx,cy,cups,units,tone){
+    let s=`<line x1="${cx}" y1="${cy-64}" x2="${cx-52}" y2="${cy-10}" stroke="${MUT}" stroke-width="1.5"/>
+           <line x1="${cx}" y1="${cy-64}" x2="${cx+52}" y2="${cy-10}" stroke="${MUT}" stroke-width="1.5"/>
+           <path d="M${cx-58} ${cy-10} L${cx+58} ${cy-10} L${cx+44} ${cy+12} L${cx-44} ${cy+12} Z" fill="#fff" stroke="${INK}" stroke-width="2"/>`;
+    /* cups sit left, discs right, stacked in rows above the pan */
+    let x=cx-46,y=cy-26;
+    for(let i=0;i<cups;i++){
+      s+=`<path d="M${x} ${y-18} L${x+20} ${y-18} L${x+16} ${y} L${x+4} ${y} Z" fill="${P}" stroke="#4A5C8C" stroke-width="1.5"/>
+          <text x="${x+10}" y="${y-4}" font-family="Inconsolata" font-size="11" fill="#fff" text-anchor="middle">x</text>`;
+      x+=24; if(x>cx+34){x=cx-46;y-=24;}
+    }
+    let dx=cx-46, dy=y-(cups?26:0);
+    for(let i=0;i<Math.min(units,60);i++){
+      s+=`<circle cx="${dx+7}" cy="${dy-7}" r="6.5" fill="${tone}" stroke="${INK}" stroke-width="1"/>`;
+      dx+=16; if(dx>cx+40){dx=cx-46;dy-=16;}
+    }
+    if(units>60)s+=`<text x="${cx}" y="${dy-22}" font-family="Inconsolata" font-size="12" fill="${MUT}" text-anchor="middle">+${units-60} more</text>`;
+    return s;
+  }
+
+  function expr(cups,units){
+    if(!cups)return String(units);
+    const c=cups===1?"":String(cups);
+    return units?`${c}x + ${units}`:`${c}x`;
+  }
+
+  function draw(){
+    if(!st){setup();return;}
+    const L=side(st.lc,st.lu), R=side(st.rc,st.ru);
+    const rel=st.rel;
+    /* equations: level while true. inequalities: left is heavier by design. */
+    let tilt;
+    if(rel==="="){ tilt = L===R?0:(L>R?7:-7); }
+    else { tilt = -7; }
+    const cy=150, half=180, cx=350;
+    const dy=Math.tan(tilt*Math.PI/180)*half;
+    const noAnim=rm();
+    let s=`<g${noAnim?"":' style="transition:transform .5s cubic-bezier(.3,1,.4,1)"'}>`;
+    s+=`<line x1="${cx-half}" y1="${cy+dy}" x2="${cx+half}" y2="${cy-dy}" stroke="${INK}" stroke-width="6" stroke-linecap="round"/>`;
+    s+=pan(cx-half,cy+dy+64,st.lc,st.lu,T);
+    s+=pan(cx+half,cy-dy+64,st.rc,st.ru,A);
+    s+=`</g>`;
+    /* stand */
+    s+=`<path d="M${cx} ${cy} L${cx-26} ${cy+120} L${cx+26} ${cy+120} Z" fill="${INK}"/>`;
+    s+=`<circle cx="${cx}" cy="${cy}" r="9" fill="${INK}"/>`;
+    /* the sentence, above the beam */
+    const relShown = rel==="=" ? (L===R?"=":(L>R?"&gt;":"&lt;")) : "&gt;";
+    s+=`<text x="${cx}" y="34" font-family="Fraunces" font-size="26" fill="${broken&&rel==="="?ROSE:INK}" text-anchor="middle">${expr(st.lc,st.lu)} ${relShown} ${expr(st.rc,st.ru)}</text>`;
+    if(rel==="="&&broken)s+=`<text x="${cx}" y="58" font-family="Inconsolata" font-size="13" fill="${ROSE}" text-anchor="middle">no longer the sentence you started with</text>`;
+    svg.innerHTML=s;
+
+    const solved = rel==="=" && !broken && st.lc===1 && st.lu===0 && st.rc===0;
+    svg.setAttribute("aria-label",
+      `A balance. The left pan holds ${st.lc} cup${st.lc===1?"":"s"} labelled x and ${st.lu} disc${st.lu===1?"":"s"}. The right pan holds ${st.rc?st.rc+" cups and ":""}${st.ru} disc${st.ru===1?"":"s"}. The beam is ${tilt===0?"level":(tilt>0?"lower on the left":"lower on the right")}. The sentence reads ${expr(st.lc,st.lu)} ${rel==="="?(L===R?"equals":(L>R?"is greater than":"is less than")):"is greater than"} ${expr(st.rc,st.ru)}.`);
+
+    let o=`<b>${expr(st.lc,st.lu)} ${relShown} ${expr(st.rc,st.ru)}</b><br>${msg}<br>`;
+    if(rel==="="){
+      o+=solved
+        ? `<span style="color:${T}">One cup on its own against ${st.ru} disc${st.ru===1?"":"s"}. <b>x = ${st.ru}</b>. Nobody moved a cup or looked inside one — the cups were the same all along, and the moves only cleared away what was around them.</span>`
+        : broken
+          ? `<span style="color:${ROSE}">Broken. This sentence is not the one you were asked about, so anything you find from here answers a different question. Undo, and do it to both sides.</span>`
+          : `<span style="color:${MUT}">Still true. Goal: one cup alone on one side. What is in the way?</span>`;
+      if(!broken)o+=`<br><span style="color:${MUT}">Check any time: the cups hold ${trueX()%1?trueX().toFixed(2):trueX()} each, so both sides weigh ${L%1?L.toFixed(2):L}.</span>`;
+    }else{
+      const sol=st.lc?`x &gt; ${((st.ru-st.lu)/st.lc)}`:"no cups left to solve for";
+      o+=`<span style="color:${MUT}">An inequality does not balance — it leans, and it must keep leaning the same way. The same moves are legal, and the lean is preserved by every one of them.</span><br>
+          Solution so far: <b>${sol}</b>. Every value above that keeps the left pan heavier, so the answer is a stretch of the number line, not a single point.`;
+    }
+    out.innerHTML=o;
+  }
+
+  $("#bsset").addEventListener("click",setup);
+  $("#bsr").addEventListener("change",setup);
+  $("#bsops").addEventListener("click",e=>{const b=e.target.closest("button[data-op]");if(b)op(b.dataset.op);});
+  setup();
+}
+return {balanceScale};
+})());
+window.__EXTRA_NAMES__=Object.assign(window.__EXTRA_NAMES__||{},{balanceScale:"Balance"});
+</script>
+
+<script>
+/* Core tools: placeValue, rounding, shift, stepper, power, barModel, factors,
+   decimalGrid, rateLine. This unit adds balanceScale. */
+window.UNIT={
+  number:5,
+  minutes:55,
+  tools:{
+     1:["balanceScale"],  2:["balanceScale"],  3:["rateLine"],      4:["stepper"],
+     5:["barModel"],      6:["barModel"],      7:["balanceScale"],  8:["barModel"],
+     9:["balanceScale"], 10:["balanceScale"], 11:["balanceScale"], 12:["balanceScale","barModel"],
+    13:["balanceScale"], 14:["balanceScale"], 15:["rateLine"],     16:["rateLine"],
+    17:["balanceScale","barModel"],          18:["barModel"],      19:["balanceScale"],
+    20:"all"
+  }
+};
+
+window.LESSONS=
+[
+{
+ day:1, short:"The unknown", title:"A letter is a number you don't know yet",
+ objective:"Explain what a letter stands for in an expression, and use a cup-and-counters model to represent an unknown quantity.",
+ standards:["6.EE.A.2","6.EE.B.6"],
+ vocab:[["Variable","A letter standing for a number. It has one value in a given problem; it is not a label for an object."],["Unknown","A specific number you have not found yet."],["Expression","A collection of numbers, letters and operations with no equals sign."],["Term","One piece of an expression: in 3x + 6, the terms are 3x and 6."]],
+ materials:["Opaque plastic cups, 6 per pair","Counters, 60 per pair","Envelopes as an alternative to cups","Sticky notes"],
+ warmup:{mins:5,text:"Hold up a closed cup with counters inside and ask how many are in it. Nobody knows. Ask what we should call that number while we work with it. Take suggestions — 'the number', 'n', 'x', 'the mystery number'. Say: all of those work, and mathematicians picked short ones because you have to write it a lot."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · hidden quantity",
+   moves:["Pairs receive a sealed cup with an unknown number of counters and three loose counters.","Describe the total on the table without opening the cup: one cup and three.","Add a second identical cup and describe again: two cups and three.","Swap cups with another pair and note the description does not change even though the number inside might."],
+   say:[["Teacher","How many counters are on your table altogether?"],["Expected","We don't know — there's a cup."],["Teacher","Describe it anyway. Use the word cup."],["Expected","One cup and three."],["Teacher","That is an expression. You just wrote algebra without a letter."],["Teacher","Now swap cups with the next pair. Is your description still correct?"],["Expected","Yes, it's still one cup and three."]],
+   watch:["Students who guess a number for the cup and work with the guess. The point is to operate without knowing. Ask them to describe rather than to solve, and hold that distinction for the whole lesson."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · drawing the unknown",
+   moves:["Draw a cup shape and three dots and label it 'one cup and three'.","Replace the cup drawing with the letter x and write x + 3.","Draw 2 cups and 5 counters and write 2x + 5.","Draw a case with counters only and note there is no letter: it is just a number."],
+   say:[["Teacher","The letter is a drawing of the cup, done faster."],["Teacher","Two cups and five. How do we write two cups?"],["Expected","2x."],["Teacher","The 2 is not next to the x by accident. Being next to it means multiply, because two cups is x plus x."]],
+   readaloud:["Say the picture aloud: 'Two identical cup shapes are drawn side by side, each labelled x. To their right are five separate dots. Beneath the whole arrangement is written two x plus five.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · notation",
+   moves:["Write expressions from cup arrangements and arrangements from expressions.","Establish that 3x means 3 × x and that x1 is never written.","Name the parts: coefficient, variable, constant.","Contrast an expression with an equation, which has an equals sign."],
+   say:[["Teacher","Three x means three lots of x. Why do we not write the times sign?"],["Expected","It looks like an x."],["Teacher","That is the actual historical reason. And we never write 1x — a single cup is just x."],["Teacher","Is x + 3 an equation?"],["Expected","No, there's no equals."],["Teacher","Expressions describe. Equations claim. You will meet the claims on day ten."]],
+   watch:["Students who read x as standing for an object rather than a number — treating 3x as 'three cups' rather than 'three times the number in a cup'. Ask what 3x would be worth if the cup held 4; the object reading cannot answer."]}
+ ],
+ guided:[["Write an expression for 2 cups and 7 counters.","2x + 7"],["Draw 3x + 2.","Three cups and two counters"],["What does 5n mean?","5 × n, or five lots of n"],["Is 4y + 1 an expression or an equation?","An expression — there is no equals sign."]],
+ worksheet:[
+  {t:"A · Write the expression",d:"Use x for the cup.",items:["1 cup, 4 counters","3 cups, 0 counters","2 cups, 9 counters","5 cups, 1 counter","4 counters only","6 cups, 6 counters"]},
+  {t:"B · Name the parts",d:"State the coefficient, the variable and the constant.",items:["3x + 5","7n","y + 12","10 − 2a","4b + 4","m + 1"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why 3x is not the same as x3 in meaning, even though multiplication can be done in either order.","Two pairs have cups holding different amounts. Both write 2x + 3. Is one of them wrong? Explain.","Why do we not write 1x for a single cup? What would be confusing if we did?"]}],
+ exit:["Write an expression for 4 cups and 3 counters.","What does 6m mean?","Explain what a letter stands for in an expression."],
+ crit:"Mastery: both correct and item 3 says a letter stands for a number. Reteach if the letter is treated as an object or a label — that misconception makes substitution meaningless on day four, so it must be caught now.",
+ support:["Keep sealed cups on the desk all lesson; the physical unknown is the concept, not a scaffold.","Restrict to one variable and small coefficients before mixing.","Provide a naming frame with coefficient, variable and constant as labelled boxes."],
+ extend:["Write an expression for a situation with two different unknowns. What has to be true of the letters you choose?","Why can x + x be written as 2x but x + y cannot be written as 2xy? Explain with cups."],
+ access:["Touch: a sealed cup is an unknown you can hold, which makes 'operate without knowing' a physical experience rather than an instruction.","Vision: cups and counters differ in shape as well as size, so they are distinguishable without colour.","Language: 'variable', 'unknown' and 'letter' are used for the same thing today; post all three together rather than switching silently.","Attention: swapping cups between pairs is a short concrete demonstration that the description holds regardless of the value."]
+},
+{
+ day:2, short:"Words to symbols", title:"Writing expressions from words",
+ objective:"Translate a worded description into an algebraic expression, paying attention to the order the words imply.",
+ standards:["6.EE.A.2a","6.EE.B.6"],
+ vocab:[["Sum","The result of adding."],["Product","The result of multiplying."],["More than","Signals addition, but reverses the order the words appear in."],["Less than","Signals subtraction, and reverses the order — the most common trap in this lesson."]],
+ materials:["Cups and counters","Word-phrase cards for sorting","Chart paper for the translation wall"],
+ warmup:{mins:5,text:"Post 'five less than a number' and ask for it as an expression. Collect both 5 − n and n − 5. Do not resolve it yet. Ask instead: if the number were 12, what is five less than it? Everyone says 7. Then ask which expression gives 7. Now it is settled by evidence rather than by rule."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · acting the phrase",
+   moves:["Build 'three more than a number' with a cup and three counters.","Build 'five less than a number' by removing five counters from a cup's worth.","Build 'twice a number' with two cups, then 'twice a number plus one'.","Build 'twice a number plus one' and 'twice the sum of a number and one' separately and compare."],
+   say:[["Teacher","Twice a number, plus one. Build it."],["Expected","Two cups and one counter."],["Teacher","Now twice the sum of a number and one. Build that."],["Expected","Two cups and two counters — because you double the whole thing."],["Teacher","Same words in a different order, different pile on the table. The word 'sum' packaged them together before doubling."]],
+   watch:["Students who build both phrases identically. The word 'sum' or 'the quantity' groups first — have them build one cup and one counter, then double the whole arrangement physically."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · brackets as a bag",
+   moves:["Draw the two doubling cases side by side.","Draw a bag or loop around the grouped version and write 2(x + 1).","Draw four phrase-to-picture pairs and label each.","Draw a division phrase: a number shared between three, written as n/3."],
+   say:[["Teacher","The loop is what brackets do. It says 'this whole thing' before the two acts on it."],["Teacher","So 2(x + 1) is a doubled bag, and 2x + 1 is two cups with a counter beside them."],["Teacher","Two pictures, two expressions, and the brackets are the difference."]],
+   readaloud:["Say the picture aloud: 'On the left, two cups sit beside a single dot. On the right, a cup and a dot are enclosed in a loop, and the whole loop is drawn twice. The left is labelled two x plus one; the right, two times the quantity x plus one.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · translation",
+   moves:["Build a translation wall: sum, difference, product, quotient, more than, less than, twice, half.","Translate ten phrases, watching order on the reversing ones.","Translate back from expressions to words.","Flag the two reversing phrases explicitly on the wall."],
+   say:[["Teacher","'More than' and 'less than' both reverse. Everything else reads left to right."],["Teacher","Why is 'five less than n' written n − 5?"],["Expected","Because you start with n and take five off."],["Teacher","The English says the five first. The mathematics does it second. That mismatch is the whole trap and it never stops being a trap."]],
+   watch:["Students who write 5 − n. Return to the warm-up: substitute 12 and see which expression gives 7. Checking with a number beats memorising which phrases reverse."]}
+ ],
+ guided:[["Write 'seven more than a number'.","n + 7"],["Write 'four less than a number'.","n − 4"],["Write 'twice a number, plus three'.","2n + 3"],["Write 'twice the sum of a number and three'.","2(n + 3)"]],
+ worksheet:[
+  {t:"A · Words to symbols",d:"Use n for the number.",items:["six more than a number","a number less five","three times a number","a number divided by four","half of a number","ten less than a number"]},
+  {t:"B · Watch the grouping",d:"Brackets where needed.",items:["three times the sum of a number and two","three times a number, plus two","the sum of a number and five, doubled","a number doubled, plus five"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why 'five less than a number' is n − 5 and not 5 − n. Test both with n = 12.","Write a phrase in words for 4(n − 2) and another for 4n − 2. How do your two phrases differ?","Why do brackets matter in algebra when they often do not matter in a sentence?"]}],
+ exit:["Write 'eight more than a number'.","Write 'three less than a number'.","Explain why 'less than' reverses the order."],
+ crit:"Mastery: both correct and item 3 says the phrase names the subtracted amount first. Reteach if the subtraction is reversed — teach the substitute-and-check habit rather than a list of reversing phrases, since the habit generalises.",
+ support:["Provide the translation wall as a printed reference for every problem.","Restrict to non-reversing phrases before introducing 'less than'.","Keep cups available for building each phrase before writing it."],
+ extend:["Write a phrase that translates to 2(n + 3) − 4 and one that translates to 2n + 3 − 4.","Find two English phrases that sound similar but give different expressions. Explain the difference."],
+ access:["Touch: physically doubling a grouped arrangement shows what brackets do, in a way the symbol cannot.","Language: this lesson is a translation task and the reading load is the mathematics; read every phrase aloud before writing.","Memory: the translation wall stays visible during the assessment — recognising the phrase is the skill, not recalling the list.","Vision: the loop drawn around grouped terms uses a distinct line style so it reads as packaging rather than decoration."]
+},
+{
+ day:3, short:"Real contexts", title:"Expressions from real situations",
+ objective:"Write an expression for a real situation, and state clearly what the variable represents.",
+ standards:["6.EE.A.2","6.EE.B.6","6.RP.A.3"],
+ vocab:[["Define the variable","Write a sentence saying exactly what the letter stands for, including units."],["Constant","The part of a situation that does not change."],["Coefficient","The number multiplying the variable — usually a rate."],["Context","The real situation the expression describes."]],
+ materials:["Price lists and menus","Cups and counters","Whiteboards"],
+ warmup:{mins:5,text:"Post: 'Taxi costs $3 to start, plus $2 per kilometre.' Ask what changes and what stays the same. The $3 is fixed; the $2 repeats. Say: every expression you write today has those two parts, and telling them apart is most of the work."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · building a growing cost",
+   moves:["Build the taxi fare for 1 km with counters: three for the flag fall, two for the kilometre.","Build 2 km, then 3 km, recording each total.","Identify which pile grows and which does not.","Replace the repeated twos with cups holding two each and describe the arrangement."],
+   say:[["Teacher","Which pile changed when the journey got longer?"],["Expected","The two-per-kilometre pile."],["Teacher","And the three?"],["Expected","It stayed."],["Teacher","So three is a constant and two is a rate. Now say the whole thing with a letter."],["Expected","Two k plus three."]],
+   watch:["Students who write 3k + 2, attaching the letter to the constant. Ask which number repeats per kilometre; the letter goes with the thing that repeats."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · table then expression",
+   moves:["Build a table of kilometres against cost for 1 to 5 km.","Identify the constant difference between rows as the coefficient.","Identify the value at zero kilometres as the constant.","Write the expression and check it against every row of the table."],
+   say:[["Teacher","What is the jump between rows?"],["Expected","Two each time."],["Teacher","That is your coefficient. And what would the cost be for zero kilometres?"],["Expected","Three."],["Teacher","That is your constant. The table hands you both numbers if you ask it the right two questions."]],
+   readaloud:["Say the table aloud: 'A two-column table. Kilometres one through five in the left column; costs five, seven, nine, eleven and thirteen in the right. Each cost is two more than the one above it.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · define and write",
+   moves:["Write a variable definition sentence with units before any expression.","Write expressions for four contexts.","Check each expression against a value from the situation.","Compare two expressions for the same context written by different students."],
+   say:[["Teacher","Before the expression, write the sentence. 'Let k be the number of kilometres travelled.' With units."],["Teacher","Why bother, when we all know what k means?"],["Expected","So someone reading it knows."],["Teacher","And so you know, in twenty minutes, when you have forgotten. An undefined letter is the most common reason a correct expression gets marked wrong."]],
+   watch:["Students who define the variable as the object rather than the quantity — 'let k be kilometres' rather than 'the number of kilometres'. The variable is always a number, and the definition should say so."]}
+ ],
+ guided:[["Taxi: $3 flag fall, $2 per km. Write the expression.","2k + 3, where k is the number of kilometres"],["Gym: $20 joining fee, $5 per visit.","5v + 20"],["A number of boxes each holding 12 pens.","12b"],["$50 spent from a starting balance.","b − 50"]],
+ worksheet:[
+  {t:"A · Write the expression",d:"Define your variable first.",wide:true,
+   items:["A plumber charges $40 call-out plus $60 per hour.","A phone plan costs $15 a month plus $0.20 per text.","A box holds 24 cans; write the number of cans in a number of boxes.","You start with $80 and spend an amount."]},
+  {t:"B · Constant or coefficient",d:"For each, state which number is which.",items:["3n + 7","12m","5 + 4t","20 − 2d"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Write an expression for a taxi charging $4 plus $1.50 per km, and use it to find the cost of a 6 km trip.","Explain why defining the variable with units matters, giving an example where leaving it out causes confusion.","Two students write 5v + 20 and 20 + 5v for the same gym. Are both correct? Explain."]}],
+ exit:["A cafe charges $2 per coffee plus a $1 service fee. Write the expression.","State what your variable represents.","Explain the difference between the constant and the coefficient."],
+ crit:"Mastery: expression correct and the variable defined as a number with units. Reteach if the letter attaches to the constant — the table's constant difference identifies the coefficient reliably and is worth practising.",
+ support:["Provide a two-box frame labelled 'what stays the same' and 'what repeats'.","Build the table first on every problem; the expression comes from it.","Give a sentence stem: 'Let ___ be the number of ___.'"],
+ extend:["Write an expression for a situation where the rate applies only after the first few units, such as a phone plan with free texts included.","A context gives the expression 8h + 25. Invent a realistic situation that fits it."],
+ access:["Touch: physically rebuilding the cost for each kilometre shows which pile grows.","Language: the sentence stem for defining variables removes the phrasing burden while keeping the discipline.","Vision: tables are printed with the difference column left blank, so the constant difference is discovered rather than shown.","Attention: the two-box frame splits the task into two short identifications before any writing."]
+},
+{
+ day:4, short:"Substitution", title:"Evaluating an expression by substitution",
+ objective:"Evaluate an expression for a given value of the variable, applying order of operations correctly.",
+ standards:["6.EE.A.2c","6.EE.A.1"],
+ vocab:[["Substitute","Replace the letter with a number."],["Evaluate","Work out the resulting value."],["Order of operations","Unit 1's rules, unchanged — brackets, indices, then multiply and divide, then add and subtract."],["Value of the expression","What it comes to for that particular value of the variable."]],
+ materials:["Cups and counters","Unit 1 order-of-operations reference","Whiteboards"],
+ warmup:{mins:5,text:"Post 3x + 2 and ask for its value when x = 4. Collect answers; 14 and 18 will both appear. Do not say which is right. Build it with cups instead: three cups of four, plus two loose. Count. The cups settle it, not the rule."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · filling the cups",
+   moves:["Set out 3 cups and 2 loose counters for 3x + 2.","Open the cups and put 4 counters in each, announcing x = 4.","Count the total: 14.","Repeat with x = 7 and x = 0, noting the expression is unchanged."],
+   say:[["Teacher","Four in each cup. Not four altogether — four in each."],["Teacher","Count everything."],["Expected","Fourteen."],["Teacher","Now empty the cups. What is the expression worth when x is zero?"],["Expected","Just the two."],["Teacher","The cups are still there. They are just holding nothing. The expression did not change; only its value did."]],
+   watch:["Students who put 4 counters across the three cups in total. 'Each' is the whole instruction. Have them fill one cup at a time and say the number aloud."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · showing the substitution",
+   moves:["Write 3x + 2, then rewrite as 3 × 4 + 2 with the substitution shown.","Bracket the multiplication to show it happens first.","Evaluate step by step, one operation per line, as in Unit 1.","Repeat for an expression with brackets: 2(x + 3)."],
+   say:[["Teacher","Write the substitution line before you calculate anything. Three times four plus two."],["Teacher","Which happens first?"],["Expected","The multiplication."],["Teacher","Same rules as Unit 1. Substituting does not suspend them — it just gives you numbers to apply them to."]],
+   readaloud:["Say the working aloud: 'The first line reads three x plus two. The second line reads three times four plus two, with the letter replaced. The third line reads twelve plus two. The fourth line reads fourteen.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · careful substitution",
+   moves:["Substitute into expressions with brackets, powers and division.","Handle a coefficient beside a bracket: 2(x + 3) with x = 5.","Evaluate an expression with two variables.","Build a table of values for one expression across several inputs."],
+   say:[["Teacher","2(x + 3) with x = 5. What is inside the bracket first?"],["Expected","Eight."],["Teacher","Then doubled — sixteen. If you had done 2 times 5 first you would have got thirteen, and that is a different expression."],["Teacher","The brackets survive substitution. Write them in."]],
+   watch:["Students who drop the brackets when substituting, turning 2(x + 3) into 2 × 5 + 3. Require the substitution line written in full with brackets intact before any arithmetic."]}
+ ],
+ guided:[["Evaluate 3x + 2 when x = 4.","14"],["Evaluate 2(x + 3) when x = 5.","16"],["Evaluate 20 − 3n when n = 6.","2"],["Evaluate 3x + 2 when x = 0.","2"]],
+ worksheet:[
+  {t:"A · Substitute",d:"Show the substitution line.",items:["4n + 1, n = 3","2a − 5, a = 8","10 − x, x = 4","6m, m = 7","n/2 + 3, n = 10","5 + 3p, p = 2"]},
+  {t:"B · With brackets and powers",d:"Show every step.",items:["2(x + 4), x = 3","3(n − 2), n = 7","x² + 1, x = 5","4(a + a), a = 2"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Build a table of values for 2x + 1 with x from 0 to 5. What pattern do you see in the outputs?","Explain why 2(x + 3) and 2x + 3 give different values when x = 5.","An expression gives 17 when x = 4. Find two different expressions that do this."]}],
+ exit:["Evaluate 5x − 3 when x = 4.","Evaluate 2(n + 1) when n = 6.","Explain why the brackets must be kept when you substitute."],
+ crit:"Mastery: both correct and item 3 says the bracket groups before the multiplication. Reteach if the coefficient is applied before the bracket — that is Unit 1's order of operations failing under new notation, so revisit the stepper tool rather than teaching substitution again.",
+ support:["Keep cups and counters available; filling them physically answers any substitution question.","Restrict to expressions without brackets before introducing them.","Provide the Unit 1 order-of-operations reference card."],
+ extend:["Find a value of x for which 2(x + 3) and 2x + 3 give the same answer. Is there one? Explain.","Evaluate 3x + 2 for x = 0.5 and x = 1/4. Does the method change?"],
+ access:["Touch: filling cups is substitution made physical, and 'each' becomes unambiguous when you are holding the cups.","Memory: the Unit 1 rules are named as unchanged rather than restated, so this is one rule applied twice, not two rules.","Attention: the substitution line written before any arithmetic gives a fixed first action.","Vision: working is set out one operation per line, as in Unit 1, so the format is already familiar."]
+},
+{
+ day:5, short:"Formulas", title:"Using formulas",
+ objective:"Substitute into a formula to find a value, and explain what each letter in the formula represents.",
+ standards:["6.EE.A.2c","6.EE.B.6","6.G.A.1"],
+ vocab:[["Formula","An expression or equation describing a general relationship: A = lw."],["Subject","The letter on its own, usually on the left."],["Units","What the answer is measured in — a formula's answer is rarely just a number."],["General rule","A formula works for every case, not just the one you tested."]],
+ materials:["Rulers and measuring tape","Rectangular objects to measure","Formula reference card","Calculators after the substitution is written"],
+ warmup:{mins:5,text:"Ask for the area of a rectangle 7 cm by 4 cm. Everyone answers. Then ask them to write a rule that works for any rectangle. Collect attempts. Say: what you just wrote is a formula, and it is worth more than the twenty-eight because it answers every rectangle at once."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · measuring and calculating",
+   moves:["Measure three real rectangles and record length and width.","Calculate each area by counting or multiplying.","Write the general rule that worked every time.","Test the rule on a fourth rectangle by predicting before measuring."],
+   say:[["Teacher","Three rectangles, one rule. Write the rule using letters."],["Expected","Area equals length times width."],["Teacher","Now predict the fourth before you measure it. If the rule is right, your prediction holds."],["Teacher","That is what a formula buys you — predictions, not just records."]],
+   watch:["Students who write the formula with the numbers from one rectangle still in it. A formula has letters where the measurements go, which is exactly what makes it general."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · labelled diagram",
+   moves:["Draw a rectangle with l and w labelled on the sides.","Substitute measurements onto the diagram before calculating.","Draw a triangle and label b and h for the area formula.","Draw a perimeter case and derive P = 2(l + w) from the picture."],
+   say:[["Teacher","Label the diagram first, then substitute. The picture is where you check that l and w went to the right sides."],["Teacher","Perimeter — why 2(l + w) rather than 2l + 2w?"],["Expected","They're the same thing."],["Teacher","They are, and you will prove that on day eight. For now, notice both describe the same walk around the shape."]],
+   readaloud:["Say the picture aloud: 'A rectangle is drawn with its horizontal side labelled l and its vertical side labelled w. Inside the rectangle is written A equals l w.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · substituting with units",
+   moves:["Substitute into A = lw, P = 2(l + w) and A = bh/2.","Include units in every answer, with squared units for area.","Substitute into a non-geometric formula such as cost or distance.","Check each answer for plausibility against the diagram."],
+   say:[["Teacher","Area comes out in square centimetres. Why squared?"],["Expected","Because you multiplied two lengths."],["Teacher","So the unit tells you what operation happened. If your area answer is in plain centimetres, you have done a perimeter."]],
+   watch:["Students who substitute correctly but give area in linear units. The unit is part of the answer; require it and treat a missing unit as an incomplete response."]}
+ ],
+ guided:[["A = lw, l = 7, w = 4. Find A.","28 cm²"],["P = 2(l + w), l = 7, w = 4. Find P.","22 cm"],["A = bh/2, b = 6, h = 5. Find A.","15 cm²"],["d = st, s = 60, t = 3. Find d.","180 km"]],
+ worksheet:[
+  {t:"A · Substitute into the formula",d:"Include units.",items:["A = lw, l = 9, w = 5","P = 2(l + w), l = 12, w = 3","A = bh/2, b = 10, h = 7","d = st, s = 45, t = 4","A = s², s = 6","P = 4s, s = 11"]},
+  {t:"B · Which formula",d:"Choose the right one, then use it.",wide:true,
+   items:["A rectangular garden is 8 m by 5 m. How much fencing is needed to go around it?","The same garden — how much turf covers it?","A triangle has base 12 cm and height 9 cm. Find its area."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why area is measured in squared units but perimeter is not.","A rectangle has area 24 cm². Give three possible pairs of side lengths. How many are there?","Why is a formula more useful than a worked example, even though the example gives an actual answer?"]}],
+ exit:["A = lw with l = 6 and w = 7. Find A with units.","P = 2(l + w) with l = 6 and w = 7. Find P.","Explain what each letter in A = lw stands for."],
+ crit:"Mastery: both correct with units, and item 3 defines both letters as measurements. Reteach if units are omitted or linear units used for area — the unit is the check that the right formula was chosen.",
+ support:["Provide the formula reference card and permit its use throughout.","Restrict to rectangles before triangles.","Label the diagram before substituting on every problem."],
+ extend:["Rearrange A = lw to find l when A and w are known. Test it on a real rectangle.","Why does the triangle area formula have a division by two? Show it with a rectangle cut in half."],
+ access:["Touch: measuring real objects makes the letters stand for something a student has physically determined.","Vision: diagrams are labelled on the sides themselves, never in a separate key.","Language: 'formula' and 'rule' are used interchangeably; post both and say so.","Motor: a partner can measure while another records, with both substituting."]
+},
+{
+ day:6, short:"Tables & rules", title:"From patterns to expressions",
+ objective:"Find the rule for a growing pattern and write it as an expression, justifying it from the structure of the pattern.",
+ standards:["6.EE.A.2","6.EE.B.6","6.EE.C.9"],
+ vocab:[["Term number","Which step of the pattern you are on — the input."],["Rule","The expression giving the value for any term number."],["Constant difference","The amount added each step — the coefficient."],["Zero term","What the pattern would be at step zero — the constant."]],
+ materials:["Matchsticks or toothpicks, 60 per pair","Square tiles","Grid paper","Whiteboards"],
+ warmup:{mins:5,text:"Build the first three steps of a matchstick square pattern where each new square shares a side. Ask how many matches for step 10. Take guesses. Then ask how many for step 100 — the guessing stops and someone asks for a rule. That request is the lesson."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · building the pattern",
+   moves:["Build steps 1, 2 and 3 of the shared-side square pattern with matchsticks.","Count the matches at each step and record: 4, 7, 10.","Identify what is added each time and where it goes physically.","Identify the first square as one extra match beyond a repeating group of three."],
+   say:[["Teacher","How many new matches does each square need after the first?"],["Expected","Three."],["Teacher","So where does the fourth match in step one come from?"],["Expected","It's the starting side."],["Teacher","Three per square, plus one to start. Say that as an expression."],["Expected","Three n plus one."]],
+   watch:["Students who find the constant difference but stop, giving the rule as 3n. Test it at step one: 3 gives three matches, but they built four. The test catches the missing constant every time."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · table and structure",
+   moves:["Build a table of term number against count.","Mark the constant difference between rows.","Work backwards to a term-zero value.","Circle the repeating group and the starting piece on the drawn pattern."],
+   say:[["Teacher","Difference of three each row. What would step zero be?"],["Expected","One."],["Teacher","So the rule is three n plus one. And notice the one is visible in the picture — it is that first vertical match."],["Teacher","A rule you can point at in the picture is a rule you will remember."]],
+   readaloud:["Say the picture aloud: 'Three arrangements in a row. The first is a single square of four matches. The second is two squares sharing a vertical side, seven matches. The third is three squares in a line sharing sides, ten matches.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · writing and testing",
+   moves:["Write the rule as an expression in n.","Test it at three known term numbers.","Use it to find a far term such as step 100.","Find the rule for two more patterns, one with a difference of two and one with a subtraction."],
+   say:[["Teacher","Test your rule on every step you built. All three must work, not just one."],["Teacher","Now step one hundred."],["Expected","Three hundred and one."],["Teacher","That is why the rule was worth finding. You will never build that one."]],
+   watch:["Students who test the rule on only one term. A wrong rule often works for one value by coincidence — three tests is the minimum and it should be a habit, not an instruction."]}
+ ],
+ guided:[["Pattern 4, 7, 10, 13. Write the rule.","3n + 1"],["Pattern 5, 7, 9, 11. Write the rule.","2n + 3"],["Use 3n + 1 to find step 100.","301"],["Pattern 10, 8, 6, 4. Write the rule.","12 − 2n"]],
+ worksheet:[
+  {t:"A · Find the rule",d:"Test it on three terms.",items:["3, 5, 7, 9","6, 10, 14, 18","2, 5, 8, 11","20, 18, 16, 14","7, 12, 17, 22","1, 4, 7, 10"]},
+  {t:"B · Use the rule",d:"Find the term asked for.",items:["4n + 2, find term 20","5n − 1, find term 12","3n + 7, find term 50","100 − 4n, find term 15"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Build a matchstick pattern of triangles sharing sides. Find its rule and explain where each number comes from in the picture.","Explain why the constant difference gives the coefficient and not the constant.","Two patterns both have a difference of 3. Write two different rules and say what makes them different."]}],
+ exit:["Pattern 5, 9, 13, 17. Write the rule.","Use it to find term 20.","Explain how you find the constant in a rule."],
+ crit:"Mastery: both correct and item 3 describes working back to term zero or testing at term one. Reteach if the constant is omitted — require the three-term test, since it exposes the error without any explanation from you.",
+ support:["Provide tables with the difference column pre-drawn.","Restrict to patterns with a positive constant difference before decreasing ones.","Keep matchsticks available so the structure stays visible."],
+ extend:["Find a pattern whose rule involves multiplication by the term number twice, such as n². How does its table differ?","Two students write 3n + 1 and 3(n + 1) − 2 for the same pattern. Are both right? Explain."],
+ access:["Touch: matchstick patterns let the repeating group be picked up and separated from the starting piece.","Vision: the repeating group is circled on the drawn pattern so the rule's structure is visible, not just its numbers.","Attention: the three-term test gives a definite endpoint to each problem.","Language: 'term number' and 'step' mean the same thing; use one consistently and name the other."]
+},
+{
+ day:7, short:"Like terms", title:"Collecting like terms",
+ objective:"Simplify an expression by collecting like terms, and explain why unlike terms cannot be combined.",
+ standards:["6.EE.A.3","6.EE.A.4"],
+ vocab:[["Like terms","Terms with exactly the same letter part: 3x and 5x."],["Unlike terms","Terms with different letter parts: 3x and 5y, or 3x and 5."],["Collect","Combine like terms into one."],["Simplify","Write the same expression with fewer terms."]],
+ materials:["Cups and counters, two cup colours or shapes for two variables","Sorting trays","Whiteboards"],
+ warmup:{mins:5,text:"Post 3x + 2 + 5x + 4 and ask for a shorter way to write it. Collect answers; 8x + 6 and 14x will both appear. Do not resolve. Set out the cups and counters instead and ask a pair to sort them into piles. The piles answer it."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · sorting into piles",
+   moves:["Set out 3 cups, 2 counters, 5 more cups and 4 more counters.","Sort into two piles: cups and counters.","Count each pile: 8 cups, 6 counters, written 8x + 6.","Introduce a second cup shape for y and sort three piles."],
+   say:[["Teacher","Sort them. How many piles do you end up with?"],["Expected","Two — cups and counters."],["Teacher","Why can they not go in one pile?"],["Expected","They're different things."],["Teacher","And you cannot count them together for the same reason you could not add tenths to hundredths in Unit 2. Same size, same pile."]],
+   watch:["Students who combine cups and counters into 14x. Have them count the sorted piles physically; 8 cups and 6 counters is visibly not 14 of anything."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · grouping on the page",
+   moves:["Write 3x + 2 + 5x + 4 and loop the x terms and the number terms separately.","Rewrite with the loops collected.","Handle a subtraction: 7x + 5 − 3x − 2, keeping each sign with its term.","Handle two variables: 4x + 3y + 2x + y."],
+   say:[["Teacher","Loop the like terms before you move anything. The sign in front of a term belongs to it."],["Teacher","In 7x − 3x, what travels with the three?"],["Expected","The minus."],["Teacher","Always. A term is its sign and its value together, and separating them is where the errors come from."]],
+   readaloud:["Say the working aloud: 'The expression three x plus two plus five x plus four is written out. A loop encircles the three x and the five x. A second loop encircles the two and the four. Beneath is written eight x plus six.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · simplifying",
+   moves:["Collect like terms in expressions with one and two variables.","Handle subtraction and terms that cancel entirely.","Note that y means 1y when collecting.","Check by substituting a value into both the original and the simplified form."],
+   say:[["Teacher","Check by substitution. Put x equals two into the original and into your simplified version."],["Expected","They both give twenty-two."],["Teacher","Then they are the same expression written two ways. That check works every time and costs you thirty seconds."]],
+   watch:["Students who lose the coefficient of 1 on a lone y, giving 3y + y as 3y. Write the invisible one in while collecting is new; it can be dropped again once the habit holds."]}
+ ],
+ guided:[["Simplify 3x + 2 + 5x + 4.","8x + 6"],["Simplify 7a − 3a + 5.","4a + 5"],["Simplify 4x + 3y + 2x + y.","6x + 4y"],["Simplify 5n + 3 − 5n.","3"]],
+ worksheet:[
+  {t:"A · Collect",d:"Simplify each.",items:["2x + 5x","4n + 3 + 2n","8y − 3y + 1","6a + 2 + a + 7","10m − 4m − 2","3p + 9 − p − 4"]},
+  {t:"B · Two variables",d:"Simplify each.",items:["3x + 2y + x + 4y","5a + 3b − 2a","7m + 4n − 3m − n","2x + 3 + 5y + 4x"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why 3x + 5 cannot be simplified to 8x, using cups and counters in your explanation.","Simplify 6x + 4 − 6x and explain what happened to the x terms.","Check that 4x + 3 + 2x equals 6x + 3 by substituting x = 5 into both."]}],
+ exit:["Simplify 4x + 3 + 2x + 1.","Simplify 9n − 4n + 2.","Explain why 3x and 5 cannot be combined."],
+ crit:"Mastery: both correct and item 3 says they are different kinds of quantity. Reteach if unlike terms are combined — the sorting trays make the error visible, and connecting it to Unit 2's piece sizes often lands where a fresh explanation does not.",
+ support:["Provide sorting trays labelled with each term type.","Restrict to one variable and addition before subtraction.","Write the invisible coefficient of 1 explicitly on every lone variable."],
+ extend:["Simplify 3(x + 2) + 2x by expanding first. What did you have to do before collecting?","Write three different expressions that all simplify to 5x + 2."],
+ access:["Touch: sorting into physical piles is the operation, not a representation of it.","Vision: the two variables use different cup shapes rather than different colours only.","Memory: name the Unit 2 connection — you could not add tenths to hundredths for the same reason.","Attention: the substitution check gives a clear endpoint and a reason to trust the answer."]
+},
+{
+ day:8, short:"Distributive", title:"The distributive property",
+ objective:"Expand a bracket using the distributive property, and factorise a simple expression, justifying both from an area model.",
+ standards:["6.EE.A.3","6.EE.A.4","6.NS.B.4"],
+ vocab:[["Expand","Multiply out the bracket: 3(x + 2) becomes 3x + 6."],["Factorise","The reverse — pull the common factor out front."],["Distribute","Give the outside number to every term inside, not just the first."],["Equivalent expressions","Two expressions giving the same value for every value of the variable."]],
+ materials:["Grid paper","Algebra tiles or paper rectangles","Counters","Whiteboards"],
+ warmup:{mins:5,text:"Post 3(x + 2) and ask for it without brackets. Collect answers; 3x + 2 and 3x + 6 will both appear. Say nothing. Draw a rectangle 3 tall and x + 2 wide and ask a student to shade it. The area answers it."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · building the rectangle",
+   moves:["Build a rectangle 3 rows tall and (x + 2) wide using an x-strip and two unit squares per row.","Count the strips: three. Count the units: six.","Write the total as 3x + 6.","Rebuild as three separate rows of (x + 2) and confirm the same pieces."],
+   say:[["Teacher","Three rows, each holding an x and two ones. How many x strips altogether?"],["Expected","Three."],["Teacher","And how many single units?"],["Expected","Six — two in each of three rows."],["Teacher","So the three reached the two as well as the x. That is what distribute means, and forgetting it is the single most common algebra error there is."]],
+   watch:["Students who multiply only the first term. Count the physical unit squares — six is undeniable in a way that a rule is not."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · area model",
+   moves:["Draw the rectangle split into an x region and a 2 region.","Label each region's area: 3x and 6.","Add the regions to get the total.","Reverse the process: given 4x + 8, draw the rectangle and find the common width."],
+   say:[["Teacher","Two regions, two areas, one total. Same picture as multiplying decimals in Unit 2 and mixed numbers in Unit 2 day eight."],["Teacher","Now backwards. 4x + 8 — what number goes into both?"],["Expected","Four."],["Teacher","So the rectangle is four tall, and the width is x plus two. Factorising is reading the same picture from the outside in."]],
+   readaloud:["Say the picture aloud: 'A rectangle three units tall is divided by a vertical line into two regions. The left region is x wide and labelled three x. The right region is two wide and labelled six.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · both directions",
+   moves:["Expand a(b + c) as ab + ac and apply to four examples.","Expand with a subtraction inside: 5(x − 3).","Factorise by finding the greatest common factor, as in Unit 1.","Check every expansion by substituting a value into both forms."],
+   say:[["Teacher","Factorising uses the greatest common factor. You met that in Unit 1 and used it again in Unit 2 and Unit 3."],["Teacher","6x + 9 — what is the GCF?"],["Expected","Three."],["Teacher","So 3(2x + 3). Check it by expanding back. Every factorisation has a free check built in."]],
+   watch:["Students who expand 5(x − 3) as 5x − 3, dropping the multiplication on the second term. The sign travels but so does the multiplication; the area model shows five lots of the three being removed."]}
+ ],
+ guided:[["Expand 3(x + 2).","3x + 6"],["Expand 5(n − 4).","5n − 20"],["Factorise 4x + 8.","4(x + 2)"],["Factorise 6n + 9.","3(2n + 3)"]],
+ worksheet:[
+  {t:"A · Expand",d:"Multiply every term inside.",items:["2(x + 5)","4(n + 3)","3(a − 2)","6(2m + 1)","5(y − 4)","7(x + x)"]},
+  {t:"B · Factorise",d:"Take out the greatest common factor.",items:["3x + 6","10n + 15","4a − 12","8m + 20","6y + 9","14x − 21"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why 3(x + 2) is not 3x + 2, using an area model in your explanation.","Show that 2(x + 3) + 3(x + 1) simplifies to 5x + 9, giving every step.","Explain why factorising and expanding are opposite processes, and how each checks the other."]}],
+ exit:["Expand 4(x + 3).","Factorise 5n + 10.","Explain why the outside number reaches every term inside."],
+ crit:"Mastery: both correct and item 3 says the multiplier applies to each term. Reteach if only the first term is multiplied — count the unit squares in the area model, since the physical count settles it faster than a restated rule.",
+ support:["Provide pre-drawn split rectangles with the regions blank.","Restrict to addition inside the bracket before subtraction.","Permit the substitution check on every problem."],
+ extend:["Expand and simplify 3(x + 2) + 2(x − 1). What had to happen before collecting?","Factorise 12x + 18 in two different ways. Which is fully factorised, and how do you know?"],
+ access:["Touch: algebra tiles let the three rows be built and the unit squares physically counted.","Vision: the two regions are separated by a drawn line and labelled inside, not by colour.","Memory: this is the same area model as Unit 2 days seven, eight and fourteen; naming that keeps it one idea.","Attention: the substitution check gives a definite end to each problem."]
+},
+{
+ day:9, short:"Equivalent", title:"Equivalent expressions",
+ objective:"Decide whether two expressions are equivalent, and justify the decision by simplifying or by substitution.",
+ standards:["6.EE.A.4","6.EE.A.3"],
+ vocab:[["Equivalent","Giving the same value for every value of the variable — not just for one."],["Counterexample","A single value that makes two expressions differ, proving they are not equivalent."],["Simplify to compare","Reduce both to their simplest form and see if they match."],["Not proof","One matching value does not prove equivalence."]],
+ materials:["Cups and counters","Algebra tiles","Whiteboards","Expression cards for matching"],
+ warmup:{mins:5,text:"Post 2(x + 3) and 2x + 6 and ask whether they are the same. Then post 2(x + 3) and 2x + 3 and ask again. Then post x + x and 2x. Take a vote on each and record. Say: you need a way to be sure, and testing one number is not it."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · building both",
+   moves:["Build 2(x + 3) and 2x + 6 with tiles and compare the piles.","Build 2(x + 3) and 2x + 3 and compare.","Find the physical difference in the second pair: three unit squares.","Sort a set of expression cards into equivalent groups by building each."],
+   say:[["Teacher","Build both. Are the piles identical?"],["Expected","Yes — two strips and six units each time."],["Teacher","Now the second pair."],["Expected","One has six units and one has three."],["Teacher","So they differ by three, for any value of x. That is what not-equivalent looks like — a gap that never closes."]],
+   watch:["Students who test one value, find a match, and declare equivalence. Ask them to test a second value. x = 0 and x = 1 disagree far more often than students expect."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · tables of values",
+   moves:["Build a table of values for both expressions across x = 0 to 4.","Compare the columns row by row.","Find a pair that agrees at one value but differs elsewhere.","Note that agreement everywhere in the table is strong evidence but the algebra is the proof."],
+   say:[["Teacher","Here are 2x and x + 2. Do they ever agree?"],["Expected","At x equals two."],["Teacher","And everywhere else?"],["Expected","They're different."],["Teacher","So one agreement proves nothing. That is why a single test can mislead you, and why simplifying is the reliable route."]],
+   readaloud:["Say the table aloud: 'A three-column table. The first column lists x from zero to four. The second, headed two x, reads zero, two, four, six, eight. The third, headed x plus two, reads two, three, four, five, six. The two columns match only in the row where x is two.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · simplify to decide",
+   moves:["Simplify both expressions fully and compare.","Use a counterexample to disprove equivalence quickly.","Decide four pairs, giving a justification for each.","State the rule: same simplest form means equivalent."],
+   say:[["Teacher","To prove equivalent, simplify both. To prove not equivalent, one counterexample is enough."],["Teacher","Why is that asymmetry fair?"],["Expected","Because 'always' needs everything but 'not always' just needs one."],["Teacher","That is a genuine piece of mathematical logic, and it is worth more than today's algebra."]],
+   watch:["Students who declare non-equivalence without producing the counterexample. The claim needs the number attached; require it in writing."]}
+ ],
+ guided:[["Are 3(x + 1) and 3x + 3 equivalent?","Yes — expanding gives the same expression."],["Are 2x + 4 and 2(x + 4) equivalent?","No — the second is 2x + 8. Counterexample: x = 0 gives 4 and 8."],["Are x + x + 3 and 2x + 3 equivalent?","Yes."],["Are 5x − 2x and 3x equivalent?","Yes."]],
+ worksheet:[
+  {t:"A · Equivalent or not",d:"Write yes with a simplification, or no with a counterexample.",items:["4(x + 2) and 4x + 8","3x + 3 and 3(x + 3)","x + x + x and 3x","2(n − 1) and 2n − 2","5 + 3a and 8a","6y − 2y and 4y"]},
+  {t:"B · Match the pairs",d:"Match each expression on the left to its equivalent.",wide:true,
+   items:["2(x + 4) · 3x + 6 · 5x · 4x + 4","matched with: 2x + 8 · 3(x + 2) · 2x + 3x · 4(x + 1)"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why testing one value is not enough to prove two expressions are equivalent.","Find a value of x for which 2x and x + 2 agree, then explain why they are still not equivalent.","Write two different expressions equivalent to 6x + 12, and say how you know."]}],
+ exit:["Are 5(x + 2) and 5x + 10 equivalent? How do you know?","Are 3x + 1 and 3(x + 1) equivalent? Give a counterexample if not.","Explain why one matching value does not prove equivalence."],
+ crit:"Mastery: both correct with justification of the right type — simplification for yes, counterexample for no. Reteach if a single test is offered as proof; the 2x versus x + 2 table is the fastest correction.",
+ support:["Provide value tables pre-drawn for both expressions.","Restrict to pairs differing by a constant before more subtle cases.","Permit tile-building for every pair."],
+ extend:["Find two expressions that agree at x = 0 and x = 1 but differ at x = 2. What does that tell you about how many tests are enough?","Are x² and 2x equivalent? Test several values and explain what you find."],
+ access:["Touch: building both expressions makes a persistent gap physically visible.","Vision: value tables are printed with the matching row unhighlighted, so students find it rather than being shown.","Language: 'equivalent' means 'for every value'; post the full phrase, since the short word hides the important part.","Attention: the yes-or-no decision with a required justification type gives a clear format for every item."]
+},
+{
+ day:10, short:"Equations", title:"An equation is a balance",
+ objective:"Solve a one-step equation using the balance model, and explain why the same operation must be done to both sides.",
+ standards:["6.EE.B.5","6.EE.B.7"],
+ vocab:[["Equation","A claim that two expressions are equal."],["Solution","The value of the variable that makes the claim true."],["Balance","The physical model: level while the claim holds."],["Both sides","The rule, and today you will see why it is not arbitrary."]],
+ materials:["Pan balance if available","Cups and counters","Balance mats printed with two pans","Whiteboards"],
+ warmup:{mins:5,text:"Set a real or drawn balance with a cup and three counters on one side, eight counters on the other. Ask what is in the cup. Someone will say five. Ask how they know, and write their reasoning down verbatim. It will already contain the method; the lesson is making it repeatable."},
+ stages:[
+  {k:"c",label:"Concrete",mins:13,sense:"touch · keeping it level",
+   moves:["Build x + 3 = 8 on a balance mat: a cup and three counters against eight counters.","Remove three counters from one side only and observe the imbalance.","Restore, then remove three from both sides and observe it stay level.","Read the remaining arrangement: one cup against five counters."],
+   say:[["Teacher","Take three off the left only. What happened?"],["Expected","It tipped."],["Teacher","Is the claim still true?"],["Expected","No."],["Teacher","Put them back. Now take three off both sides."],["Expected","It stays level."],["Teacher","One cup against five. You did not open the cup and you did not guess. The cup held five the whole time; you just cleared away what was around it."]],
+   watch:["Students who tip the balance and then treat the result as progress. A tipped balance means the claim has changed, so anything found afterwards answers a different question. Make them undo it."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · drawing the steps",
+   moves:["Draw the balance and the equation side by side.","Draw each step as a new balance with the equation beneath it.","Record the operation between steps in the margin.","Draw a multiplication case: 3x = 12, split into three equal groups."],
+   say:[["Teacher","Every balance gets its equation written under it. The picture and the symbols move together."],["Teacher","For 3x = 12, what does splitting into three groups look like?"],["Expected","One cup against four."],["Teacher","And notice you never opened a cup. Three identical cups split three ways is one cup per group, whatever is inside."]],
+   readaloud:["Say the picture aloud: 'A level balance. The left pan holds one cup labelled x and three discs. The right pan holds eight discs. Beneath is written x plus three equals eight.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · recording the solve",
+   moves:["Write the equation, the operation applied to both sides, and the result on three lines.","Solve one-step equations with addition, subtraction, multiplication and division.","Check every solution by substituting back into the original.","Name the operation that undoes each one."],
+   say:[["Teacher","Write the operation in the margin, on both sides. Minus three, minus three."],["Teacher","Then check. Put five back into x plus three."],["Expected","Eight — it works."],["Teacher","Every equation you ever solve has that check available. Use it and you will never hand in a wrong answer you could have caught."]],
+   watch:["Students who apply the operation to one side in writing while saying it aloud for both. The written record must show both; require the margin note on every line."]}
+ ],
+ guided:[["Solve x + 3 = 8.","x = 5"],["Solve n − 4 = 6.","n = 10"],["Solve 3x = 12.","x = 4"],["Solve m/2 = 7.","m = 14"]],
+ worksheet:[
+  {t:"A · One step",d:"Show the operation on both sides. Check your answer.",items:["x + 5 = 12","n − 3 = 9","4a = 20","y/3 = 5","x + 11 = 20","7m = 42"]},
+  {t:"B · Which operation",d:"State what undoes each, then solve.",items:["p + 8 = 15","t − 6 = 6","5k = 45","w/4 = 8"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why taking three from one side only makes the equation untrue, using the balance in your explanation.","Solve 6x = 18 and explain what splitting into six groups means for the cups.","Why is checking your answer by substitution always possible? What does it actually confirm?"]}],
+ exit:["Solve x + 7 = 15.","Solve 5n = 35.","Explain why the same thing must be done to both sides."],
+ crit:"Mastery: both correct with a substitution check shown, and item 3 refers to keeping the claim true. Reteach if the operation is applied to one side — use the physical balance, since a tipped beam is an argument and a rule is not.",
+ support:["Use the balance mat and physical cups for every equation before writing anything.","Restrict to addition and subtraction before multiplication and division.","Provide a three-line recording frame with a margin column for the operation."],
+ extend:["Solve x + 3 = 3 and 4x = 0. What is unusual about the solutions, and why do they still work?","Write an equation whose solution is 7, using each of the four operations. Four equations."],
+ access:["Touch: a real balance is the strongest version of this lesson; use one if the school has it, and cups on a drawn mat if not.","Vision: the two pans are drawn at clearly different heights when tipped, so the state is readable at a glance.","Attention: the three-line frame with a margin note is the same format for every equation this week.","Language: 'solve' means find the value that makes it true; post that definition, since the word otherwise sounds like a general instruction."]
+},
+{
+ day:11, short:"Two steps", title:"Two-step equations, and which step first",
+ objective:"Solve a two-step equation, and explain why the order of steps is a choice rather than a rule.",
+ standards:["6.EE.B.7","6.EE.A.1"],
+ vocab:[["Two-step","An equation needing two operations to isolate the variable."],["Isolate","Get the variable alone on one side."],["Undo in reverse","Removing what was added last, first — usually the easier route."],["Both routes valid","Dividing first also works when the numbers cooperate."]],
+ materials:["Balance mats","Cups and counters","Whiteboards","Unit 1 order-of-operations reference"],
+ warmup:{mins:5,text:"Post 3x + 6 = 21. Ask which operation to undo first and take a vote between subtracting six and dividing by three. Record the split. Say: both of those work here, and one of them stops working when I change a single number. Finding out which is today's job."},
+ stages:[
+  {k:"c",label:"Concrete",mins:13,sense:"touch · two ways to clear the pan",
+   moves:["Build 3x + 6 = 21 with three cups and six counters against twenty-one.","Route A: remove six from both sides, leaving 3x = 15, then split into three groups.","Rebuild and try Route B: split the whole arrangement into three equal groups first, giving x + 2 = 7, then remove two.","Compare the two solutions."],
+   say:[["Teacher","Route A first. Six off both sides."],["Expected","Three cups against fifteen."],["Teacher","Now rebuild and try dividing first. Split everything into three equal groups."],["Expected","One cup and two counters against seven."],["Teacher","Both gave five. So which is correct?"],["Expected","Both."],["Teacher","Right. Now watch what happens with a different number."]],
+   watch:["Students who conclude that the order does not matter at all. It matters for ease and sometimes for possibility — the next stage shows the case where dividing first fails."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · when one route closes",
+   moves:["Draw 3x + 7 = 22 and attempt to divide by three first.","Find that the seven cannot be split into three whole groups.","Draw the subtract-first route, which works.","Record the reason: the loose counters are accessible, the grouped cups are not."],
+   say:[["Teacher","Divide 3x + 7 = 22 by three. What goes wrong?"],["Expected","Seven doesn't split into three."],["Teacher","So dividing first only works when the numbers cooperate. Subtracting first always works."],["Teacher","And there is a physical reason. The loose counters are on top and you can reach them. The cups are bundled underneath. You take off your shoes before your socks, even though the socks went on first."]],
+   readaloud:["Say the picture aloud: 'A balance holds three cups and seven discs on the left against twenty-two discs on the right. An attempt to divide into three equal groups is drawn crossed through, with the seven discs unable to form three equal piles.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · recording two steps",
+   moves:["Solve two-step equations using the subtract-then-divide route.","Record both operations in the margin.","Try one problem both ways and compare the working.","Check every solution by substituting into the original."],
+   say:[["Teacher","Notice this is the reverse of order of operations. The expression was built multiply-then-add; you undo add-then-multiply."],["Teacher","Why reverse?"],["Expected","Because you take off the last thing that was put on."],["Teacher","And that is not a new rule. It is what undoing anything looks like."]],
+   watch:["Students who divide only the term with the variable, turning 3x + 6 = 21 into x + 6 = 7. The division applies to every term on both sides; the balance shows the six being split too."]}
+ ],
+ guided:[["Solve 3x + 6 = 21.","x = 5"],["Solve 2n − 5 = 11.","n = 8"],["Solve 4a + 3 = 19.","a = 4"],["Solve 3x + 6 = 21 by dividing first.","x + 2 = 7, so x = 5"]],
+ worksheet:[
+  {t:"A · Two steps",d:"Show both operations. Check your answer.",items:["2x + 5 = 17","3n − 4 = 14","5a + 2 = 27","4m − 9 = 11","6y + 6 = 42","2p − 7 = 3"]},
+  {t:"B · Both routes",d:"Solve each twice, subtracting first and dividing first.",items:["2x + 8 = 20","5n + 10 = 35","3a + 9 = 18","4m + 12 = 32"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Solve 3x + 7 = 22 and explain why dividing first does not work here.","Explain why solving reverses the order of operations, using the shoes-and-socks idea or one of your own.","Write a two-step equation where dividing first is genuinely easier than subtracting first."]}],
+ exit:["Solve 2x + 3 = 15.","Solve 5n − 4 = 21.","Explain why you usually subtract before dividing."],
+ crit:"Mastery: both correct with checks shown, and item 3 refers to removing the loose amount first or to reversing the build order. Reteach if the division is applied to only one term — the balance shows every pile being split, and that is the argument.",
+ support:["Use the balance for every equation before writing.","Restrict to the subtract-first route until it is fluent.","Provide a four-line frame with margin columns for both operations."],
+ extend:["Solve 2(x + 3) = 14 in two ways: expand first, or divide first. Which was shorter?","Find a two-step equation where both routes take exactly the same effort. What is true of its numbers?"],
+ access:["Touch: attempting the failing route physically is more convincing than being told it fails.","Memory: the shoes-and-socks image is short and concrete; repeat it rather than restating the rule formally.","Attention: solving one problem both ways is a bounded comparison task with a clear payoff.","Vision: the crossed-through failed attempt is drawn, not merely described, so the obstruction is visible."]
+},
+{
+ day:12, short:"Equations in context", title:"Writing and solving equations from words",
+ objective:"Write an equation for a worded situation and solve it, checking the answer against the original context.",
+ standards:["6.EE.B.7","6.EE.B.6","6.RP.A.3"],
+ vocab:[["Define the variable","Say what the letter stands for before writing the equation."],["Equation from context","The claim the situation makes, written in symbols."],["Solve","Find the value that makes the claim true."],["Check in context","Confirm the answer makes sense in the story, not just in the algebra."]],
+ materials:["Balance mats","Bar-model paper","Highlighters","Whiteboards"],
+ warmup:{mins:5,text:"Post: 'I think of a number, multiply by three and add six. The answer is twenty-one.' Ask students to write it as an equation before solving anything. Compare the versions produced. The equation is the step that gets skipped and the step that gets marked."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · acting the story",
+   moves:["Act the number puzzle with cups: start with a cup, make three, add six counters.","Set the result against twenty-one and confirm the balance.","Solve by clearing the pans.","Act a second story: a taxi fare totalling a given amount."],
+   say:[["Teacher","Build the story in order. One cup, then three of them, then six counters."],["Teacher","Now set twenty-one on the other side. Is that a claim or a description?"],["Expected","A claim — it says they're equal."],["Teacher","So it is an equation, and it is solvable. Descriptions are not."]],
+   watch:["Students who build the story backwards, starting from the twenty-one. Build in the order the sentence gives; the reversal happens when solving, not when writing."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · bar model to equation",
+   moves:["Draw a bar model for the situation with the unknown marked.","Write the equation directly from the bar.","Solve the equation and label the bar with the answer.","Repeat for a comparison situation: one amount is three more than another."],
+   say:[["Teacher","The bar shows the structure; the equation says it in symbols. Draw first, write second."],["Teacher","This one says Ben has three more than Ana, and together they have nineteen. What are the bars?"],["Expected","One bar, and another the same plus three."],["Teacher","So x plus x plus three equals nineteen. The bar wrote the equation for you."]],
+   readaloud:["Say the picture aloud: 'Two bars aligned at the left. The upper is one unit long, labelled Ana. The lower is the same unit plus a short extra section labelled three, for Ben. A brace spans both bars, labelled nineteen.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · write, solve, check",
+   moves:["Define the variable in a sentence with units.","Write the equation, solve it, and state the answer in context.","Check the answer against the original words, not the equation.","Work four contexts of increasing structure."],
+   say:[["Teacher","Last step: read the story again with your answer in it. Does it work?"],["Expected","Ana has eight, Ben has eleven, together nineteen. Yes."],["Teacher","That check catches a mistake the algebra cannot, because a correct solve of a wrong equation still looks right."]],
+   watch:["Students who solve correctly and report x rather than the quantity asked for. This is Unit 2 day nineteen and Unit 3 day nine, again — name it as the same habit."]}
+ ],
+ guided:[["A number times three plus six is 21. Find it.","3x + 6 = 21, x = 5"],["Ben has 3 more than Ana; together 19. Find Ana's.","x + x + 3 = 19, Ana has 8"],["Taxi: $3 plus $2 per km, total $17. How far?","2k + 3 = 17, k = 7 km"],["Four equal boxes plus 5 loose pens make 29 pens.","4b + 5 = 29, b = 6"]],
+ worksheet:[
+  {t:"A · Write and solve",d:"Define the variable first.",wide:true,
+   items:["A number doubled and increased by 7 gives 23. Find the number.","A plumber charges $40 plus $60 per hour. The bill was $220. How many hours?","Five equal packets plus 3 extra sweets make 43 sweets. How many in a packet?"]},
+  {t:"B · Comparison situations",d:"Draw a bar model first.",wide:true,
+   items:["Sam has 5 more marbles than Jo. Together they have 31. How many does Jo have?","A rope is cut into two pieces, one twice as long as the other. The rope is 27 m. Find both lengths.","Three consecutive numbers add to 48. Find them."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why writing the equation is worth doing even when you can see the answer.","A student solves correctly but answers with x = 8 rather than 'Jo has 8 marbles'. Why does that matter?","Write a story problem whose equation is 4x + 3 = 27, then solve it."]}],
+ exit:["A number times four plus two is 22. Write and solve the equation.","State your answer as a sentence.","Explain why you check the answer against the story."],
+ crit:"Mastery: equation correct, solved correctly, and answered as a sentence in context. Reteach if x is reported rather than the quantity — the underline-the-question routine has now run for four units and should be named as the same habit.",
+ support:["Provide the sentence stem for defining the variable.","Draw the bar model on every problem before writing the equation.","Restrict to one-step contexts before two-step."],
+ extend:["Write a context whose equation has a solution that does not make sense in the story. What went wrong?","Three consecutive even numbers add to 54. Write and solve the equation."],
+ access:["Language: word problems carry the heaviest reading load in the unit; read every problem aloud before independent work.","Vision: bar models are labelled inside each section and the unknown marked consistently.","Attention: define-draw-write-solve-check is a fixed five-step sequence on every problem.","Motor: acting the story with cups can be directed verbally rather than done by hand."]
+},
+{
+ day:13, short:"Inequalities", title:"Inequalities and what they claim",
+ objective:"Interpret an inequality, represent its solution set on a number line, and explain why the answer is a range rather than a single value.",
+ standards:["6.EE.B.5","6.EE.B.8"],
+ vocab:[["Inequality","A claim that one side is greater or less than the other."],["Solution set","Every value making the claim true — usually infinitely many."],["Open circle","Marks a boundary not included, for &gt; and &lt;."],["Closed circle","Marks a boundary included, for at least and at most."]],
+ materials:["Balance mats","Cups and counters","Blank number lines","Sticky dots for marking boundaries"],
+ warmup:{mins:5,text:"Post x + 2 = 9 and x + 2 > 9 side by side. Ask how many answers each has. The first has one. The second has more than anyone can list, and noticing that is the whole difference. Do not solve either yet."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · a balance that leans",
+   moves:["Build x + 2 > 9 with a cup and two counters against nine, with the cup side heavier.","Test values for the cup: 6 makes it level, so 6 is not a solution.","Test 7, 8, 10 and find they all work.","Test 5 and find it fails, establishing a boundary."],
+   say:[["Teacher","Put six in the cup. What happens?"],["Expected","It balances — so it's not greater."],["Teacher","Seven?"],["Expected","It leans. That works."],["Teacher","So seven works, eight works, a hundred works. How would you write all of them?"],["Expected","Anything more than seven."],["Teacher","And six is the edge that does not count. That edge is what the open circle marks."]],
+   watch:["Students who look for the single answer. An inequality claims a range; asking for 'the' answer is the wrong question and worth saying so directly."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · number line",
+   moves:["Draw a number line and mark the boundary with an open circle.","Shade the direction that satisfies the claim.","Test one shaded value and one unshaded value to confirm.","Draw a closed-circle case for 'at least' and compare."],
+   say:[["Teacher","Open circle at the boundary, then shade the side that works. Test a value from the shaded part to be sure you shaded the right way."],["Teacher","When is the circle filled in?"],["Expected","When the boundary itself counts — at least, or at most."],["Teacher","So the circle is not decoration. It carries whether one particular number is in or out."]],
+   readaloud:["Say the picture aloud: 'A number line marked from zero to twelve. An unfilled circle sits at seven, and the line is shaded solidly to the right of it with an arrow at the end, indicating all values greater than seven.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · solving",
+   moves:["Solve one-step inequalities using the same moves as equations.","Write the solution set in symbols and draw it.","Interpret 'at least' and 'at most' as closed boundaries.","Check by testing one value inside and one outside."],
+   say:[["Teacher","The moves are identical to equations. Add, subtract, and the lean is preserved."],["Teacher","So why bother distinguishing them?"],["Expected","Because the answer is a range, not a number."],["Teacher","And because the check is different. You test a value from the range, not a single substitution."]],
+   watch:["Students who write x > 7 but shade to the left. Require the test-a-shaded-value step; it catches the direction error without needing a rule about which way arrows point."]}
+ ],
+ guided:[["Solve x + 2 > 9 and draw it.","x > 7, open circle at 7, shaded right"],["Solve n − 3 < 5.","n < 8"],["Write 'at least 12' as an inequality.","x ≥ 12, closed circle"],["Is 7 a solution of x > 7?","No — the boundary is not included."]],
+ worksheet:[
+  {t:"A · Solve and draw",d:"Mark the boundary correctly.",items:["x + 4 > 10","n − 2 < 6","a + 5 ≥ 12","m − 1 ≤ 9","y + 7 > 7","p − 4 ≥ 0"]},
+  {t:"B · Words to inequalities",d:"Write the inequality and draw it.",items:["at least 15","fewer than 8","no more than 20","more than 3"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain the difference between an open and a closed circle, giving a real situation where it matters.","A lift holds at most 8 people. Write an inequality and explain why the boundary is included.","Why does an inequality have infinitely many solutions when an equation usually has one?"]}],
+ exit:["Solve x + 3 > 10 and draw it.","Write 'at most 5' as an inequality.","Explain why an inequality's answer is a range."],
+ crit:"Mastery: both correct with the right circle type, and item 3 says many values satisfy the claim. Reteach if the shading direction is reversed — the test-a-value step is the fix and should be required on every drawing.",
+ support:["Provide number lines with the boundary pre-marked so only the circle type and shading remain.","Restrict to > and < before ≥ and ≤.","Use the balance for every inequality before drawing."],
+ extend:["Write an inequality whose solution set contains exactly three whole numbers. How did you constrain it?","A situation says 'more than 10 but no more than 20'. Draw it. What is different about this one?"],
+ access:["Touch: sticky dots let a student place the boundary marker physically and change it if the type is wrong.","Vision: open and closed circles differ by fill, and are also labelled 'not included' or 'included' on early examples.","Language: 'at least', 'at most', 'no more than' and 'fewer than' are the phrases that carry the meaning; post all four with their symbols.","Attention: the test-a-value step gives a definite confirmation after each drawing."]
+},
+{
+ day:14, short:"Inequalities II", title:"Inequalities in context",
+ objective:"Write an inequality for a real constraint, solve it, and interpret the solution set in terms of the situation.",
+ standards:["6.EE.B.8","6.EE.B.5","6.EE.B.6"],
+ vocab:[["Constraint","A limit the situation imposes: a budget, a capacity, a minimum."],["Feasible","A value the situation actually allows."],["Whole-number solutions","Many contexts only permit whole numbers, even when the inequality allows more."],["Interpret","Say what the range means in the story."]],
+ materials:["Price lists","Blank number lines","Balance mats","Whiteboards"],
+ warmup:{mins:5,text:"Post: 'You have $20. Each ticket costs $3.' Ask how many tickets you can buy. Someone says six. Ask whether 6.67 is an answer. It solves the inequality but you cannot buy two thirds of a ticket. Say: the algebra gives a range and the situation trims it. Both steps count."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · spending to a limit",
+   moves:["Lay out 20 counters as a budget and remove 3 at a time for tickets.","Count how many removals are possible: six, with two left over.","Write the constraint as 3t ≤ 20.","Solve and compare the algebraic answer with the physical one."],
+   say:[["Teacher","How many times could you take three away?"],["Expected","Six, with two left."],["Teacher","And the inequality gives t less than or equal to six and two thirds. Which is the answer?"],["Expected","Six — you can't buy part of a ticket."],["Teacher","So you solve it, then you read the situation. The mathematics does not know what a ticket is."]],
+   watch:["Students who give the algebraic answer without trimming to whole numbers. Ask what a fractional answer would mean in the story; if it means nothing, it is not an answer."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · line with feasible points",
+   moves:["Draw the solution set on a number line.","Mark the whole-number solutions with dots.","Identify the largest feasible value.","Draw a minimum-constraint case where the range runs the other way."],
+   say:[["Teacher","Shade the range, then dot the whole numbers inside it. Those dots are your actual answers."],["Teacher","Which dot is the one the question wants?"],["Expected","The biggest one."],["Teacher","Usually. But read it — some questions want the smallest, and some want all of them."]],
+   readaloud:["Say the picture aloud: 'A number line from zero to eight. The region from zero up to six and two thirds is shaded, with a filled circle at the right end. Dots mark the whole numbers zero through six inside the shaded region.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · write, solve, interpret",
+   moves:["Write the inequality with a defined variable.","Solve it.","State the whole-number solution set.","Answer the question as a sentence about the situation."],
+   say:[["Teacher","Three steps and then a sentence. The sentence is the answer; the inequality is the working."],["Teacher","And check it in the story. Six tickets at three dollars is eighteen. Under twenty. Seven would be twenty-one. Over."],["Teacher","That check uses the situation, not the algebra, which is exactly why it catches different mistakes."]],
+   watch:["Students who reverse the inequality when the constraint is a minimum — writing ≤ for 'at least'. Read the phrase aloud and ask whether the boundary value is allowed and which side works."]}
+ ],
+ guided:[["$20, tickets $3 each. How many?","3t ≤ 20, t ≤ 6.67, so 6 tickets"],["Need at least 50 points, have 20, each task gives 5.","5n + 20 ≥ 50, n ≥ 6, so 6 tasks"],["A lift holds at most 8. Write the inequality.","p ≤ 8"],["Why is 6.67 not an answer for tickets?","You cannot buy part of a ticket."]],
+ worksheet:[
+  {t:"A · Write and solve",d:"Give the whole-number answer.",wide:true,
+   items:["You have $50. Each book costs $7. How many books can you buy?","A van holds at most 12 boxes. You have loaded 5. How many more can you add?","You need at least 100 points. You have 40 and each round gives 15. How many rounds?"]},
+  {t:"B · Interpret",d:"State the largest or smallest feasible value.",items:["4t ≤ 30","2n + 6 ≥ 20","5x < 47","3m + 4 ≤ 25"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why an inequality's answer sometimes has to be trimmed to whole numbers, with an example.","A phone plan gives 500 texts. Write an inequality for staying within it and explain your boundary choice.","Write a situation whose answer is 'at least 4', then write and solve the inequality."]}],
+ exit:["$30, items cost $4. Write and solve the inequality.","State the answer as a sentence.","Explain why the algebraic answer sometimes needs trimming."],
+ crit:"Mastery: inequality correct, solved, and interpreted as a whole-number sentence. Reteach if the direction is reversed for a minimum constraint — reading the phrase aloud and testing a value is the fix.",
+ support:["Provide a four-step frame: define, write, solve, interpret.","Restrict to maximum constraints before minimums.","Keep counters available for acting out the spending."],
+ extend:["Write a situation with both a minimum and a maximum. Draw the solution set. What does the region between them mean?","Why do some contexts allow fractional answers while others do not? Give one of each."],
+ access:["Touch: physically removing counters until the budget runs out gives the whole-number answer without any algebra.","Language: 'at least', 'at most' and 'no more than' decide the symbol; post them with examples.","Attention: the four-step frame is identical on every problem, so no format decision is needed.","Vision: feasible whole-number solutions are dotted on the line, distinguishing them from the continuous shading."]
+},
+{
+ day:15, short:"Two variables", title:"Dependent and independent variables",
+ objective:"Identify the independent and dependent variables in a situation, and write an equation relating them.",
+ standards:["6.EE.C.9","6.EE.B.6","6.RP.A.3"],
+ vocab:[["Independent variable","The one you choose — usually the input."],["Dependent variable","The one that follows from your choice — the output."],["Relationship","The equation connecting them."],["Input and output","Plainer names for the same pair; both are worth having."]],
+ materials:["Price lists","Grid paper","Whiteboards","Measuring jugs and a timer for the filling demonstration"],
+ warmup:{mins:5,text:"Post: 'A tap fills a tank at 5 litres per minute.' Ask which number you get to choose and which one follows. Time is chosen; volume follows. Say: one of these two depends on the other, and swapping them round is the error this lesson exists to prevent."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · watching one follow the other",
+   moves:["Run a tap or pour steadily into a jug for 1, 2 and 3 timed intervals.","Record time and volume in a table.","Identify which column was chosen and which was measured.","Write the relationship in words, then in symbols."],
+   say:[["Teacher","Which column did you decide, and which did the water decide?"],["Expected","We chose the time; the volume just happened."],["Teacher","So time is independent and volume depends on it. Write the rule."],["Expected","Volume equals five times time."],["Teacher","v equals 5t. The dependent one sits alone on the left, which is a convention worth following."]],
+   watch:["Students who reverse the roles, treating volume as chosen. Ask what they physically controlled — the stopwatch, not the water."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · table and graph",
+   moves:["Build a table of time against volume.","Plot the points on a grid with time on the horizontal axis.","Note that the independent variable conventionally goes across.","Read a value off the graph and check it against the equation."],
+   say:[["Teacher","Time goes across, volume goes up. Independent across, dependent up — that convention is worth learning now because every graph you meet uses it."],["Teacher","Read off the volume at four minutes."],["Expected","Twenty litres."],["Teacher","Check with the equation. Five times four. The graph and the equation are the same relationship in two costumes."]],
+   readaloud:["Say the graph aloud: 'A grid with time in minutes along the horizontal axis from zero to five, and volume in litres up the vertical axis from zero to twenty-five. Points are plotted at one and five, two and ten, three and fifteen, four and twenty, lying on a straight line rising from the origin.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · writing the relationship",
+   moves:["Write equations relating two variables for four contexts.","Identify the independent and dependent variable in each.","Use the equation to find an output from an input.","Use it in reverse to find an input from an output."],
+   say:[["Teacher","Now backwards. If the tank holds thirty-five litres, how long?"],["Expected","Seven minutes."],["Teacher","You just solved an equation. Five t equals thirty-five. The two halves of this unit have met."]],
+   watch:["Students who write the equation with the dependent variable on the right and then misread it. The convention is dependent alone on the left; enforce it while the idea is new."]}
+ ],
+ guided:[["Tap fills at 5 L per minute. Write the equation.","v = 5t"],["Which is independent?","Time."],["Find v when t = 6.","30 L"],["Find t when v = 45.","9 minutes"]],
+ worksheet:[
+  {t:"A · Write the relationship",d:"Define both variables.",wide:true,
+   items:["A car travels at 60 km per hour.","Pencils cost $2 each.","A candle burns down 3 cm per hour from a height of 20 cm.","A gym charges $25 joining plus $5 per visit."]},
+  {t:"B · Use the equation",d:"Find the value asked for.",items:["d = 60t, find d when t = 4","c = 2n, find n when c = 18","h = 20 − 3t, find h when t = 5","C = 5v + 25, find C when v = 8"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain the difference between an independent and a dependent variable, using an example of your own.","Build a table and plot the graph for c = 2n from n = 0 to 5. Describe the shape.","Why does the candle equation have a subtraction? What does the 20 represent?"]}],
+ exit:["A tap fills 4 L per minute. Write the equation.","Which variable is independent?","Explain what 'dependent' means."],
+ crit:"Mastery: equation correct and the independent variable correctly identified. Reteach if the roles are reversed — ask what the person physically controls in the situation, which settles it without a definition.",
+ support:["Provide a two-box frame labelled 'I choose' and 'it follows'.","Restrict to direct relationships before ones with a constant.","Give pre-drawn axes with the independent variable already labelled."],
+ extend:["Find a real situation where either variable could reasonably be called independent. What decides it?","The candle equation h = 20 − 3t stops being sensible at some point. When, and why?"],
+ access:["Touch: pouring water and timing it makes the dependence physically observable.","Vision: axes are labelled with both the variable and its units, never a bare letter.","Language: 'input and output' is the plainer pair; use it alongside the formal terms rather than instead of them.","Motor: one student can time while another records, with both writing the equation."]
+},
+{
+ day:16, short:"Graphs", title:"Graphing a relationship",
+ objective:"Plot a relationship between two variables and read values from the graph, connecting the graph to its table and equation.",
+ standards:["6.EE.C.9","6.NS.C.8"],
+ vocab:[["Axes","The two lines of the grid; the horizontal carries the independent variable."],["Origin","The point where both are zero."],["Plot","Mark a point at the pair of values."],["Read off","Find a value from the graph rather than by calculating."]],
+ materials:["Grid paper","Rulers","Price lists","Whiteboards"],
+ warmup:{mins:5,text:"Post a table for c = 2n and a graph of the same relationship, side by side, with no labels linking them. Ask what they have in common. Someone will spot that each table row is a point. That is the whole lesson and a student said it."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · building the graph physically",
+   moves:["Mark a large grid on the floor with tape, or use a pegboard.","Students stand at or peg the points for c = 2n from n = 0 to 5.","Observe the points forming a straight line.","Predict where the point for n = 6 would stand, then place it."],
+   say:[["Teacher","Stand at your point. What shape are you making?"],["Expected","A straight line."],["Teacher","Predict where the next person stands before they move."],["Expected","Two more across, four more up."],["Teacher","So the pattern in the table is a direction on the grid. The constant difference became a slope."]],
+   watch:["Students who reverse the coordinates, plotting (c, n). The horizontal value is named first; use the floor grid to walk across before walking up, in that order, every time."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · table to points to line",
+   moves:["Build a table, plot each row as a point, and join them.","Label both axes with variable and units.","Read a value off the graph and verify with the equation.","Plot a relationship with a constant, such as C = 5v + 25, and note where it crosses the vertical axis."],
+   say:[["Teacher","Where does this one cross the vertical axis?"],["Expected","At twenty-five."],["Teacher","And what is twenty-five in the story?"],["Expected","The joining fee — what you pay before any visits."],["Teacher","So the crossing point is the constant, visible on the picture. You met that on day six as the zero term."]],
+   readaloud:["Say the graph aloud: 'A grid with visits along the horizontal axis from zero to eight and cost in dollars up the vertical axis from zero to seventy. The line begins at twenty-five on the vertical axis when visits are zero, and rises by five for each visit.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · three representations",
+   moves:["Move between equation, table and graph in all directions.","Given a graph, write the equation by reading the constant and the step.","Given an equation, sketch the graph without a full table.","Compare two relationships on the same axes."],
+   say:[["Teacher","Given the graph, you can write the equation. Where does it cross, and how much does it climb per step?"],["Expected","Crosses at twenty-five, climbs five."],["Teacher","Then C equals five v plus twenty-five. Equation, table, graph — three views of one relationship, and you can start from any of them."]],
+   watch:["Students who join points with a curve or a freehand line. Use a ruler and check the line passes through every plotted point; a point missed usually means an arithmetic slip in the table."]}
+ ],
+ guided:[["Plot c = 2n for n = 0 to 4.","Points (0,0), (1,2), (2,4), (3,6), (4,8)"],["Where does C = 5v + 25 cross the vertical axis?","At 25"],["From a graph crossing at 10 and rising 3 per step, write the equation.","y = 3x + 10"],["Read c when n = 3.5 on c = 2n.","7"]],
+ worksheet:[
+  {t:"A · Plot",d:"Build the table first, then plot.",items:["y = 3x, x from 0 to 5","c = 4n, n from 0 to 4","y = x + 5, x from 0 to 5","d = 20 − 2t, t from 0 to 5"]},
+  {t:"B · Read the graph",d:"Use the graph, not the equation.",items:["Find y when x = 3","Find x when y = 12","Find where the line crosses the vertical axis","Find the climb per step"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain what the crossing point on the vertical axis means for a gym charging a joining fee.","Two gyms: one charges $5 per visit with no fee, the other $3 per visit plus $20. Plot both and say when each is cheaper.","Why do the points for y = 3x lie on a straight line? What would make them not?"]}],
+ exit:["Plot y = 2x for x = 0 to 3.","Where does y = 2x + 4 cross the vertical axis?","Explain what a point on the graph tells you."],
+ crit:"Mastery: points plotted correctly and the crossing point identified. Reteach if coordinates are reversed — the floor grid, walked across then up, fixes the order more reliably than a mnemonic.",
+ support:["Provide pre-drawn labelled axes with a suitable scale.","Restrict to relationships through the origin before those with a constant.","Give the table pre-filled so plotting is the only task."],
+ extend:["Plot y = 2x and y = x + 3 on the same axes. Where do they cross, and what does that point mean?","A graph is a straight line but slopes downward. What does that say about the relationship?"],
+ access:["Touch: a floor or pegboard grid makes plotting a whole-body action and the across-then-up order physical.","Vision: axes carry variable names and units; grid lines are printed at a readable spacing.","Motor: a partner can peg or mark while another directs, with both reading the graph.","Attention: building the table before plotting splits the task in two with a clear checkpoint."]
+},
+{
+ day:17, short:"Problems I", title:"Multi-step algebra problems",
+ objective:"Solve problems requiring an expression or equation plus a further step, choosing the representation before calculating.",
+ standards:["6.EE.B.7","6.EE.B.6","6.EE.A.3"],
+ vocab:[["Multi-step","The first answer feeds the second."],["Model first","Bar, balance or table — drawn before any arithmetic."],["Substitute back","Use the solved value in a further calculation."],["Report","Answer the question asked, not the value found on the way."]],
+ materials:["Bar-model paper","Balance mats","Highlighters","Calculators after the model is drawn"],
+ warmup:{mins:5,text:"Post a two-step problem and ask only for the sequence of steps, not any numbers. Take two orderings if they arise and ask whether both work. Some do. The one that does not usually needs an answer it has not found yet."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · acting the sequence",
+   moves:["Act a situation with cups: solve for the unknown, then use it in a second calculation.","Record each step's answer before starting the next.","Repeat with a situation where the second step is a percent or rate from an earlier unit.","Name which model handled which step."],
+   say:[["Teacher","Step one gave you six pens per box. What does step two ask?"],["Expected","The cost of all of them."],["Teacher","So step two uses step one's answer. Write it down before you go on — an answer you are holding in your head is an answer you will lose."]],
+   watch:["Students who combine both steps into one calculation and lose track. Require each step on its own line with its answer labelled."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · choosing the model",
+   moves:["Model a problem with a balance for the equation and a bar for the sharing.","Model a second with a table for the pattern and an equation for the far term.","Draw one problem two ways and compare.","Establish a rule of thumb for which model suits which step."],
+   say:[["Teacher","Balances for equations. Bars for sharing and comparing. Tables for patterns."],["Teacher","That is a rule of thumb, not a law. If a bar helps you see an equation, draw the bar."]],
+   readaloud:["Say the page aloud: 'Above, a balance holds four cups and three discs against twenty-seven. Below, a bar of six units is divided into two sections in the ratio one to two, its total labelled with the value found from the balance.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · chained working",
+   moves:["Write one line per step with each answer labelled.","Estimate the final answer before calculating.","Substitute the solved value into the second step.","Re-read the question and confirm the reported quantity."],
+   say:[["Teacher","Estimate first. Roughly what should this come to?"],["Expected","About fifty."],["Teacher","So five hundred means a slipped decimal and you will catch it now."],["Teacher","And the last action, always?"],["Expected","Read the question again."]],
+   watch:["Students who report an intermediate value. Fifth unit running for this habit; name it as the same one rather than as a new instruction."]}
+ ],
+ guided:[["4b + 3 = 27. Then find the cost of b pens at $2 each.","b = 6, cost $12"],["2x + 5 = 21, then find 3x.","x = 8, 3x = 24"],["A pattern is 3n + 2. Find term 10, then double it.","32, then 64"],["5p = 45, then find 20% of p.","p = 9, 20% is 1.8"]],
+ worksheet:[
+  {t:"A · Two steps",d:"Draw a model for each step. Estimate first.",wide:true,
+   items:["Five equal boxes plus 4 loose pens make 44 pens. Each pen costs $3. What is the total value of one box?","A taxi charges $5 plus $2 per km. A trip cost $27. How far, and what would a trip twice as long cost?","Three consecutive numbers add to 42. Find them, then find their product."]},
+  {t:"B · Mixed with earlier units",d:"Name the models you used.",wide:true,
+   items:["2x + 6 = 20. Share x in the ratio 2 : 5.","A pattern is 4n + 1. Find term 12, then find 25% of it.","A rectangle has perimeter 34 cm and length 10 cm. Find the width, then the area."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain how you decide which model to draw for a given step.","Write a two-step problem combining an equation and a percent, then solve it.","Why is writing each step's answer down worth the time on a multi-step problem?"]}],
+ exit:["3x + 2 = 17. Find x, then find 2x.","State both answers clearly.","Explain why you write each step's answer down."],
+ crit:"Mastery: both correct and item 3 refers to not losing an intermediate value. Reteach if steps are combined — the error is organisational rather than mathematical, so the step-per-line format is the fix.",
+ support:["Provide a two-box frame labelled step 1 and step 2.","Reduce to single-step problems and build up.","Permit calculators for all arithmetic so effort goes into the modelling."],
+ extend:["Write a three-step problem using an equation, a ratio and a percent. Solve it and write the key.","Find a problem solvable by equation or by bar model. Solve both ways and say which was shorter."],
+ access:["Attention: the step-per-line format externalises sequencing rather than requiring it be held in memory.","Language: read every problem aloud before independent work.","Motor: calculators permitted once the model is drawn.","Vision: models are drawn in a fixed page position so the layout is predictable."]
+},
+{
+ day:18, short:"Problems II", title:"Harder contexts and checking",
+ objective:"Solve algebra problems with less obvious structure, and check the answer against the situation rather than the working.",
+ standards:["6.EE.B.7","6.EE.B.6","6.EE.A.4"],
+ vocab:[["Structure","How the quantities relate, underneath the wording."],["Check in context","Test the answer in the original story."],["Reasonable","An answer the situation could actually produce."],["Hidden unknown","A quantity the problem never names but you need."]],
+ materials:["Bar-model paper","Balance mats","Highlighters","Whiteboards"],
+ warmup:{mins:5,text:"Post: 'Ana has twice as many as Ben. Ben has three fewer than Cara. Together they have 27.' Ask which person to call x. Take votes for each. Say: all three work, but one gives much easier algebra, and choosing it is a skill worth ten minutes."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · choosing the unit",
+   moves:["Build the three-person situation with cups, trying Ben as the unit.","Rebuild with Ana as the unit and compare the difficulty.","Identify which choice produced whole cups rather than halves.","State the rule: pick the smallest or the most-referenced quantity."],
+   say:[["Teacher","Try Ana as x. What is Ben?"],["Expected","Half of Ana — that's awkward."],["Teacher","Now try Ben as x."],["Expected","Ana is two cups and Cara is a cup and three."],["Teacher","Whole cups all round. The quantity everything else is described against is usually the one to name."]],
+   watch:["Students who pick the first-named person automatically. Ask which quantity the others are described in terms of; that is the one to choose."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · bar model for three quantities",
+   moves:["Draw three bars using Ben as one unit.","Label Ana as two units and Cara as one unit plus three.","Brace the total and write the equation.","Solve and label all three bars."],
+   say:[["Teacher","Four units and a three, all making twenty-seven. Write it."],["Expected","4x plus 3 equals 27."],["Teacher","The bar wrote the equation. That is what the drawing is for — not decoration, translation."]],
+   readaloud:["Say the picture aloud: 'Three bars aligned at the left. The first is one unit, labelled Ben. The second is two units, labelled Ana. The third is one unit plus a short section labelled three, for Cara. A brace spans all three bars, labelled twenty-seven.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · solve and verify",
+   moves:["Write the equation, solve it, and find all requested quantities.","Check every quantity against every statement in the problem.","Work a problem where the check fails and find the error.","Answer in sentences with units."],
+   say:[["Teacher","Check all three statements, not just the total. Is Ana twice Ben? Is Ben three fewer than Cara?"],["Expected","Twelve and six — yes. Six and nine — yes."],["Teacher","A wrong answer often satisfies one statement by luck. It rarely satisfies all of them."]],
+   watch:["Students who check only the total. Require every given statement to be verified; that is what makes the check worth doing."]}
+ ],
+ guided:[["Ana twice Ben, Ben three fewer than Cara, total 27. Find all.","Ben 6, Ana 12, Cara 9"],["A number plus its double is 36. Find it.","12"],["Two numbers differ by 5 and total 31. Find them.","13 and 18"],["Which quantity should be x in a problem?","The one the others are described against."]],
+ worksheet:[
+  {t:"A · Choose and solve",d:"Say which quantity you called x and why.",wide:true,
+   items:["Tom has three times as many cards as Ravi. Together they have 48. How many each?","A rope is cut into three pieces. The second is twice the first, the third is 4 m longer than the first. The rope is 24 m. Find all three.","Two numbers differ by 7 and add to 41. Find them."]},
+  {t:"B · Check them",d:"Verify every statement in the problem.",wide:true,
+   items:["A student says the answer to the rope problem is 5, 10 and 9. Check every statement and comment.","A student solves 3x + 4 = 22 and gets x = 6. Check it.","Three consecutive numbers add to 51. A student answers 16, 17, 18. Check it."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain how you decide which quantity to call x, using one of today's problems.","Why is checking against the story better than checking your own working?","Write a three-quantity problem of your own and solve it."]}],
+ exit:["Ana has twice Ben's amount; together 27. Find both.","Check your answer against both statements.","Explain how you chose which quantity to call x."],
+ crit:"Mastery: both correct, with every statement verified. Reteach if only the total is checked — a partially-satisfied answer is the most common wrong answer, and only a full check catches it.",
+ support:["Provide bars pre-drawn with the unit marked.","Restrict to two quantities before three.","Give a checking frame listing each statement with a tick box."],
+ extend:["A problem gives three statements but one is redundant. Find it and explain how you knew.","Write a problem where the obvious choice of x makes the algebra harder. Solve it both ways."],
+ access:["Touch: rebuilding with a different unit shows directly why the choice matters.","Attention: the checking frame with one row per statement makes the full check quick and hard to skip.","Vision: bars are labelled inside each section, with the unit consistent across all three.","Language: three-quantity problems are dense; read aloud and underline each statement separately before modelling."]
+},
+{
+ day:19, short:"Putting it together", title:"Expressions, equations and inequalities together",
+ objective:"Distinguish an expression, an equation and an inequality, and apply the right method to each without being told which is which.",
+ standards:["6.EE.A.2","6.EE.B.5","6.EE.B.7","6.EE.B.8"],
+ vocab:[["Expression","Describes. Simplify or evaluate it; you cannot solve it."],["Equation","Claims equality. Solve for one value."],["Inequality","Claims a comparison. Solve for a range."],["Method selection","Reading which of the three you have — today's actual skill."]],
+ materials:["Mixed problem cards","Balance mats","Number lines","Highlighters"],
+ warmup:{mins:5,text:"Post 3x + 2, 3x + 2 = 11 and 3x + 2 > 11 together. Ask what you can do with each. The first cannot be solved; it has no claim to be true or false. Say: telling these three apart is worth more than any single method in this unit."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · sorting the three",
+   moves:["Sort problem cards into three piles: expression, equation, inequality.","Compare sortings with another pair and discuss differences.","Identify the feature that decided each: no sign, equals, or a comparison sign.","Build a class reference showing what you do with each."],
+   say:[["Teacher","Sort first. What decided each pile?"],["Expected","Whether there's an equals or a greater-than."],["Teacher","And what can you do with an expression?"],["Expected","Simplify it, or evaluate it if you know x."],["Teacher","Not solve it. Asking to solve an expression is like asking what a sentence fragment is true about."]],
+   watch:["Students who try to solve an expression by setting it to zero. That is a later-years move; here, an expression with no claim attached is simplified or evaluated, not solved."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · one model per type",
+   moves:["Draw the appropriate model for four mixed items without working them.","Swap with a partner and check the model matches the type.","Revise any mismatch.","Then complete all four."],
+   say:[["Teacher","Expressions get tiles or cups. Equations get a balance. Inequalities get a number line."],["Teacher","Model all four before any arithmetic, then swap and check."]],
+   readaloud:["Say the page aloud: 'Four workings in a two-by-two grid. Upper left, algebra tiles collected into groups. Upper right, a level balance. Lower left, a number line with an open circle and shading to the right. Lower right, a second balance, tipped.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · doing the right thing",
+   moves:["Simplify the expressions, solve the equations, solve and draw the inequalities.","Justify the method chosen in one sentence each.","Check each result appropriately: substitution for equations, a tested value for inequalities.","Compare with a partner and resolve any disagreement."],
+   say:[["Teacher","One sentence per item on why that method. The sentence is what transfers to next term."],["Teacher","And notice the checks differ. Equations get one substitution; inequalities need a value from the range."]],
+   watch:["Students who solve everything as if it were an equation, giving a single answer for an inequality. Ask how many values satisfy the claim; the answer decides the form of the response."]}
+ ],
+ guided:[["Simplify 4x + 3 + 2x.","6x + 3"],["Solve 4x + 3 = 27.","x = 6"],["Solve 4x + 3 > 27 and draw it.","x > 6, open circle"],["What can you do with 4x + 3?","Simplify or evaluate it — not solve it."]],
+ worksheet:[
+  {t:"A · Which is it",d:"Label expression, equation or inequality, then do the right thing.",items:["5n + 2n","3x − 4 = 11","2a + 1 < 9","7(m + 2)","6y = 42","n + 5 ≥ 12"]},
+  {t:"B · Mixed",d:"Show the model you used.",wide:true,
+   items:["Simplify 3(x + 2) + 4x, then evaluate it when x = 5.","Solve 2n + 7 = 23, then check by substitution.","You have $40 and each item costs $6. Write and solve an inequality for how many you can buy."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain the difference between an expression, an equation and an inequality, with an example of each.","Why can an expression not be solved? What would solving it even mean?","Write one of each type using the numbers 3 and 12, then handle each appropriately."]}],
+ exit:["Label and handle: 5x + 2x.","Label and handle: 5x + 2 = 17.","Explain why an expression cannot be solved."],
+ crit:"Mastery: both handled correctly with the right label, and item 3 says an expression makes no claim. Reteach by type rather than by topic — the sorting activity identifies exactly which distinction is missing.",
+ support:["Provide the three-way reference card showing what each type permits.","Reduce to two types before mixing three.","Allow the sorting step with a partner throughout."],
+ extend:["Write an expression, an equation and an inequality that all involve 4x + 3. Handle each.","Can an equation have no solution? Try x + 1 = x and explain what happens."],
+ access:["Attention: sorting before working splits one long task into two shorter ones.","Language: the three-way card names what each type permits, in plain words alongside the formal ones.","Vision: each type has its own model, so the page shows at a glance which was chosen.","Memory: the card stays available during the assessment — recognising the type is the skill."]
+},
+{
+ day:20, short:"Review", title:"Review stations and unit assessment",
+ objective:"Consolidate algebra across all methods, and self-identify which topics need more work before the assessment.",
+ standards:["6.EE.A.2","6.EE.A.3","6.EE.A.4","6.EE.B.5","6.EE.B.7","6.EE.B.8","6.EE.C.9"],
+ vocab:[["Self-assessment","Judging your own accuracy honestly — a skill, and one being assessed today."],["Station","A short focused task at one method, then rotate."],["Justify","Say why, not just what — required at every station."],["Next step","A specific action, not a topic name."]],
+ materials:["All manipulatives from the unit","Station cards, one per method","Self-assessment grid","Assessment papers"],
+ warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: those are the stations to visit first, and the tally is data, not a confession."},
+ stages:[
+  {k:"c",label:"Concrete",mins:15,sense:"touch · rotation",
+   moves:["Six stations: writing expressions, substitution, collecting and expanding, solving equations, inequalities, and relationships with graphs.","Each station holds its manipulative and three graded tasks.","Students choose a starting station from the warm-up tally.","Every station requires one written justification."],
+   say:[["Teacher","Start where you are least confident, not where you are quickest."],["Teacher","One sentence per station explaining why your method works."],["Teacher","Twelve minutes per station. Rotate on the signal whether or not you have finished."]],
+   watch:["Students who visit only easy stations. The private warm-up slip is the accountability tool — ask them to show which station addresses what they wrote."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · one model per method",
+   moves:["On a single page, draw one model for each of the six station topics.","Annotate each with its explaining sentence.","Keep the page as the revision sheet.","Identify any model that could not be drawn and return to that station."],
+   say:[["Teacher","One page, six models, six sentences. Better than any notes you could copy."],["Teacher","A model you cannot draw names the topic to go back to."]],
+   readaloud:["Say the page aloud: 'Six diagrams across two rows. Cups and counters forming an expression; a filled cup showing substitution; tiles grouped into a rectangle; a level balance; a number line with an open circle; and a grid with a straight line rising from the vertical axis.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · assessment",
+   moves:["Complete the written assessment covering all twenty days.","Self-mark section A against a displayed key.","Record scores by topic on the self-assessment grid.","Identify two weakest topics and write one specific next step for each."],
+   say:[["Teacher","Self-mark honestly. Marking generously only costs you later."],["Teacher","One specific next step per weak topic. 'Practise algebra' is not a step. 'Rebuild three two-step equations on the balance' is."]],
+   watch:["Students whose self-assessment does not match their station work. The mismatch signals either low confidence or an unnoticed gap, and those need opposite responses."]}
+ ],
+ guided:[["Simplify 5x + 3 + 2x − 1.","7x + 2"],["Expand 4(n − 3).","4n − 12"],["Solve 3x + 5 = 26.","x = 7"],["Solve n − 4 ≥ 10 and draw it.","n ≥ 14, closed circle"]],
+ worksheet:[
+  {t:"A · Expressions",d:"Simplify or expand.",items:["6x + 2x − 3x","3(a + 5)","4n + 7 + 2n − 2","5(2m − 1)","Factorise 8y + 12","2(x + 3) + 3x"]},
+  {t:"B · Substitute",d:"Show the substitution line.",items:["3x + 4, x = 6","2(n − 1), n = 9","20 − 4a, a = 3","m² + 2, m = 4"]},
+  {t:"C · Solve",d:"Check every answer.",items:["x + 9 = 21","5n = 60","3a + 4 = 25","2m − 7 = 9","x + 6 > 14","4p ≤ 28"]},
+  {t:"D · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why the same operation must be done to both sides of an equation.","A gym charges $30 joining plus $6 per visit. Write the equation, find the cost of 9 visits, and find how many visits cost $102.","Choose the topic you found hardest this unit. Explain it with a picture, as if teaching someone who missed the lesson."]}],
+ exit:["Name the topic you are most confident with and give one reason.","Name the topic you want more practice on and give one specific next step.","Complete: a letter in an expression stands for ___."],
+ crit:"Mastery: assessment sections A through C at 80 percent or better, with self-assessment matching actual performance within one band. Reteach in small groups by method rather than reteaching the unit; the self-assessment grid tells you how to form those groups.",
+ support:["Reduce to four stations covering expressions, substitution, equations and inequalities.","Provide worked examples at each station as reference.","Allow the assessment across two sittings if sustained concentration is the barrier rather than the mathematics."],
+ extend:["Design a station task of your own, including the manipulative and the justification prompt.","Write a problem requiring four of the unit's methods in sequence, then solve it and write the key."],
+ access:["Motor: stations are arranged so each can be completed seated, with materials brought to the student.","Attention: twelve-minute rotations with a clear signal give predictable structure.","Vision: every station card uses the same layout so the format is never re-learned.","Language: the self-assessment grid pairs picture icons with topic names so it can be completed without heavy reading.","Hearing: the rotation signal is both visual and audible."]
+}
+];
+</script>
+<script src="curriculum-core.js"></script>
+</body>
+</html>

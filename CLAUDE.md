@@ -44,6 +44,8 @@ Everything stays in one folder. Links and shared assets break otherwise.
 In `curriculum-core.js` (promoted when a second unit reused them):
 `decimalGrid` · `rateLine`
 
+Still unit-local, in unit-05: `balanceScale` (also shipped as `balance-scale.js`)
+
 Still unit-local, in unit-02: `fractionModel` · `fractionDivide`
 
 Reuse before rebuilding. If a third unit needs one of these, promote it into
@@ -254,7 +256,7 @@ existing tools are template work; Sonnet handles them well.
 |---|---|---|
 | 03 | done | built in chat |
 | 04 | done | built in chat |
-| 05 | **Opus** | balance model for equations |
+| 05 | done | built in chat |
 | 06 | Sonnet | angle-chase follows the `stepper` pattern |
 | 07 | **Opus** | π derivation and circle-area rearrangement |
 | 08 | Sonnet, or Opus if nets need a fold tool | decide before starting |
