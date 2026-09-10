@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit 3 &mdash; Ratio &amp; Rate | Grade 6 CPA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="curriculum.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+    <h1>Unit 3 &mdash; Ratio &amp; Rate</h1>
+    <p class="sub">A ratio is a relationship that survives when both amounts change together. This unit builds that idea from grouping counters up to scale drawings, and treats the unit rate not as a division rule but as a step back along a line to the value of one &mdash; the move that makes any two rates comparable.</p>
+    <div class="facts">
+      <span><b>15</b> instructional days</span>
+      <span><b>3</b> weeks</span>
+      <span><b>55</b> minutes per lesson</span>
+      <span><b>6.RP</b> standards</span>
+    </div>
+  </div>
+  <div class="wrap"><nav class="daynav" id="daynav" aria-label="Lesson days"></nav></div>
+</header>
+
+<main class="wrap">
+  <div class="lesson">
+    <div id="content"></div>
+    <aside class="side" id="side"></aside>
+  </div>
+  <div class="pager">
+    <button id="prev">&larr; Previous lesson</button>
+    <button id="next">Next lesson &rarr;</button>
+  </div>
+</main>
+
+<!-- Unit-specific manipulative. Must load before curriculum-core.js. -->
+<script>
+/* rateLine — double number line + rate table.
+   Unit 3 (Ratio & Rate). Declare before curriculum-core.js. */
+window.__EXTRA_TOOLS__=Object.assign(window.__EXTRA_TOOLS__||{},(function(){
+const rm=()=>(!!window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a);
+const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#5B7189", LINE="#D3DCE4";
+const fmt=n=>{
+  if(!isFinite(n))return"—";
+  const r=Math.round(n*1000)/1000;
+  return Number.isInteger(r)?r.toLocaleString("en-US"):String(r);
+};
+/* label a quantity with its unit, unit before the number for currency */
+const q=(n,u)=>u==="$"?"$"+fmt(n):fmt(n)+(u?" "+u:"");
+
+const PRESETS=[
+ {k:"3 kg for $12",      a:3,   ua:"kg",    b:12,  ub:"$"},
+ {k:"5 pens for $4",     a:5,   ua:"pens",  b:4,   ub:"$"},
+ {k:"150 km in 2 h",     a:2,   ua:"h",     b:150, ub:"km"},
+ {k:"240 km in 3 h",     a:3,   ua:"h",     b:240, ub:"km"},
+ {k:"2 flour : 3 water", a:2,   ua:"cups flour", b:3, ub:"cups water"},
+ {k:"4 blue : 6 yellow", a:4,   ua:"blue",  b:6,   ub:"yellow"}
+];
+
+function rateLine(host){
+  const box=el("div","tool");
+  box.innerHTML=`<h3>Rate line<span class="mins">tool</span></h3>
+    <p class="sense">sight · correspondence</p>
+    <p class="how">Two scales that move together. Every tick on the bottom has a partner directly above it, and the pair never stops being the same ratio — that is what makes the jump to a unit rate a step along the line rather than a rule.</p>
+    <div class="ctl">
+      <label for="rlm">what are we doing</label>
+      <select id="rlm">
+        <option value="equiv">finding equivalent ratios</option>
+        <option value="unit">finding the unit rate</option>
+        <option value="cmp">comparing two rates</option>
+      </select>
+      <label for="rla">for every</label>
+      <input id="rla" type="number" value="3" min="1" max="60" aria-label="first quantity">
+      <input id="rlua" type="text" value="kg" size="6" aria-label="first unit" style="min-width:70px">
+      <label for="rlb">you get</label>
+      <input id="rlb" type="number" value="12" min="1" max="999" aria-label="second quantity">
+      <input id="rlub" type="text" value="$" size="6" aria-label="second unit" style="min-width:70px">
+    </div>
+    <div class="ctl" id="rl2" hidden>
+      <label for="rlc">compare with: for every</label>
+      <input id="rlc" type="number" value="5" min="1" max="60" aria-label="third quantity">
+      <label for="rld">you get</label>
+      <input id="rld" type="number" value="18" min="1" max="999" aria-label="fourth quantity">
+    </div>
+    <div class="ctl picker" id="rlp"></div>
+    <div class="stage-area"><svg class="bm" viewBox="0 0 700 200" role="img"></svg></div>
+    <div id="rltab" style="margin-top:16px;overflow-x:auto"></div>
+    <div class="out" id="rlout"></div>
+    <p class="note">A ratio compares two amounts. A rate is a ratio with units attached, and a unit rate is the value of one — which is why the line always walks back to 1 before it does anything else.</p>`;
+  host.appendChild(box);
+  const svg=box.querySelector("svg"),out=box.querySelector("#rlout"),tab=box.querySelector("#rltab");
+  const $=s=>box.querySelector(s), $m=$("#rlm");
+  $("#rlp").innerHTML=PRESETS.map((p,i)=>`<button class="btn sm" data-i="${i}">${p.k}</button>`).join("");
+
+  const X0=74,W=560;
+  function scale(y,label,vals,unit,colour,dash){
+    let s=`<line x1="${X0}" y1="${y}" x2="${X0+W}" y2="${y}" stroke="${INK}" stroke-width="2"/>`;
+    s+=`<text x="${X0-10}" y="${y+4}" font-family="Inconsolata" font-size="12" fill="${MUT}" text-anchor="end">${label}</text>`;
+    vals.forEach((v,i)=>{
+      const x=X0+(i/(vals.length-1))*W;
+      s+=`<line x1="${x}" y1="${y-7}" x2="${x}" y2="${y+7}" stroke="${INK}" stroke-width="2"/>`;
+      s+=`<circle class="bmseg" cx="${x}" cy="${y}" r="4" fill="${colour}"/>`;
+      s+=`<text x="${x}" y="${y+(dash?24:-15)}" font-family="Inconsolata" font-size="12" fill="${INK}" text-anchor="middle">${q(v,unit)}</text>`;
+    });
+    return s;
+  }
+  function connectors(yTop,yBot,n,hi){
+    let s="";
+    for(let i=0;i<n;i++){
+      const x=X0+(i/(n-1))*W;
+      const on=hi===i;
+      s+=`<line x1="${x}" y1="${yTop+8}" x2="${x}" y2="${yBot-8}" stroke="${on?A:MUT}" stroke-width="${on?2:1}" stroke-dasharray="${on?"":"3 4"}" opacity="${on?1:.55}"/>`;
+    }
+    return s;
+  }
+  function table(rowsA,rowsB,ua,ub,hi){
+    const th=`padding:6px 12px;font-family:var(--mono);font-size:.78rem;color:${MUT};font-weight:400;text-align:left;border-bottom:1px solid ${LINE}`;
+    const td=i=>`padding:6px 12px;font-family:var(--mono);font-size:.9rem;color:${INK};border-bottom:1px solid ${LINE};${i===hi?`background:#FAEDD6;font-weight:600`:""}`;
+    let h=`<table style="border-collapse:collapse;min-width:320px"><caption style="caption-side:top;text-align:left;font-family:var(--mono);font-size:.76rem;color:${MUT};padding-bottom:6px">equivalent ratios</caption><thead><tr>
+      <th scope="col" style="${th}">${ua}</th><th scope="col" style="${th}">${ub}</th><th scope="col" style="${th}">${ub} per 1 ${ua}</th></tr></thead><tbody>`;
+    rowsA.forEach((v,i)=>{
+      h+=`<tr><td style="${td(i)}">${fmt(v)}</td><td style="${td(i)}">${fmt(rowsB[i])}</td><td style="${td(i)}">${v?fmt(rowsB[i]/v):"—"}</td></tr>`;
+    });
+    return h+"</tbody></table>";
+  }
+
+  function draw(){
+    const a=Math.max(1,+$("#rla").value||1), b=Math.max(1,+$("#rlb").value||1);
+    const ua=$("#rlua").value.trim()||"units", ub=$("#rlub").value.trim()||"units";
+    const m=$m.value;
+    $("#rl2").hidden=m!=="cmp";
+    svg.classList.remove("anim");void svg.offsetWidth;if(!rm())svg.classList.add("anim");
+
+    if(m==="cmp"){
+      const c=Math.max(1,+$("#rlc").value||1), d=Math.max(1,+$("#rld").value||1);
+      const r1=b/a, r2=d/c;
+      const n=4;
+      const unitsX=[0,1,2,3];
+      svg.setAttribute("viewBox","0 0 700 210");
+      let s=scale(46,"offer A",unitsX.map(u=>u*r1),ub,T,false);
+      s+=scale(104,ua,unitsX,ua,INK,false);
+      s+=scale(170,"offer B",unitsX.map(u=>u*r2),ub,P,true);
+      s+=connectors(46,104,n,1)+connectors(104,170,n,1);
+      svg.innerHTML=s;
+      svg.setAttribute("aria-label",`Three aligned scales. The middle scale counts ${ua} from 0 to 3. Above it, offer A reaches ${q(r1,ub)} at one ${ua}. Below it, offer B reaches ${q(r2,ub)} at one ${ua}. ${r1===r2?"The two offers match.":`Offer ${r1<r2?"A":"B"} gives less per ${ua}.`}`);
+      tab.innerHTML=table([1,2,3],[r1,r1*2,r1*3],ua,ub+" (A)",0)+
+        `<div style="height:12px"></div>`+table([1,2,3],[r2,r2*2,r2*3],ua,ub+" (B)",0);
+      const cheaper=r1===r2?null:(r1<r2?"A":"B");
+      out.innerHTML=`Offer A: ${q(b,ub)} for ${q(a,ua)} → <b>${q(r1,ub)} per ${ua}</b>.<br>
+        Offer B: ${q(d,ub)} for ${q(c,ua)} → <b>${q(r2,ub)} per ${ua}</b>.<br>
+        ${cheaper===null?"The two rates are equal — the same ratio written two ways."
+          :`Per single ${ua}, offer <b>${cheaper}</b> is the smaller amount of ${ub}.`}<br>
+        <span style="color:${MUT}">You cannot compare ${q(b,ub)} with ${q(d,ub)} directly — they buy different amounts. Walking both back to one ${ua} is what makes them comparable, exactly like a common denominator.</span>`;
+      return;
+    }
+
+    if(m==="unit"){
+      const r=b/a, n=Math.min(6,Math.max(3,a+1));
+      const bot=Array.from({length:n},(_,i)=>i);
+      svg.setAttribute("viewBox","0 0 700 170");
+      let s=scale(56,ub,bot.map(u=>u*r),ub,T,false);
+      s+=scale(122,ua,bot,ua,INK,true);
+      s+=connectors(56,122,n,1);
+      svg.innerHTML=s;
+      svg.setAttribute("aria-label",`Two aligned scales. The lower scale counts ${ua} from 0 to ${n-1}. The upper scale shows the matching amount of ${ub}, reaching ${q(r,ub)} directly above one ${ua}. The pair at one is marked.`);
+      tab.innerHTML=table(bot.slice(1),bot.slice(1).map(u=>u*r),ua,ub,0);
+      out.innerHTML=`${q(b,ub)} for ${q(a,ua)}. Step back along the line to <b>1 ${ua}</b>.<br>
+        Unit rate: <b>${q(r,ub)} per ${ua}</b> &nbsp;(${fmt(b)} ÷ ${fmt(a)})<br>
+        The other one: <b>${q(a/b,ua)} per ${ub}</b> &nbsp;(${fmt(a)} ÷ ${fmt(b)})<br>
+        <span style="color:${MUT}">Both are unit rates for the same situation. Which one you want depends on the question — read it before you divide, because dividing the wrong way round gives a number that looks fine.</span>`;
+      return;
+    }
+
+    /* equivalent ratios */
+    const g=gcd(a,b), n=5;
+    const ks=Array.from({length:n},(_,i)=>i);
+    svg.setAttribute("viewBox","0 0 700 170");
+    let s=scale(56,ub,ks.map(k=>k*b),ub,T,false);
+    s+=scale(122,ua,ks.map(k=>k*a),ua,INK,true);
+    s+=connectors(56,122,n,2);
+    /* multiplier bracket between the first and the highlighted pair */
+    const x1=X0, x2=X0+(2/(n-1))*W;
+    s+=`<path d="M${X0+(1/(n-1))*W} 150 L${X0+(1/(n-1))*W} 158 L${x2} 158 L${x2} 150" fill="none" stroke="#B87C1C" stroke-width="1.5"/>`;
+    svg.innerHTML=s;
+    svg.setAttribute("aria-label",`Two aligned scales showing equivalent ratios. The lower scale counts ${ua} in steps of ${fmt(a)}, the upper counts ${ub} in steps of ${fmt(b)}. Each pair down the line — ${fmt(a)} to ${fmt(b)}, ${fmt(2*a)} to ${fmt(2*b)}, ${fmt(3*a)} to ${fmt(3*b)} — is the same ratio.`);
+    tab.innerHTML=table(ks.slice(1).map(k=>k*a),ks.slice(1).map(k=>k*b),ua,ub,1);
+    out.innerHTML=`${fmt(a)} : ${fmt(b)} = ${fmt(2*a)} : ${fmt(2*b)} = ${fmt(3*a)} : ${fmt(3*b)} = ${fmt(4*a)} : ${fmt(4*b)}.<br>
+      Both scales were multiplied by the same number, so the pairing never changed. ${g>1?`In simplest form this ratio is <b>${fmt(a/g)} : ${fmt(b/g)}</b>.`:`This ratio is already in simplest form — ${fmt(a)} and ${fmt(b)} share no factor but 1.`}<br>
+      <span style="color:${MUT}">Every row of the table sits on one straight walk down the line. That is what "equivalent" means here — same walk, further along.</span>`;
+  }
+  $m.addEventListener("change",draw);
+  box.querySelectorAll("input,select").forEach(i=>i.addEventListener("input",draw));
+  $("#rlp").addEventListener("click",e=>{
+    const btn=e.target.closest("button[data-i]");if(!btn)return;
+    const p=PRESETS[+btn.dataset.i];
+    $("#rla").value=p.a;$("#rlua").value=p.ua;$("#rlb").value=p.b;$("#rlub").value=p.ub;draw();
+  });
+  draw();
+}
+return {rateLine};
+})());
+window.__EXTRA_NAMES__=Object.assign(window.__EXTRA_NAMES__||{},{rateLine:"Rate line"});
+</script>
+
+<script>
+/* Core tools: placeValue, rounding, shift, stepper, power, barModel, factors.
+   This unit adds rateLine. */
+window.UNIT={
+  number:3,
+  minutes:55,
+  tools:{
+     1:["barModel"],      2:["rateLine"],  3:["barModel"],   4:["rateLine"],
+     5:["rateLine"],      6:["rateLine"],  7:["rateLine"],   8:["rateLine"],
+     9:["barModel"],     10:["barModel"], 11:["barModel"],  12:["barModel","rateLine"],
+    13:["rateLine"],     14:["barModel","rateLine"],
+    15:"all"
+  }
+};
+
+window.LESSONS=
+[
+{
+ day:1, short:"What a ratio is", title:"Ratio as a comparison, not a count",
+ objective:"Describe a relationship between two quantities as a ratio, and explain why a ratio survives when both amounts change together.",
+ standards:["6.RP.A.1"],
+ vocab:[["Ratio","A comparison of two amounts by how many times one fits the other."],["Term","One of the two numbers in a ratio. 3 : 5 has two terms."],["Part-part","A ratio comparing one group with another group."],["Part-whole","A ratio comparing one group with the total."]],
+ materials:["Two-colour counters, 40 per pair","Linking cubes in two colours","Paper cups for grouping","Chart paper"],
+ warmup:{mins:5,text:"Put 6 red and 9 blue counters under a document camera. Ask students to describe what they see in one sentence, then collect the sentences. Some will count (6 and 9), some will compare (more blue), a few will say 2 to 3. Do not rank the answers. Say: three different kinds of description, and today is about the third kind."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · grouping",
+   moves:["Pairs build 6 red and 9 blue, then physically group them into matching sets of 2 red with 3 blue.","Count the groups: three of them, with nothing left over.","Add one more group of 2 red and 3 blue and check the grouping still works.","Try to group 6 red and 10 blue the same way and find the leftover."],
+   say:[["Teacher","Group them so every group looks the same. Two red, three blue. How many groups?"],["Expected","Three, and nothing's left over."],["Teacher","Now add another group. You have 8 red and 12 blue. Has the relationship changed?"],["Expected","No — the groups still look the same."],["Teacher","So the amounts changed but the comparison didn't. That is what a ratio holds onto."],["Teacher","Now try 6 red and 10 blue with the same grouping."],["Expected","There's a leftover blue — it doesn't work."]],
+   watch:["Students who report the ratio as 3 : 3 because there are three groups of each. The ratio describes what is inside one group, not how many groups there are. Have them point at a single group and read it aloud."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · matched bars",
+   moves:["Draw two bars, one of 2 units for red and one of 3 units for blue, with the units drawn the same size.","Extend both bars to show 6 and 9, keeping the unit size identical.","Mark the total bar of 5 units and name the part-whole ratios 2 : 5 and 3 : 5.","Draw a case where the unit sizes are drawn unequally and ask what has gone wrong."],
+   say:[["Teacher","Every unit square must be the same size in both bars. If they are not, the picture lies."],["Teacher","Now look at the whole thing. How many units altogether?"],["Expected","Five."],["Teacher","So red to blue is 2 to 3, and red to total is 2 to 5. Both are true, and they are different comparisons. Read the question before you decide which one it wants."]],
+   readaloud:["Say the picture aloud: 'Two bars sit one above the other, aligned at the left. The upper bar is two units long and labelled red. The lower bar is three units long and labelled blue. Every unit is the same width, so the lower bar extends one unit further right.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · notation",
+   moves:["Write the ratio three ways: 2 : 3, 2 to 3, and 2/3, and note when each is used.","Write the part-whole ratios for the same situation.","Practise translating sentences into ratios, watching the order of the terms.","Establish that order matters: 2 : 3 and 3 : 2 describe different situations."],
+   say:[["Teacher","Order carries meaning. If I say the ratio of red to blue is 2 to 3, and you write 3 : 2, you have described a different bag of counters."],["Teacher","When would you write a ratio as a fraction rather than with a colon?"],["Expected","When it's part to whole, maybe — like 2 out of 5."],["Teacher","That is the safer habit. Part-whole reads naturally as a fraction; part-part does not, and writing 2/3 for two reds to three blues invites the wrong reading."]],
+   watch:["Students who reverse the terms when the sentence puts them in the other order — 'for every 3 blue there are 2 red' becoming 3 : 2 when the question asked for red to blue. Underline the two nouns in the question before writing anything."]}
+ ],
+ guided:[["A bag has 4 apples and 6 pears. Write the ratio of apples to pears.","4 : 6"],["Write the ratio of pears to the total.","6 : 10"],["In a class of 12 boys and 15 girls, write boys to girls.","12 : 15"],["Why is 2 : 3 different from 3 : 2?","The terms name different quantities; swapping them describes a different situation."]],
+ worksheet:[
+  {t:"A · Write the ratio",d:"Use the order given in the question.",items:["5 cats to 3 dogs","7 red to 2 blue","4 wins to 9 games","6 boys to 14 students","8 cups flour to 3 cups sugar","10 pens to 25 pencils"]},
+  {t:"B · Part-part or part-whole",d:"Label each ratio, then write the other one for the same situation.",items:["3 red : 5 blue","4 girls : 9 children","2 cars : 7 vehicles","6 apples : 5 oranges"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A recipe uses 2 cups of oats to 3 cups of flour. Explain why doubling both keeps the recipe tasting the same.","Jamal says a bag with 4 red and 6 blue has the same ratio as one with 6 red and 4 blue, because the numbers are the same. Explain his mistake.","A class has a boys-to-girls ratio of 3 : 4. Can the class have exactly 20 students? Explain how you decided."]}],
+ exit:["A box has 6 pencils and 9 pens. Write pencils to pens.","Write pencils to the total.","Explain why a ratio does not change when both amounts are doubled."],
+ crit:"Mastery: both ratios correct in the right order, and item 3 mentions the groups staying the same. Reteach if part-whole and part-part are confused — that error will silently corrupt every ratio word problem in the unit, so catch it here.",
+ support:["Keep counters out for every problem; grouping physically answers the question without notation.","Restrict to part-part ratios before introducing part-whole.","Provide a two-column frame with the two nouns pre-written so only the numbers must be placed."],
+ extend:["A ratio of 2 : 3 describes a bag of 30 counters. How many of each? Find a method that does not use trial and error.","Write three different situations that all have the ratio 3 : 4 but different totals."],
+ access:["Touch: grouping counters into cups makes the ratio a physical set, readable without sight.","Vision: pair colour with a texture or shape so the two groups are distinguishable in greyscale.","Language: 'for every' is the phrase that signals a ratio — post it and refer to it, since it does the work that 'of' did in Unit 2.","Attention: the underline-the-two-nouns routine gives a fixed first action on every problem."]
+},
+{
+ day:2, short:"Simplest form", title:"Equivalent ratios and simplest form",
+ objective:"Simplify a ratio using the greatest common factor, and explain why the simplified ratio describes the same relationship.",
+ standards:["6.RP.A.1","6.NS.B.4"],
+ vocab:[["Equivalent ratios","Different numbers, same relationship: 4 : 6 and 2 : 3."],["Simplest form","Both terms divided by their greatest common factor."],["Greatest common factor","The largest number dividing both terms — from Unit 1's factor lab."],["Unit of the ratio","One group. 4 : 6 is two groups of 2 : 3."]],
+ materials:["Two-colour counters","Paper cups for grouping","Unit 1 factor lists if kept"],
+ warmup:{mins:5,text:"Show 8 red and 12 blue counters. Ask two students to group them into identical sets, working separately at the board. One will likely make four groups of 2 : 3, another two groups of 4 : 6. Both are correct. Ask the class which grouping tells you the most about the relationship, and hold the question."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · regrouping",
+   moves:["Build 8 red and 12 blue and group them into as many identical sets as possible.","Count: four groups of 2 red and 3 blue.","Try to make five identical groups and find that it fails.","Repeat with 18 : 24, finding six groups of 3 : 4."],
+   say:[["Teacher","Make as many identical groups as you can, using every counter."],["Expected","Four groups of two and three."],["Teacher","Could you make more than four?"],["Expected","No — you'd have to split a counter."],["Teacher","So four is the greatest number of groups, and what is inside one group is the simplest form. The GCF is not a rule here; it is the number of groups you just made."]],
+   watch:["Students who divide only one term. Have them make the groups physically; an unequal division produces groups that visibly do not match, which is a faster correction than any explanation."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · scaled bars",
+   moves:["Draw 8 : 12 as two bars, then draw the dividing lines showing four identical groups.","Circle one group and label it 2 : 3.","Draw the chain 8 : 12 = 4 : 6 = 2 : 3, with the group size growing as the count shrinks.","Repeat for 18 : 24."],
+   say:[["Teacher","Every ratio in this chain is the same relationship. What is changing?"],["Expected","How big the groups are."],["Teacher","And which one would you rather work with?"],["Expected","The smallest."],["Teacher","Simplest form is the version with the most groups and the smallest numbers. It is the one that shows the relationship most clearly."]],
+   readaloud:["Say the picture aloud: 'Two aligned bars, the upper eight units long and the lower twelve. Three vertical lines cut both bars into four matching sections. Each section holds two units of the upper bar and three of the lower.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · division",
+   moves:["Divide both terms by the GCF in one step.","Practise: 15 : 25, 24 : 36, 14 : 21, 30 : 45.","Handle ratios where one term divides the other: 6 : 18 giving 1 : 3.","Handle ratios with three terms: 4 : 6 : 10 giving 2 : 3 : 5."],
+   say:[["Teacher","Divide both by the greatest common factor and you land in simplest form in one move."],["Teacher","6 : 18 — what happens here?"],["Expected","It becomes 1 : 3."],["Teacher","A one in a ratio is fine. It means one of these for every three of those, which is often the clearest form there is."],["Teacher","Now three terms. What has to be true of the number you divide by?"],["Expected","It has to divide all three."]],
+   watch:["Students who simplify a ratio the way they would reduce a fraction and then read it as a fraction — turning 4 : 6 into 2/3 and treating it as an amount. It is a comparison, not a quantity. Keep the colon in the answer."]}
+ ],
+ guided:[["Simplify 10 : 15.","2 : 3"],["Simplify 24 : 36.","2 : 3"],["Simplify 6 : 18.","1 : 3"],["Simplify 8 : 12 : 20.","2 : 3 : 5"]],
+ worksheet:[
+  {t:"A · Simplify",d:"Show the factor you divided by.",items:["12 : 18","20 : 25","14 : 42","36 : 48","9 : 21","50 : 30"]},
+  {t:"B · Three terms",d:"Simplify each.",items:["6 : 9 : 12","10 : 15 : 25","8 : 12 : 20","14 : 21 : 35"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why 4 : 6 and 2 : 3 describe the same relationship, using groups in your explanation.","A ratio in simplest form is 3 : 5. Write three ratios that simplify to it. What do the three have in common?","Nadia simplifies 12 : 18 to 6 : 9 and stops. Is she wrong? Explain precisely what is and is not correct about her answer."]}],
+ exit:["Simplify 18 : 24.","Simplify 5 : 20.","Explain what the greatest common factor tells you about the groups."],
+ crit:"Mastery: both correct and item 3 links the GCF to the number of identical groups. Reteach if only one term is divided — use the counters, since unequal groups are visible in a way that a rule violation is not.",
+ support:["Keep counters and cups available so simplification stays a grouping action.","Provide factor lists for the numbers used.","Allow simplification in several steps rather than requiring the GCF in one move."],
+ extend:["Which ratios with both terms under 20 are already in simplest form? Connect the pattern to coprime numbers.","Can a ratio simplify to 1 : 1? What does that mean about the two quantities?"],
+ access:["Touch: making the groups physically is the simplification — no symbolic step is required to get the answer.","Memory: this is Unit 1's GCF and Unit 2's equivalence in a new costume; say so, since recognising it as familiar reduces the load.","Language: keep the colon in spoken answers — 'two to three', not 'two thirds' — so the comparison does not get heard as a fraction.","Attention: three-term ratios are held until the two-term case is secure, rather than interleaved."]
+},
+{
+ day:3, short:"Part & whole", title:"Part-part and part-whole, and finding the total",
+ objective:"Move between part-part and part-whole ratios, and find a total or a missing part from a ratio and one known amount.",
+ standards:["6.RP.A.1","6.RP.A.3"],
+ vocab:[["Total","The sum of all parts. In 3 : 5 the total is 8 units."],["Unit","One equal share of the bar. Find one unit first — this is the move the whole unit rests on."],["Missing part","The amount not given, found once one unit is known."],["Share","To split a total according to a ratio."]],
+ materials:["Two-colour counters","Blank bar-model paper","Highlighters"],
+ warmup:{mins:5,text:"Write: 'The ratio of cats to dogs is 3 : 5.' Ask what you can and cannot know from this alone. Students will realise you cannot know how many animals there are. Say: a ratio without an amount is a shape without a size. Today we add the size."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · sharing to a ratio",
+   moves:["Share 24 counters between two people in the ratio 1 : 2 by dealing one to A and two to B repeatedly.","Count the rounds: eight rounds, giving 8 and 16.","Note that each round is one unit, and there are 3 units per round across both people.","Repeat sharing 30 counters in the ratio 2 : 3."],
+   say:[["Teacher","Deal them out — one for A, two for B, and repeat until they run out."],["Teacher","How many rounds did that take?"],["Expected","Eight."],["Teacher","So 24 split into how many equal shares altogether?"],["Expected","Twenty-four divided by three, so eight in each share."],["Teacher","Eight is one unit. Everything else today is multiplying that eight."]],
+   watch:["Students who divide the total by 2 because there are two people. The number of shares is the sum of the ratio terms, not the number of groups. Have them count the counters handed out per round."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · bar model",
+   moves:["Draw a bar of 3 units for cats and 5 for dogs, aligned and same unit size.","Brace the whole bar, 8 units, and label the total.","Given 40 animals, label one unit as 5 and fill in both parts.","Given that there are 15 cats, find one unit from the cat bar instead and complete the rest."],
+   say:[["Teacher","Eight units, forty animals. What is one unit worth?"],["Expected","Five."],["Teacher","Now the harder version: I tell you there are fifteen cats. Which bar do you use to find one unit?"],["Expected","The cat bar — fifteen divided by three."],["Teacher","So you find one unit from whatever you were given, not always from the total. Read what you have before you divide."]],
+   readaloud:["Say the picture aloud: 'Two aligned bars. The upper is three equal units long, labelled cats. The lower is five units, labelled dogs. A brace beneath both spans a combined eight units and is labelled total.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · unit method",
+   moves:["Write the method as three lines: total units, one unit, then each part.","Work forwards from the total and backwards from one part.","Work from a difference: the dogs exceed the cats by 10.","Check every answer by confirming the parts sum to the total."],
+   say:[["Teacher","Three lines every time. How many units, what one unit is worth, then multiply out."],["Teacher","Now: there are ten more dogs than cats. How many units is that difference?"],["Expected","Two units — five minus three."],["Teacher","So one unit is five again, by a different route. The difference is a bar you can see, just like the total."]],
+   watch:["Students who find one unit correctly and then report it as the answer. The unit is a stepping stone, not the answer. Requiring the final check — do the parts sum to the total — catches this."]}
+ ],
+ guided:[["Share 35 in the ratio 2 : 5.","10 and 25"],["The ratio is 3 : 4 and there are 12 in the first group. Find the total.","28"],["The ratio is 5 : 2 and the difference is 9. Find both parts.","15 and 6"],["Why divide by 8 and not by 2 when sharing in the ratio 3 : 5?","Because there are 8 equal units altogether, not 2."]],
+ worksheet:[
+  {t:"A · Share the total",d:"Find both parts.",items:["24 in 1 : 2","45 in 4 : 5","60 in 3 : 7","33 in 5 : 6","72 in 1 : 3 : 4","50 in 2 : 3"]},
+  {t:"B · Work backwards",d:"Find what is missing.",items:["3 : 4, first part is 15 — find the total","2 : 7, second part is 35 — find the first","5 : 3, difference is 8 — find both","4 : 5, total is 63 — find both"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Prize money of $120 is split 3 : 5 between two teams. How much each? Draw the bar model.","Explain why you cannot find the number of cats from the ratio 3 : 5 alone.","A ratio is 2 : 3 and one part is 18. Explain why there are two possible totals, and find both."]}],
+ exit:["Share 40 in the ratio 3 : 5.","The ratio is 2 : 5 and the smaller part is 8. Find the total.","Explain what 'one unit' means in a bar model."],
+ crit:"Mastery: both correct and item 3 describes one equal share of the bar. Reteach if the total is divided by the number of groups rather than the sum of the terms — that is the unit's most costly error and it is worth ten minutes now.",
+ support:["Provide pre-drawn bars with the units already marked so only the labelling remains.","Restrict to sharing a given total before working backwards.","Keep counters available for physical dealing on every problem."],
+ extend:["Share 100 in the ratio 2 : 3 : 5. Then find a three-term ratio that shares 100 with no remainder in a different way.","A ratio is 3 : 4. The total is between 40 and 60 and is a whole number of units. What could it be?"],
+ access:["Touch: dealing counters round by round makes the unit a physical event rather than a calculation.","Vision: bar models label the value inside each unit rather than relying on relative length alone.","Attention: the three-line format is identical on every problem, so no decision about layout is needed.","Language: 'share in the ratio' is the phrase to watch for; post it beside a worked example."]
+},
+{
+ day:4, short:"Ratio tables", title:"Ratio tables and scaling",
+ objective:"Build a ratio table by scaling both quantities by the same factor, and use it to find a missing value.",
+ standards:["6.RP.A.3a","6.RP.A.1"],
+ vocab:[["Ratio table","Rows of equivalent ratios, each one a scaling of the last."],["Scale factor","The number both quantities are multiplied by."],["Scaling up","Multiplying both terms."],["Scaling down","Dividing both terms — including all the way down to one."]],
+ materials:["Printed blank ratio tables","Counters","Rulers"],
+ warmup:{mins:5,text:"Post: 3 kg of apples cost $12. Ask for the cost of 6 kg, then 12 kg, then 1 kg. Take the answers in that order and write them as a growing table without naming it. The last one is the hardest and that is deliberate — leave it visible."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · repeated sets",
+   moves:["Build one set of 2 red and 3 blue with counters.","Build a second identical set beside it and record 4 : 6.","Continue to four sets, recording each stage in a table.","Remove sets one at a time and record the table shrinking back."],
+   say:[["Teacher","Each new set multiplies both numbers by the same amount. Watch the table build."],["Teacher","Now take sets away. What happens to the numbers?"],["Expected","They go down together."],["Teacher","Scaling runs both directions. Down is just as legitimate as up, and going down is how you reach the most useful row of all."]],
+   watch:["Students who add a fixed amount to one column rather than multiplying — a table going 2, 4, 6 for red but 3, 5, 7 for blue. Ask them to build that fourth row with counters; the groups will not match."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · table and line together",
+   moves:["Draw a two-column table for kg and cost, filling 3 : 12, 6 : 24, 9 : 36.","Draw the matching double number line beneath it, with corresponding ticks aligned.","Mark the scale factor between rows with arrows on both columns.","Scale down to 1 kg and mark that row."],
+   say:[["Teacher","The table and the line say the same thing. The table stacks the pairs; the line lays them out."],["Teacher","Draw the arrow between rows on both columns. Are the two arrows the same?"],["Expected","Yes, both times three."],["Teacher","If the arrows ever differ, the row is wrong. That is a check you can do without recalculating anything."]],
+   readaloud:["Say the picture aloud: 'A two-column table lists three kilograms with twelve dollars, six with twenty-four, nine with thirty-six. Below it, two aligned number lines: the lower counts kilograms in threes, the upper counts dollars in twelves, with each pair connected by a vertical dashed line.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · missing value",
+   moves:["Find a missing value by identifying the scale factor between a known pair.","Handle non-integer scale factors by scaling down to one first.","Work: 4 pens cost $6, find the cost of 10 pens.","State the rule that both columns take the same multiplier, always."],
+   say:[["Teacher","Four pens to ten pens is not a whole-number jump. What is the safe route?"],["Expected","Go down to one pen first, then up to ten."],["Teacher","Down to one, then up to anything. That row is worth finding even when nobody asked for it."]],
+   watch:["Students who multiply one column and forget the other. The two-arrow check catches it; require both arrows to be drawn on every table this week."]}
+ ],
+ guided:[["3 kg costs $12. Find the cost of 7 kg.","$4 per kg, so $28"],["4 pens cost $6. Find the cost of 10.","$1.50 each, so $15"],["Complete: 2 : 5, 4 : __, 6 : __","10, 15"],["Why must both columns be multiplied by the same number?","Because the relationship between them must not change."]],
+ worksheet:[
+  {t:"A · Complete the table",d:"Fill the missing values.",items:["3 : 4, 6 : __, 9 : __","5 : 2, 10 : __, 20 : __","2 : 7, __ : 21, 8 : __","4 : 5, __ : 15, 16 : __"]},
+  {t:"B · Find the missing value",d:"Scale down to one first if the jump is not a whole number.",items:["6 kg for $18, find 5 kg","4 tickets for $30, find 7","10 m for $25, find 3 m","8 books for $20, find 5"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A recipe for 4 people uses 300 g of rice. How much for 7 people? Show your table.","Explain why adding 2 to both terms of 3 : 5 does not give an equivalent ratio, but multiplying both by 2 does.","Build a ratio table for 3 : 8 with five rows, then say which row would be most useful for answering any question about this ratio."]}],
+ exit:["Complete: 4 : 6, 8 : __, 2 : __","5 kg costs $20. Find the cost of 8 kg.","Explain the check you can do on any ratio table row."],
+ crit:"Mastery: both correct and item 3 names the same-multiplier-on-both-columns check. Reteach if a constant is added rather than multiplied — this is the same misconception as adding to a fraction's numerator and denominator in Unit 2, and naming that connection often lands where a fresh explanation does not.",
+ support:["Provide tables with the arrows pre-drawn so only the multipliers are written.","Restrict to whole-number scale factors before requiring the scale-down-to-one route.","Allow counters for building the first three rows."],
+ extend:["A ratio table has rows 6 : 15 and 10 : 25. Find the scale factor between them and explain why it is not a whole number.","Build a table where scaling down to one gives a decimal. Is the table still correct? Explain."],
+ access:["Vision: tables are printed with alternating row shading and the arrows drawn in a distinct line style, not distinguished by colour alone.","Touch: building rows with counters keeps the scaling physical for as long as a student needs it.","Attention: the two-arrow check gives a quick verification that does not require redoing the arithmetic.","Memory: name the link to Unit 2's equivalent fractions explicitly — same idea, new notation."]
+},
+{
+ day:5, short:"Rate vs ratio", title:"Rate: a ratio with units attached",
+ objective:"Distinguish a rate from a ratio, and read a rate correctly from a context involving two different units.",
+ standards:["6.RP.A.2","6.RP.A.3b"],
+ vocab:[["Rate","A ratio comparing quantities measured in different units: km per hour, dollars per kilogram."],["Per","For each one. The word that signals a rate."],["Ratio","A comparison of two quantities, often the same unit."],["Associated rate","Every rate has a partner rate, found by swapping the two quantities."]],
+ materials:["Price labels and packaging with unit prices","Stopwatch","Metre wheel or measuring tape","Measuring jugs"],
+ warmup:{mins:5,text:"Post two statements: 'the ratio of boys to girls is 3 : 4' and 'the car travels 90 km in 2 hours'. Ask what is different about them. Someone will notice the second compares different kinds of thing. Say: both are comparisons, but only one has units doing the comparing, and that one has a special name."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · measuring two quantities",
+   moves:["Time a student walking a measured 20 m and record distance and time.","Record a second walk at a different pace and compare.","Measure water poured into a jug over a timed interval.","Read unit prices from real packaging and identify the two units in each."],
+   say:[["Teacher","Twenty metres in eight seconds. Two different units in one comparison — that is a rate."],["Teacher","What are the two units in this price label?"],["Expected","Dollars and kilograms."],["Teacher","So the label is telling you a rate, and the shop has already done the work of scaling it down to one kilogram. That is why it is on the shelf edge."]],
+   watch:["Students who treat a rate as a ratio in simplest form and drop the units — writing 90 : 2 as 45 : 1 and reporting 45 with no unit. A number without its unit is not an answer to a rate question. Require the unit in every written response today."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · double number line",
+   moves:["Draw a double number line for 90 km in 2 hours, with hours below and km above.","Tick both scales in step and read off the pairs.","Draw a second line for a slower journey and compare visually.","Mark the associated rates: km per hour and hours per km."],
+   say:[["Teacher","The line does not care which quantity is on top. But you do, because the question does."],["Teacher","This one asks for speed. Which quantity goes per which?"],["Expected","Kilometres per hour."],["Teacher","And the other way round would answer a different question — how long per kilometre. Both are true, and only one is what was asked."]],
+   readaloud:["Say the picture aloud: 'Two aligned scales. The lower counts hours: zero, one, two, three. The upper counts kilometres: zero, forty-five, ninety, one hundred thirty-five. Vertical dashed lines connect each pair.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · notation and reading",
+   moves:["Write rates with the per notation and the unit fraction form.","Read a rate aloud correctly, naming both units.","Identify the associated rate for three examples.","Decide which of a pair of rates a given question is asking for."],
+   say:[["Teacher","Read it aloud with both units every time. 'Forty-five kilometres per hour', not 'forty-five'."],["Teacher","Why does that matter if everyone knows what you mean?"],["Expected","Because you might mix it up with the other rate."],["Teacher","And because the unit is where the meaning lives. The number alone is just a number."]],
+   watch:["Students who compute the correct division but label it with the wrong units, giving 'hours per km' for a speed. Underline the two nouns in the question, in the order asked, before dividing — the same routine as day 1."]}
+ ],
+ guided:[["A car travels 150 km in 3 h. Write the rate.","50 km per hour"],["Write the associated rate.","0.06 hours per km, or 1/50 h per km"],["4 kg of rice costs $10. Write the rate.","$2.50 per kg"],["Why is 'the ratio of boys to girls is 3 : 4' not a rate?","Both quantities are the same kind of thing — children — so no units are being compared."]],
+ worksheet:[
+  {t:"A · Rate or ratio",d:"Label each, and name the units if it is a rate.",items:["5 apples to 3 pears","120 km in 2 h","3 cups flour to 2 cups water","$18 for 6 kg","7 boys to 9 girls","250 mL in 5 s"]},
+  {t:"B · Write the rate",d:"Include both units in your answer.",items:["240 km in 4 h","$45 for 9 kg","180 words in 3 min","500 mL in 4 s"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain the difference between a ratio and a rate, using one example of each.","A runner covers 400 m in 50 s. Write both associated rates and say what question each one answers.","Why do shops print a price per 100 g on the shelf edge? Explain what work that saves the shopper."]}],
+ exit:["A car goes 180 km in 3 h. Write the rate with units.","Is '4 cats to 6 dogs' a rate? Explain.","Explain what the word 'per' tells you."],
+ crit:"Mastery: rate correct with both units named, and item 2 correctly identifies it as a ratio because the units match. Reteach if units are dropped from answers — the number alone will not survive contact with a word problem.",
+ support:["Provide a word bank of unit pairs so the labelling is a selection rather than a recall task.","Restrict to rates where the division is exact before introducing decimals.","Allow the double number line for every problem."],
+ extend:["Find three rates on real packaging at home or in the classroom and write each with both associated forms.","A rate is 60 km per hour. What is the associated rate, and why is it an awkward number? What does that tell you about which form is useful?"],
+ access:["Touch: the timed walk and the water pour make a rate a physical event with a duration, not a pair of numbers.","Hearing: reading rates aloud with both units is the practice that fixes the labelling error; build in speaking time.","Language: 'per' is the key word; post it with three worked examples, since the whole distinction hangs on it.","Motor: a student can time or record rather than walk, and still do the full mathematical work."]
+},
+{
+ day:6, short:"Unit rate", title:"Unit rate: the value of one",
+ objective:"Find a unit rate by scaling down to one, and explain why the unit rate makes any other amount easy to calculate.",
+ standards:["6.RP.A.2","6.RP.A.3b"],
+ vocab:[["Unit rate","The amount per one: $4 per kg, 60 km per hour."],["Scaling down","Dividing both quantities until one of them is 1."],["Per one","The phrase that names what a unit rate is."],["Best value","The option with the smaller cost per unit — the reason unit rates exist outside a classroom."]],
+ materials:["Price labels","Calculators, permitted after the line is drawn","Blank double number lines"],
+ warmup:{mins:5,text:"Post: 3 kg for $12 and 5 kg for $18. Ask which is better value, without calculating. Take a vote and record the split. Say: most of you cannot tell yet, and that is the honest answer — the numbers are not comparable as they stand."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · dealing to one",
+   moves:["Lay out 12 counters as $12 and split them into 3 equal piles for 3 kg.","Count one pile: 4. That is the cost of one kilogram.","Repeat with 18 counters into 5 piles and find the remainder.","Resolve the remainder by splitting counters, or by noting the rate is $3.60."],
+   say:[["Teacher","Three kilograms, twelve dollars. Split the money into three equal piles, one for each kilogram."],["Expected","Four each."],["Teacher","Now eighteen into five piles."],["Expected","Three each with three left over."],["Teacher","So the rate is between three and four. Split the remaining three dollars five ways and you get sixty cents. Three dollars sixty. The leftover did not stop us; it just moved us into decimals."]],
+   watch:["Students who report the remainder as a whole-number remainder — '$3 remainder 3'. A rate must be a single number. This is the same trade as Unit 2 day 16, and naming that connection is faster than re-teaching it."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · walking back to one",
+   moves:["Draw the double number line for 3 kg and $12 and tick to 1 kg.","Mark the value above 1 and name it the unit rate.","Draw the second offer on the same unit scale.","Compare the two values sitting above 1 and answer the warm-up."],
+   say:[["Teacher","Walk the line back to one kilogram. What sits above it?"],["Expected","Four dollars."],["Teacher","Now the other offer, on a line with the same scale."],["Expected","Three sixty."],["Teacher","Now they are comparable, and the warm-up question has an answer. What made them comparable?"],["Expected","Both are per one kilogram."]],
+   readaloud:["Say the picture aloud: 'Two aligned scales. The lower counts kilograms from zero to three. The upper counts dollars: zero, four, eight, twelve. A solid vertical line marks the pair at one kilogram and four dollars.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · division",
+   moves:["Write the unit rate as a division and state which quantity is divided by which.","Use the unit rate to find the cost of any other amount by multiplying.","Compare three offers by unit rate.","Note both associated unit rates and which question each answers."],
+   say:[["Teacher","Once you have the value of one, every other amount is one multiplication away. That is what the unit rate buys you."],["Teacher","Cost of seven kilograms at four dollars each?"],["Expected","Twenty-eight."],["Teacher","No table, no line, no scaling. That is why we walk back to one before doing anything else."]],
+   watch:["Students who divide the wrong way round and get 0.25 for the price per kilogram. The size check settles it: is a kilogram of apples more likely to cost four dollars or twenty-five cents? Require that sentence before the answer is accepted."]}
+ ],
+ guided:[["3 kg for $12. Find the unit rate.","$4 per kg"],["5 kg for $18. Find the unit rate.","$3.60 per kg"],["Which is better value?","The second — $3.60 per kg is less than $4"],["Using $4 per kg, find the cost of 7 kg.","$28"]],
+ worksheet:[
+  {t:"A · Find the unit rate",d:"Include the units.",items:["4 kg for $10","6 tickets for $27","150 km in 3 h","8 pens for $6","250 g for $2","12 m for $30"]},
+  {t:"B · Better value",d:"Find both unit rates, then decide.",items:["3 kg for $12 or 5 kg for $18","4 pens for $6 or 6 pens for $8.40","500 mL for $2 or 1.5 L for $5.40","2 kg for $7 or 3 kg for $10.20"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A 6-pack costs $9 and a 10-pack costs $14. Which is better value, and by how much per item?","Explain why you cannot compare $12 and $18 directly to decide which is better value.","A shop offers 3 for the price of 2 on items costing $4 each. Find the effective unit rate and explain your reasoning."]}],
+ exit:["4 kg for $14. Find the unit rate.","Which is better: 3 for $9 or 5 for $14?","Explain why the unit rate makes other amounts easy to find."],
+ crit:"Mastery: both correct with units, and item 3 says that any amount is one multiplication from the unit rate. Reteach if the division is reversed — require the plausibility sentence in writing, since it catches the error without new teaching.",
+ support:["Provide the double number line pre-drawn with the 1 already ticked.","Restrict to rates dividing exactly before introducing decimal unit rates.","Permit calculators once the line has been drawn."],
+ extend:["Three offers on the same product. Find all three unit rates and rank them, then say how much is saved per item by choosing the best over the worst.","When is the cheaper unit rate not the better choice? Give a real situation and explain."],
+ access:["Touch: splitting counters into piles is division made physical, and the leftover is visible rather than abstract.","Language: 'per one' and 'each' mean the same thing here — post both, since worksheets and shelf labels use them interchangeably.","Attention: the plausibility sentence is a required written step, giving a checkpoint before the arithmetic is committed to.","Vision: double number lines carry the pair at one marked with a solid line against the dashed connectors elsewhere."]
+},
+{
+ day:7, short:"Compare rates", title:"Comparing rates and choosing a common unit",
+ objective:"Compare two or more rates by converting both to a common unit, and justify which unit to compare on.",
+ standards:["6.RP.A.3b","6.RP.A.2"],
+ vocab:[["Common unit","The single amount both rates are scaled to — usually one."],["Better value","Less cost per unit, or more product per dollar."],["Rate comparison","The same move as a common denominator, in a new setting."],["Justify","Say why the chosen unit makes the comparison fair."]],
+ materials:["Real packaging with different sizes","Blank double number lines","Calculators after the line is drawn"],
+ warmup:{mins:5,text:"Post: runner A covers 100 m in 12 s, runner B covers 200 m in 25 s. Ask who is faster. Do not let anyone calculate for thirty seconds — ask instead what has to happen before the question can be answered at all. The answer is: pick a common amount."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · matching amounts",
+   moves:["Lay out two boxes of the same product in different sizes with their prices.","Scale both physically to the same amount using counters or measuring cups.","Compare the resulting costs.","Repeat with a case where scaling to 100 g is easier than scaling to 1 g."],
+   say:[["Teacher","You cannot compare these boxes as they stand. What has to be true before you can?"],["Expected","They have to be the same size."],["Teacher","So make them the same size — on paper, not by opening them. Which size do you choose?"],["Expected","One of something."],["Teacher","Usually. But sometimes one gram gives you a silly number. Shops use one hundred grams for exactly that reason."]],
+   watch:["Students who compare total prices and declare the cheaper box better value. Ask how much product each contains; the question is not which costs less but which gives more per dollar."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · stacked lines",
+   moves:["Draw both rates as double number lines sharing a common bottom scale.","Mark the value above 1 on each.","Compare the two marked values directly.","Draw a case comparing per-dollar instead of per-item and note the reversal."],
+   say:[["Teacher","Same bottom scale for both. That is what makes the comparison honest."],["Teacher","Now compare per dollar instead of per item. What happens to which one looks better?"],["Expected","It's the same answer, just upside down — more items per dollar is better."],["Teacher","Right. The direction flips but the conclusion does not. Say which direction you chose, so nobody misreads your answer."]],
+   readaloud:["Say the picture aloud: 'Three aligned scales. The middle scale counts items from zero to three. Above it, offer A reaches one dollar fifty at one item. Below it, offer B reaches one dollar forty at one item, a shorter distance from zero.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · comparison",
+   moves:["Compute both unit rates and compare.","State the conclusion with the unit and the direction: cheaper per item, or more per dollar.","Compare three offers and rank them.","Handle a case where the amounts are in different units, requiring a conversion first."],
+   say:[["Teacher","One of these is in grams and the other in kilograms. What comes first?"],["Expected","Converting so they match."],["Teacher","That is a Unit 2 skill — shift the digits. The ratio work has not started until the units agree."]],
+   watch:["Students who compare correctly but state the conclusion without direction — 'A is better' with no per-what. Require the full sentence: cheaper per kilogram, or more millilitres per dollar."]}
+ ],
+ guided:[["3 kg for $12 or 4 kg for $15. Which is better?","$4/kg vs $3.75/kg, so the second"],["Runner A: 100 m in 12 s. Runner B: 200 m in 25 s. Who is faster?","A at 8.33 m/s vs B at 8 m/s, so A"],["500 g for $3 or 2 kg for $11. Which is better?","$6/kg vs $5.50/kg, so the second"],["Why convert grams to kilograms first?","Because rates can only be compared once the units match."]],
+ worksheet:[
+  {t:"A · Which is better value",d:"Show both unit rates.",items:["4 for $10 or 6 for $14","2 kg for $9 or 5 kg for $21","300 mL for $2 or 1 L for $6","6 m for $15 or 10 m for $24"]},
+  {t:"B · Who is faster",d:"Give both speeds with units.",items:["120 km in 2 h or 200 km in 3 h","400 m in 50 s or 100 m in 13 s","15 km in 30 min or 25 km in 1 h","5 km in 20 min or 12 km in 45 min"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A 750 mL bottle costs $3 and a 2 L bottle costs $7.60. Which is better value? Show the conversion you needed.","Explain why comparing two total prices tells you nothing about value.","Give a situation where the better unit rate is not the better purchase. Explain the reasoning."]}],
+ exit:["3 for $12 or 5 for $19 — which is better value?","150 km in 3 h or 220 km in 4 h — which is faster?","Explain why both rates must be scaled to the same amount."],
+ crit:"Mastery: both correct with the unit stated in the conclusion. Reteach if totals are compared instead of rates — return to the two physical boxes, since the difference in contents is visible in a way that two prices are not.",
+ support:["Provide a comparison frame with 'per one' pre-labelled for both offers.","Restrict to same-unit comparisons before introducing conversions.","Permit calculators throughout so the reasoning is the work."],
+ extend:["Find a real pair of package sizes where the larger is worse value. Explain why shops sometimes price this way.","Three offers on the same item. Rank them and state the saving per unit between best and worst."],
+ access:["Touch: two real packages with real prices make the comparison concrete and the stakes obvious.","Language: the conclusion must name the unit; model the full sentence and require it, since a bare 'A is better' is genuinely ambiguous.","Attention: comparisons are limited to two offers before three, so the tracking load grows only once the method is secure.","Vision: stacked double number lines share a bottom scale so the comparison is a vertical read, not a memory task."]
+},
+{
+ day:8, short:"Speed", title:"Speed as a rate, and finding time or distance",
+ objective:"Calculate speed, distance or time given the other two, and use a double number line to decide which operation is needed.",
+ standards:["6.RP.A.3b","6.RP.A.2"],
+ vocab:[["Speed","Distance per unit of time."],["Average speed","Total distance divided by total time, whatever happened in between."],["Elapsed time","How long a journey took."],["Unit consistency","km with hours, m with seconds — mixing them silently gives a wrong answer."]],
+ materials:["Stopwatches","Measuring tape or a marked corridor","Blank double number lines","Calculators after the line is drawn"],
+ warmup:{mins:5,text:"Ask: a car travels at 60 km/h. How far in 3 hours? Most will answer quickly. Then ask: how long to travel 90 km? Watch the pace change. Say: same rate, same line, different question — and the second one is the one people get wrong."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · timing real movement",
+   moves:["Time students walking a measured 20 m and calculate speed in m/s.","Predict the time to walk 50 m at that speed, then test it.","Predict the distance covered in 30 s, then test it.","Compare predictions with results and discuss why they differ."],
+   say:[["Teacher","You walked twenty metres in sixteen seconds. What is your speed?"],["Expected","One and a quarter metres per second."],["Teacher","Predict how long fifty metres will take, then walk it."],["Expected","Forty seconds."],["Teacher","You got thirty-seven. Why the difference?"],["Expected","I walked faster the second time."],["Teacher","So the calculation gives an average, and real journeys vary. Both facts are true and worth holding."]],
+   watch:["Students who mix units — timing in seconds but calculating in km/h. Fix the units at the start of every problem and write them down before any number is used."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · line for three questions",
+   moves:["Draw a double number line for 60 km/h with hours below and km above.","Read off distance for a given time by going up.","Read off time for a given distance by going down.","Mark a journey of 90 km and find the time between ticks."],
+   say:[["Teacher","Same line, three different questions. Going up gives distance. Going down gives time."],["Teacher","Ninety kilometres — where does that land?"],["Expected","Between one and two hours, halfway."],["Teacher","One and a half hours. You read it off the line before dividing anything. Draw the line and half the errors disappear."]],
+   readaloud:["Say the picture aloud: 'Two aligned scales. The lower counts hours from zero to three. The upper counts kilometres: zero, sixty, one hundred twenty, one hundred eighty. A mark sits midway between the first and second ticks on both scales, at ninety kilometres and one and a half hours.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · three forms",
+   moves:["Write speed as distance divided by time.","Rearrange to find distance and to find time, deriving each from the line rather than memorising a triangle.","Work all three question types on one rate.","Handle a journey in minutes where the rate is per hour."],
+   say:[["Teacher","You could memorise a formula triangle. You could also draw the line and read it. I want you able to do the second, because the line still works when the numbers get strange."],["Teacher","Forty-five minutes at sixty km per hour. What is the first move?"],["Expected","Turn forty-five minutes into three quarters of an hour."],["Teacher","Because the rate is per hour. The units have to agree before the arithmetic starts."]],
+   watch:["Students who divide time by distance when finding speed. The plausibility check settles it: is a car more likely to travel 60 km each hour or 0.017 hours each kilometre? Both are true statements, but only one answers the question asked."]}
+ ],
+ guided:[["A car travels 150 km in 3 h. Find the speed.","50 km/h"],["At 50 km/h, how far in 4 h?","200 km"],["At 50 km/h, how long for 125 km?","2.5 hours"],["A runner covers 400 m in 80 s. Find the speed in m/s.","5 m/s"]],
+ worksheet:[
+  {t:"A · Find the speed",d:"Include units.",items:["180 km in 3 h","100 m in 20 s","240 km in 4 h","1500 m in 5 min","90 km in 1.5 h","60 m in 8 s"]},
+  {t:"B · Find distance or time",d:"Draw the line first.",items:["70 km/h for 3 h","5 m/s for 12 s","At 60 km/h, time for 150 km","At 8 m/s, time for 200 m"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A cyclist rides 45 km in 90 minutes. Find the speed in km/h, showing the unit conversion.","Explain why 'average speed' is not the same as the speed at every moment of a journey.","Two runners finish the same race at the same time but one ran faster in the first half. What must have been true of the second half?"]}],
+ exit:["A train travels 240 km in 3 h. Find the speed.","At 80 km/h, how far in 2.5 h?","Explain why the units must agree before you calculate."],
+ crit:"Mastery: both correct with units, and item 3 refers to mixing hours with minutes or km with metres. Reteach if the division is reversed — the plausibility sentence catches it, and it is worth requiring in writing for the rest of the unit.",
+ support:["Provide the double number line pre-drawn with the rate already ticked.","Restrict to whole-number speeds and times before introducing fractions of an hour.","Give a unit-conversion reference for minutes to hours."],
+ extend:["A journey of 100 km takes 1 h 20 min. Find the speed, then find how much faster you would need to go to finish in an hour.","Explain why doubling the speed halves the time, using the double number line rather than a formula."],
+ access:["Touch: walking and timing a measured distance makes speed a lived quantity before it is a calculation.","Motor: students can time, measure or record rather than walk, and still do all the mathematics.","Language: 'per' again, now with time; connect explicitly to day 5 rather than treating it as new.","Memory: the line replaces the formula triangle, which is one less thing to hold and does not break when the numbers get awkward."]
+},
+{
+ day:9, short:"Bar models I", title:"Comparison bar models for ratio problems",
+ objective:"Solve a ratio word problem by drawing a comparison bar model, finding one unit, and answering the question actually asked.",
+ standards:["6.RP.A.3","6.RP.A.1"],
+ vocab:[["Comparison model","Two bars drawn to scale so the difference is visible."],["One unit","One equal share of a bar. Find it before anything else."],["Difference","How many units longer one bar is than the other."],["Answer the question","Report the quantity asked for, not the unit you found on the way."]],
+ materials:["Blank bar-model paper","Rulers","Highlighters for marking the question","Counters for checking"],
+ warmup:{mins:5,text:"Post: 'The ratio of Aiden's cards to Beth's is 3 : 5. Beth has 12 more than Aiden.' Ask what you would draw first, not what the answer is. Collect the answers; the useful one is 'two bars, three units and five units'. Draw it and stop there."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · building the difference",
+   moves:["Build a 3-unit and a 5-unit bar with linking cubes, one colour each.","Line them up at the left and physically identify the 2-cube difference.","Given that the difference is 12, work out that each cube stands for 6.","Rebuild with 6 counters per cube and count the totals."],
+   say:[["Teacher","Line them up at the left. How much longer is Beth's bar?"],["Expected","Two cubes."],["Teacher","And those two cubes are worth twelve cards. So one cube is?"],["Expected","Six."],["Teacher","One unit is six. Now everything else is multiplication. Aiden has three sixes, Beth has five sixes."]],
+   watch:["Students who set the difference equal to one unit rather than two. Have them point at the physical overhang and count the cubes in it before dividing."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · bars to scale",
+   moves:["Draw both bars with identical unit widths, aligned left.","Brace the difference and label it 12.","Label one unit as 6 and fill in both bars.","Answer three different questions from the same drawing: Aiden's total, Beth's total, and the combined total."],
+   say:[["Teacher","One drawing, three questions. Which bar answers which?"],["Teacher","How many cards altogether?"],["Expected","Eight units, so forty-eight."],["Teacher","Notice you did not redraw anything. A good model answers every question the situation can raise."]],
+   readaloud:["Say the picture aloud: 'Two bars aligned at the left. The upper is three equal units, labelled Aiden. The lower is five units, labelled Beth. A brace spans the two units by which the lower bar extends beyond the upper, labelled twelve.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · recording the method",
+   moves:["Record the method in four lines: difference in units, one unit, each part, answer the question.","Work a problem given the total instead of the difference.","Work a problem given one person's amount.","Underline the question and confirm the reported quantity matches it."],
+   say:[["Teacher","Four lines, every problem. The last line is the one people skip and it is the one that gets marked."],["Teacher","Read the question again. What did it actually ask for?"],["Expected","How many Beth has, not the total."],["Teacher","Then the total is working, not an answer. Circle what you are reporting."]],
+   watch:["Students who compute one unit correctly and stop. The underline-and-report routine from Unit 2 day 19 applies here unchanged; name that connection rather than teaching it fresh."]}
+ ],
+ guided:[["Ratio 3 : 5, difference 12. Find both.","One unit 6; 18 and 30"],["Ratio 2 : 7, total 45. Find both.","One unit 5; 10 and 35"],["Ratio 4 : 3, larger is 24. Find the smaller.","One unit 6; 18"],["Ratio 5 : 2, difference 18. Find the total.","One unit 6; total 42"]],
+ worksheet:[
+  {t:"A · From the difference",d:"Draw the model. Show one unit.",items:["3 : 5, difference 10","2 : 5, difference 12","4 : 7, difference 15","5 : 8, difference 21"]},
+  {t:"B · From a total or a part",d:"Draw the model first.",items:["3 : 4, total 63","2 : 9, total 55","5 : 3, larger part 40","4 : 7, smaller part 20"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Two friends share $56 in the ratio 3 : 5. How much more does one get than the other? Draw the model.","Explain why the difference between the bars is two units and not one, for the ratio 3 : 5.","A problem gives the ratio 2 : 5 and says the larger amount is 30. Explain why you divide by 5 and not by 7."]}],
+ exit:["Ratio 2 : 5, difference 9. Find both parts.","Ratio 3 : 4, total 35. Find both parts.","Explain what 'one unit' means in a comparison model."],
+ crit:"Mastery: both correct and item 3 describes one equal share. Reteach if the difference is set equal to one unit — this error produces plausible-looking answers and will not be caught by a size check, so it must be caught here.",
+ support:["Provide pre-drawn bars with units marked, so only labelling and arithmetic remain.","Restrict to problems giving the total before those giving a difference.","Keep linking cubes available for building the model physically."],
+ extend:["A ratio problem gives neither total nor difference, but says one amount is 12 more than half the other. Can it still be modelled? Try it.","Write a ratio problem whose answer is 24, using a difference rather than a total."],
+ access:["Touch: linking cubes make the difference a physical overhang that can be counted by hand.","Vision: bars are labelled inside each unit and the brace uses a distinct line style rather than colour.","Attention: the four-line format is fixed, and the underline-the-question routine gives a reliable first action.","Memory: this is Unit 2 day 19's routine applied to ratio; naming that link reduces it to one habit rather than two."]
+},
+{
+ day:10, short:"Bar models II", title:"Three-term ratios and changing ratios",
+ objective:"Model a three-term ratio, and solve a problem in which a ratio changes because an amount is added or removed.",
+ standards:["6.RP.A.3","6.RP.A.1"],
+ vocab:[["Three-term ratio","A comparison of three quantities: 2 : 3 : 5."],["Changing ratio","A situation where the ratio before and after are different."],["Unchanged quantity","The amount that stays the same through a change — often the key to the problem."],["Before and after","Two models drawn one above the other, sharing a unit where possible."]],
+ materials:["Blank bar-model paper","Rulers","Counters in three colours"],
+ warmup:{mins:5,text:"Post: 'The ratio of red to blue is 2 : 3. Five more reds are added and now the ratio is 1 : 1.' Ask whether the number of blues changed. It did not — and noticing that is the entire solution. Do not solve it; just get the observation on the board."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · before and after",
+   moves:["Build 2 : 3 with counters in two colours, using a chosen unit size.","Add reds until the two piles match, recording how many were added.","Repeat with a different unit size and record again.","Find the unit size for which exactly 5 were added."],
+   say:[["Teacher","Build two to three. Now add reds until they match. How many did you add?"],["Expected","One per unit."],["Teacher","So the number added is one unit. If five were added, one unit is five."],["Teacher","And the blues never moved. That is why the blue bar is the same length in both pictures."]],
+   watch:["Students who redraw both bars with new unit sizes for the after picture. The unit must stay the same size across before and after, or the two models cannot be compared. Insist on one ruler width throughout."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · stacked models",
+   moves:["Draw the before model, 2 units red and 3 units blue.","Draw the after model directly beneath, with blue unchanged and red extended to match.","Mark the added portion and label it as one unit.","Given the addition is 5, label one unit and complete both models."],
+   say:[["Teacher","Blue does not move. Draw it exactly the same length in both pictures."],["Teacher","How much longer is the red bar in the after picture?"],["Expected","One unit."],["Teacher","So the five that were added is one unit. Everything follows from that."]],
+   readaloud:["Say the picture aloud: 'Four bars in two stacked pairs. In the upper pair, red is two units and blue is three. In the lower pair, blue is still three units and red is now also three, with the third red unit drawn in a different style to show it was added.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · three terms and change",
+   moves:["Share a total in a three-term ratio: 90 in 2 : 3 : 5.","Find one part given another in a three-term ratio.","Record a changing-ratio problem with before and after lines.","Identify the unchanged quantity in three different problems."],
+   say:[["Teacher","In every changing-ratio problem, find the thing that did not change first. It is the anchor."],["Teacher","Here, money is spent from one purse but not the other. Which is the anchor?"],["Expected","The one that wasn't spent from."],["Teacher","Then draw that bar identically in both models and let everything else move around it."]],
+   watch:["Students who treat before and after as unrelated problems. They share a quantity, and the shared quantity is what links the two models. Ask which bar appears in both pictures."]}
+ ],
+ guided:[["Share 90 in 2 : 3 : 5.","18, 27, 45"],["Ratio 2 : 3, add 5 red to make 1 : 1. Find the original amounts.","One unit 5; 10 red and 15 blue"],["Ratio 3 : 5 : 7, middle part is 20. Find the total.","One unit 4; total 60"],["Which quantity is unchanged when reds are added?","The blue amount."]],
+ worksheet:[
+  {t:"A · Three terms",d:"Share each total.",items:["60 in 1 : 2 : 3","84 in 2 : 3 : 7","100 in 1 : 4 : 5","72 in 3 : 4 : 5"]},
+  {t:"B · Changing ratios",d:"Draw before and after with the same unit size.",wide:true,
+   items:["Ratio 2 : 3. Adding 4 to the first makes it 1 : 1. Find the original amounts.","Ratio 1 : 3. Adding 6 to the first makes it 1 : 2. Find the original amounts.","Ratio 5 : 2. Removing 9 from the first makes it 2 : 1. Find the original amounts."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why the unit size must be the same in the before and after models.","In a changing-ratio problem, why is finding the unchanged quantity the useful first step?","Write a changing-ratio problem of your own whose answer is 20 and 30. Then solve it."]}],
+ exit:["Share 48 in 1 : 2 : 5.","Ratio 3 : 4. Adding 2 to the first makes it 1 : 1. Find the originals.","Explain what stays the same in a changing-ratio problem."],
+ crit:"Mastery: both correct and item 3 identifies the unchanged quantity. Reteach if before and after are drawn with different unit sizes — the models must share a unit or they say nothing about each other.",
+ support:["Provide before-and-after frames with the unit width pre-marked.","Restrict to three-term sharing before introducing changing ratios.","Use three colours of counter so the terms stay distinguishable while building."],
+ extend:["A ratio changes from 2 : 3 to 3 : 4 when 5 is added to the first. Find the originals and explain why this one is harder than the 1 : 1 case.","Can a changing-ratio problem have no whole-number solution? Construct one and explain."],
+ access:["Touch: three counter colours keep the three terms separable by more than position.","Vision: the added portion is drawn in a distinct hatch, not just a different colour.","Attention: before-and-after models are stacked vertically and aligned, so the comparison is a vertical read.","Language: 'unchanged quantity' is the key phrase; post it and ask for it explicitly on every changing-ratio problem."]
+},
+{
+ day:11, short:"Ratio & fractions", title:"Connecting ratios to fractions and to Unit 2",
+ objective:"Express a part-whole ratio as a fraction, and use fraction reasoning to solve ratio problems.",
+ standards:["6.RP.A.1","6.RP.A.3","6.NS.A.1"],
+ vocab:[["Part-whole fraction","3 : 5 means the first part is 3/8 of the total."],["Fraction of the other","3 : 5 also means the first is 3/5 of the second."],["Total units","The sum of the ratio terms — the denominator of the part-whole fraction."],["Same idea, two notations","Ratio and fraction describe the same relationship in different clothes."]],
+ materials:["Fraction strips from Unit 2","Bar-model paper","Counters"],
+ warmup:{mins:5,text:"Post 3 : 5 and ask for every true fraction statement students can make about it. Collect them all: 3/8 of the total, 5/8 of the total, 3/5 of the second, 5/3 of the first. Do not sort them yet. Say: four true statements from two numbers, and the trouble is choosing the right one."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · one set, several readings",
+   moves:["Build 3 red and 5 blue counters and lay them in a single row of 8.","Cover the blues and read the reds as a fraction of the whole row: 3/8.","Lay reds beneath blues and read reds as a fraction of blues: 3/5.","State both aloud and identify what changed between them."],
+   say:[["Teacher","Same counters, two different questions. What is the whole in the first one?"],["Expected","All eight."],["Teacher","And in the second?"],["Expected","Just the blues."],["Teacher","So the fraction depends on what you are calling the whole. That is the only thing you have to get right."]],
+   watch:["Students who write 3/5 when the question asked for the fraction of the total. Ask 'a fraction of what?' out loud every time, and require the answer before the fraction is written."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · bar with two braces",
+   moves:["Draw the 3 : 5 bar model.","Draw one brace over the whole 8 units and one over the 5 blue units.","Label the red bar against each brace in turn.","Use the part-whole fraction to find a part from a total directly."],
+   say:[["Teacher","Two braces, two wholes, two different fractions from one picture."],["Teacher","If the total is 40, how do you get the reds using a fraction?"],["Expected","Three eighths of forty."],["Teacher","Which is Unit 2's 'fraction of an amount'. You already know how to do this; today it just arrived wearing a colon."]],
+   readaloud:["Say the picture aloud: 'A bar of eight equal units, the first three shaded for red and the last five for blue. One brace spans all eight units, labelled total. A second brace spans only the final five units, labelled blue.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · translation",
+   moves:["Translate ratios to part-whole fractions and back.","Solve a ratio problem using fraction-of-amount instead of the unit method.","Compare the two methods on the same problem.","Given a fraction statement, recover the ratio."],
+   say:[["Teacher","Two thirds of the class are girls. What is the ratio of girls to boys?"],["Expected","Two to one."],["Teacher","Watch the trap. Two thirds is part to whole; the ratio asked for is part to part. The denominator changed."],["Teacher","Which method do you prefer for finding a part from a total?"],["Expected","Whichever — they give the same answer."],["Teacher","Then pick by which numbers are friendlier, and say which you used."]],
+   watch:["Students who convert 2/3 girls into a ratio of 2 : 3. The three is the whole, so the boys are one. Draw the bar; the error cannot survive the picture."]}
+ ],
+ guided:[["Ratio 3 : 5. What fraction of the total is the first part?","3/8"],["Ratio 3 : 5. The first is what fraction of the second?","3/5"],["3/4 of a class are boys. Find the ratio of boys to girls.","3 : 1"],["Ratio 2 : 3, total 40. Find the first part using a fraction.","2/5 of 40 = 16"]],
+ worksheet:[
+  {t:"A · Ratio to fraction",d:"Give the part-whole fraction for the first term.",items:["1 : 3","2 : 5","3 : 7","4 : 5","5 : 4","2 : 3 : 5"]},
+  {t:"B · Fraction to ratio",d:"Write the part-to-part ratio.",items:["2/5 are red","3/8 are boys","1/4 are damaged","5/6 are ripe"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["In a bag, 2/7 of the counters are red. Write the ratio of red to blue and explain the difference between the two numbers.","Ratio 3 : 4, total 63. Solve it twice — once with the unit method and once with fractions. Which was easier here?","Explain why 3 : 5 gives the fraction 3/8 in one question and 3/5 in another."]}],
+ exit:["Ratio 2 : 7. What fraction of the total is the first part?","1/3 of a group are girls. Find the ratio of girls to boys.","Explain why you must ask 'a fraction of what?' before writing the fraction."],
+ crit:"Mastery: both correct and item 3 names the whole as the thing that changes. Reteach if part-whole and part-part fractions are confused — this is day 1's error resurfacing in fraction notation, so revisit the day 1 picture rather than teaching something new.",
+ support:["Provide bars with both braces pre-drawn and labelled.","Restrict to part-whole before introducing part-to-part fractions.","Allow the unit method throughout; the fraction route is an alternative, not a replacement."],
+ extend:["A ratio is 3 : 4 : 5. Write all three part-whole fractions and confirm they sum to one. Why must they?","If the first part is 2/9 of the total, what is the ratio? Explain how you recovered it."],
+ access:["Touch: rearranging the same counters into two layouts shows that the numbers did not change, only the question did.","Language: 'a fraction of what?' is the whole lesson in four words; post it and require it aloud.","Memory: this is Unit 2's fraction-of-an-amount reused; naming that keeps it as one skill rather than two.","Vision: the two braces are drawn in distinct line styles and labelled, never distinguished by colour alone."]
+},
+{
+ day:12, short:"Ratio problems", title:"Multi-step ratio and rate problems",
+ objective:"Solve multi-step problems combining ratio, rate and unit conversion, choosing a representation before calculating.",
+ standards:["6.RP.A.3","6.RP.A.3b","6.NS.B.3"],
+ vocab:[["Multi-step","The first answer feeds the second."],["Representation","The model you choose: bar, table or double number line."],["Convert","Change units so the quantities can be combined."],["Reasonable","An answer that matches an estimate made before calculating."]],
+ materials:["Bar-model paper","Blank ratio tables and number lines","Highlighters","Calculators after the model is drawn"],
+ warmup:{mins:5,text:"Post a two-step problem and ask only which representation students would choose and why — bar, table or line. Take three answers with reasons. Do not solve it. The choice is today's skill; the arithmetic is last week's."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · acting out the steps",
+   moves:["Act out a two-step situation with counters: share in a ratio, then find a rate from one share.","Record each step separately before combining.","Repeat with a problem needing a unit conversion in the middle.","Name which step each representation handled best."],
+   say:[["Teacher","Two steps. Do the first completely before you look at the second."],["Teacher","Which model did the sharing?"],["Expected","The bar."],["Teacher","And which handled the rate?"],["Expected","The line."],["Teacher","So one problem, two tools. You are allowed to switch mid-problem, and often you should."]],
+   watch:["Students who combine steps in one calculation and lose track. Require each step written on its own line with its own answer labelled."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · choosing the model",
+   moves:["Model a problem with a bar for the ratio and a line for the rate.","Model a second problem with a table where a repeated scaling is needed.","Draw the same problem two ways and compare which was quicker.","Establish a rule of thumb for which model suits which question."],
+   say:[["Teacher","Bars for sharing and comparing. Lines for rates and unit rates. Tables when you need several equivalent pairs at once."],["Teacher","That is a rule of thumb, not a law. If a bar helps you see a rate problem, draw the bar."]],
+   readaloud:["Say the picture aloud: 'Above, two aligned bars share a total in the ratio three to five. Below, a double number line converts one of those shares into a cost per kilogram, with the pair at one kilogram marked.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · chained calculation",
+   moves:["Write one calculation line per model step.","Estimate the final answer before calculating it.","Convert units where needed and show the conversion as its own line.","Re-read the question and confirm the reported quantity."],
+   say:[["Teacher","Estimate first. Roughly what should this come to?"],["Expected","About twenty dollars."],["Teacher","So if you get two hundred, something went wrong by a factor of ten, and you will know immediately rather than at the end of the page."]],
+   watch:["Students who report an intermediate value. Same routine as day 9: underline the question, circle what you are reporting. It does not stop being necessary because the problems got longer."]}
+ ],
+ guided:[["$60 shared 2 : 3. The larger share buys 4 kg of rice. Find the price per kg.","$36 for 4 kg, so $9 per kg"],["A 3 : 5 mix uses 12 L of the first. Find the total.","One unit 4; total 32 L"],["6 kg costs $15. Find the cost of 4 kg.","$2.50 per kg, so $10"],["A journey of 90 km takes 1.5 h. Find the speed, then the time for 150 km.","60 km/h, then 2.5 h"]],
+ worksheet:[
+  {t:"A · Two steps",d:"Draw a model for each step. Estimate first.",wide:true,
+   items:["$80 is shared 3 : 5. The smaller share buys 4 kg of apples. What is the price per kg?","A recipe uses flour to sugar in the ratio 5 : 2. You use 750 g of flour. How much sugar, and what is the total mass?","A car uses 8 L of fuel for 100 km. How much fuel for a 250 km journey?"]},
+  {t:"B · With a conversion",d:"Show the conversion as its own step.",wide:true,
+   items:["A tap fills 500 mL in 4 s. How long to fill a 3 L jug?","A runner covers 1200 m in 4 minutes. Find the speed in m/s.","Paint is mixed 2 : 3. You have 1.5 L of the first colour. How much of the second, in millilitres?"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain how you decide whether to draw a bar, a table or a number line for a given problem.","Write a two-step problem combining a ratio and a rate, then solve it.","Why is estimating before calculating worth the time on a multi-step problem specifically?"]}],
+ exit:["$50 shared 2 : 3. Find the larger share.","That share buys 3 kg. Find the price per kg.","Explain why you estimate before calculating."],
+ crit:"Mastery: both correct and item 3 refers to catching a large error early. Reteach if steps are combined into one calculation — require the step-per-line format, since the error is organisational rather than mathematical.",
+ support:["Provide a two-box frame labelled step 1 and step 2.","Reduce to single-step problems and build up.","Permit calculators for all arithmetic so the effort goes into choosing the model."],
+ extend:["Write a three-step problem using a ratio, a rate and a conversion. Solve it and write the answer key.","A problem can be solved by bar or by table. Solve it both ways and write one sentence on when each is preferable."],
+ access:["Attention: the step-per-line format and the two-box frame externalise the sequencing so it is not held in memory.","Language: word problems carry the heaviest reading load; read each aloud before independent work.","Motor: calculators are permitted once the model is drawn, so effort goes to the reasoning.","Vision: models are drawn in a fixed position on the page — ratio above, rate below — so the layout never has to be re-learned."]
+},
+{
+ day:13, short:"Scale & maps", title:"Scale drawings and map distances",
+ objective:"Use a scale written as a ratio to convert between drawing and real distances, and explain what a scale statement means.",
+ standards:["6.RP.A.3","6.RP.A.2"],
+ vocab:[["Scale","A ratio of drawing distance to real distance: 1 : 50 000."],["Scale factor","How many times larger the real thing is."],["1 cm represents","The plain-English form of a scale statement."],["Unitless ratio","A scale like 1 : 100 works in any unit, as long as both sides use the same one."]],
+ materials:["Maps with printed scales","Rulers","Floor plans or a scaled classroom drawing","String for measuring curved routes"],
+ warmup:{mins:5,text:"Show a map with a scale bar. Ask what the scale is telling them. Then ask how far apart two marked points really are. Let them measure with a ruler before doing any arithmetic — the measuring is the part that makes it real."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · measuring and scaling",
+   moves:["Measure the classroom's real length in metres.","Measure the same length on a scaled floor plan in centimetres.","Work out how many real centimetres one drawn centimetre represents.","Verify by predicting a second measurement and then checking it."],
+   say:[["Teacher","Eight metres in the room, sixteen centimetres on the plan. What does one centimetre represent?"],["Expected","Fifty centimetres."],["Teacher","So the scale is one to fifty. Predict the width of the door on the plan, then measure it."],["Teacher","Close? Then the scale is doing what it claims."]],
+   watch:["Students who mix units within the ratio — writing 1 cm : 50 m as 1 : 50. The two sides must be in the same unit before the ratio is written. Convert first, every time."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · double number line for scale",
+   moves:["Draw a double number line with drawing cm below and real m above.","Tick both scales and read off distances in each direction.","Handle a map scale of 1 : 50 000 by converting to a sentence: 1 cm represents 500 m.","Measure a curved route with string and convert."],
+   say:[["Teacher","One to fifty thousand. Turn that into a sentence with units before you use it."],["Expected","One centimetre is fifty thousand centimetres, which is five hundred metres."],["Teacher","Half a kilometre per centimetre. Now the map is usable. Do that conversion first, always — the raw ratio is not something you can measure with."]],
+   readaloud:["Say the picture aloud: 'Two aligned scales. The lower counts centimetres on the drawing from zero to four. The upper counts metres in the real room: zero, point five, one, one point five, two.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · converting both ways",
+   moves:["Convert drawing to real by multiplying by the scale factor.","Convert real to drawing by dividing.","Practise with three scales, including one where the answer needs unit conversion.","Check each answer for plausibility against the real object."],
+   say:[["Teacher","Which direction makes the number bigger?"],["Expected","Drawing to real."],["Teacher","So if your real distance came out smaller than your drawing distance, you divided when you should have multiplied. That check takes two seconds."]],
+   watch:["Students who multiply when converting real to drawing, producing a plan several metres wide. The plausibility check catches it, so require it in writing."]}
+ ],
+ guided:[["Scale 1 : 100. A wall is 5 cm on the plan. Find the real length.","500 cm = 5 m"],["Scale 1 : 50. A real door is 2 m. Find the drawn length.","4 cm"],["Scale 1 : 50 000. Two towns are 6 cm apart. Find the real distance.","3 km"],["Why convert 1 : 50 000 into a sentence first?","Because the raw ratio has no units and cannot be measured with until it does."]],
+ worksheet:[
+  {t:"A · Drawing to real",d:"Give the answer in sensible units.",items:["1 : 100, drawn 7 cm","1 : 50, drawn 12 cm","1 : 20 000, drawn 4 cm","1 : 250, drawn 6 cm","1 : 50 000, drawn 9 cm","1 : 1000, drawn 15 cm"]},
+  {t:"B · Real to drawing",d:"Give the answer in centimetres.",items:["1 : 100, real 8 m","1 : 50, real 3 m","1 : 25 000, real 2 km","1 : 200, real 15 m"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A map has scale 1 : 25 000. Explain in a sentence what one centimetre represents, showing the conversion.","Two maps show the same area, one at 1 : 50 000 and one at 1 : 25 000. Which shows more detail, and why?","Draw a scaled plan of your desk at 1 : 10. State the real measurements and the drawn ones."]}],
+ exit:["Scale 1 : 100, drawn 6 cm. Find the real length.","Scale 1 : 50, real 3 m. Find the drawn length.","Explain what 1 : 50 000 means in a sentence with units."],
+ crit:"Mastery: both correct with sensible units, and item 3 converts the ratio into a per-centimetre statement. Reteach if the direction is reversed — the plausibility check is the fix, and it should be required in writing for the rest of the unit.",
+ support:["Provide the scale pre-converted into a sentence so only the multiplication remains.","Restrict to scales of 1 : 100 and 1 : 50 before map scales.","Give a conversion reference for cm, m and km."],
+ extend:["A model car is 1 : 24 and is 18 cm long. Find the real length. Then find what scale would make it 30 cm.","Why are map scales written without units when other ratios in this unit have them? Explain what makes it work."],
+ access:["Touch: measuring the real room and the plan makes the scale a relationship between two things a student has held a ruler against.","Motor: a partner can measure while another records, with both doing the mathematics.","Language: converting the ratio to a sentence is the step that makes it usable; require it in writing rather than allowing it to stay mental.","Vision: floor plans are printed with a clear scale bar as well as the ratio, so the relationship is available two ways."]
+},
+{
+ day:14, short:"Mixed practice", title:"Mixed practice across ratio and rate",
+ objective:"Select and apply the right method across mixed ratio, rate and scale problems without being told which type each is.",
+ standards:["6.RP.A.1","6.RP.A.2","6.RP.A.3","6.RP.A.3b"],
+ vocab:[["Method selection","Deciding which approach fits before starting — the skill being assessed today."],["Signal words","Per, for every, share, scale, faster, better value."],["Justify","State why the chosen method fits."],["Check","Confirm the answer is plausible and answers the question asked."]],
+ materials:["Mixed problem cards","Bar-model paper, tables and blank number lines","Highlighters","Calculators after the model is drawn"],
+ warmup:{mins:5,text:"Post four problems of different types with no labels. Ask students only to sort them by which method they would use, not to solve any. Compare sortings and discuss any disagreements. Disagreements are useful — some problems genuinely take more than one route."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · sorting by method",
+   moves:["Sort a set of problem cards into three piles: bar, table, line.","Compare sortings with another pair and discuss differences.","Identify the signal words that drove each decision.","Build a class list of signal words on chart paper."],
+   say:[["Teacher","Sort first, solve later. What word made you put that one in the bar pile?"],["Expected","'Share' — and it gave a total."],["Teacher","Good. Signal words are not a trick; they are how the question tells you its shape. Collect them."]],
+   watch:["Students who sort by surface features such as the presence of money rather than by structure. Ask what the question is asking for, not what the objects are."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · one model per problem",
+   moves:["Draw the chosen model for four mixed problems without solving them.","Swap with a partner and check whether the model matches the problem.","Revise any model that does not fit.","Then solve all four."],
+   say:[["Teacher","Model first, all four, before any arithmetic. Then swap and check each other's models."],["Teacher","If your partner cannot tell what the problem was from your model, the model is not finished."]],
+   readaloud:["Say the page aloud: 'Four models are drawn in a two-by-two grid. Upper left, two bars sharing a total. Upper right, a double number line for a price per kilogram. Lower left, a three-column ratio table. Lower right, two bars with a braced difference.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · solving and checking",
+   moves:["Solve the four modelled problems, showing one line per step.","Estimate before each calculation.","Check each answer against the question asked.","Write one sentence per problem justifying the method chosen."],
+   say:[["Teacher","One sentence per problem on why you chose that method. That sentence is worth as much as the answer."],["Teacher","Why? Because next week the numbers will be different and the sentence is what transfers."]],
+   watch:["Students who solve correctly but cannot articulate the choice. Ask them to explain to a partner; the explanation is the thing being built today, not the arithmetic."]}
+ ],
+ guided:[["$45 shared 4 : 5. Find both.","20 and 25"],["6 kg for $21. Find the cost of 10 kg.","$3.50 per kg, so $35"],["Scale 1 : 200, drawn 9 cm. Find the real length.","18 m"],["Ratio 3 : 7, difference 16. Find both.","One unit 4; 12 and 28"]],
+ worksheet:[
+  {t:"A · Mixed, unlabelled",d:"Name your method, then solve.",wide:true,
+   items:["$72 is shared between two people in the ratio 5 : 4. How much does each get?","A car travels 210 km in 3 hours. How far in 5 hours?","A map has scale 1 : 40 000. Two points are 7 cm apart. Find the real distance in km.","5 kg of flour costs $12.50. Find the cost of 8 kg."]},
+  {t:"B · Mixed, harder",d:"Estimate first, then solve.",wide:true,
+   items:["The ratio of red to blue counters is 2 : 5 and there are 21 more blue than red. How many altogether?","A tap fills 750 mL in 5 seconds. How long to fill a 4.5 L bucket?","Paint is mixed 3 : 4. You need 2.8 L in total. How much of each colour?"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["List three signal words and say which method each one points to.","Two problems have the same numbers but different methods. Write such a pair and explain the difference.","Which method have you found most reliable this unit, and why?"]}],
+ exit:["$36 shared 4 : 5. Find both parts.","4 kg for $18. Find the cost of 7 kg.","Name one signal word and the method it points to."],
+ crit:"Mastery: both correct and item 3 links a signal word to a method. Reteach by method rather than by topic — the sorting activity shows exactly which method a student cannot identify, and that is a more useful grouping than reteaching the whole unit.",
+ support:["Provide the signal-word list as a permanent reference.","Reduce to two problem types before mixing three.","Allow the sorting step to be done with a partner throughout."],
+ extend:["Write four problems, one for each method, using the same two numbers throughout.","Find a problem in this unit solvable by two different methods and write both solutions."],
+ access:["Attention: sorting before solving splits one long task into two shorter ones with a clear boundary.","Language: the signal-word list is the reading support for the whole unit; build it with the class rather than handing it over.","Vision: models are drawn in a fixed grid position so the page layout is predictable.","Memory: the signal-word list stays available during the assessment — recognising a problem type is the skill, not recalling the list."]
+},
+{
+ day:15, short:"Review", title:"Review stations and unit assessment",
+ objective:"Consolidate ratio and rate across all methods, and self-identify which topics need more work before the assessment.",
+ standards:["6.RP.A.1","6.RP.A.2","6.RP.A.3","6.RP.A.3a","6.RP.A.3b"],
+ vocab:[["Self-assessment","Judging your own accuracy honestly — a skill, and one being assessed today."],["Station","A short focused task at one method, then rotate."],["Signal word","The phrase that tells you which method the question wants."],["Justify","Say why, not just what — required at every station."]],
+ materials:["All manipulatives from the unit","Station cards, one per method","Self-assessment grid","Assessment papers"],
+ warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect the slips anonymously and tally on the board. Say: those are the stations to visit first, and the tally is data, not a confession."},
+ stages:[
+  {k:"c",label:"Concrete",mins:15,sense:"touch · rotation",
+   moves:["Five stations: ratio language and simplest form, sharing with bar models, ratio tables, unit rate and value, scale and speed.","Each station holds its manipulative and three graded tasks.","Students choose a starting station from the warm-up tally.","Every station requires one written justification, not just answers."],
+   say:[["Teacher","Start where you are least confident, not where you are quickest."],["Teacher","One sentence per station explaining why your method works. Answers alone do not count as finished."],["Teacher","Twelve minutes per station. Rotate on the signal whether or not you have finished."]],
+   watch:["Students who visit only the stations they find easy. The private warm-up slip is the accountability tool — ask them to show which station addresses what they wrote."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · one model per method",
+   moves:["On a single page, draw one model for each of the five station topics.","Annotate each with the sentence that explains it and the signal word that triggers it.","Keep the page as the revision sheet.","Identify any model that could not be drawn and return to that station."],
+   say:[["Teacher","One page, five models, five sentences. Better than any notes you could copy."],["Teacher","A model you cannot draw is a topic to go back to. The blank space is the useful part."]],
+   readaloud:["Say the page aloud: 'Five diagrams arranged across two rows. Two bars sharing a total; two bars with a braced difference; a three-column ratio table; a double number line marked at one unit; and a scale drawing with its scale bar.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · assessment",
+   moves:["Complete the written assessment covering all fifteen days.","Self-mark section A against a displayed key.","Record scores by topic on the self-assessment grid.","Identify two weakest topics and write one specific next step for each."],
+   say:[["Teacher","Self-mark honestly. Marking generously only costs you later, and the gaps will show up in Unit 4 anyway."],["Teacher","One specific next step per weak topic. 'Practise ratios' is not a step. 'Redraw the difference model for three problems' is."]],
+   watch:["Students whose self-assessment does not match their station work. The mismatch is worth a short private conversation — it signals either low confidence or an unnoticed gap, and those need opposite responses."]}
+ ],
+ guided:[["Simplify 18 : 24.","3 : 4"],["Share 55 in 2 : 9.","10 and 45"],["6 kg for $27. Find the unit rate.","$4.50 per kg"],["Scale 1 : 500, drawn 8 cm. Find the real length.","40 m"]],
+ worksheet:[
+  {t:"A · Ratio basics",d:"Simplify or share as required.",items:["16 : 24","35 : 15","Share 60 in 1 : 4","Share 81 in 4 : 5","12 : 18 : 30","Share 44 in 3 : 8"]},
+  {t:"B · Rate and value",d:"Include units in every answer.",items:["5 kg for $16 — unit rate","180 km in 4 h — speed","3 for $8 or 5 for $13 — better value","250 mL in 5 s — rate per second"]},
+  {t:"C · Models",d:"Draw the model, then solve.",wide:true,
+   items:["Ratio 3 : 7, difference 24. Find both parts.","Ratio 2 : 3, adding 6 to the first makes it 1 : 1. Find the originals.","Scale 1 : 30 000, drawn 5 cm. Find the real distance in km."]},
+  {t:"D · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain the difference between a ratio and a rate, with an example of each.","Explain why the unit rate makes comparing two offers possible when the totals do not.","Choose the topic you found hardest this unit. Explain it with a picture, as if teaching someone who missed the lesson."]}],
+ exit:["Name the topic you are most confident with and give one reason.","Name the topic you want more practice on and give one specific next step.","Complete: a rate is a ratio where ___."],
+ crit:"Mastery: assessment sections A and B at 80 percent or better, with self-assessment matching actual performance within one band. Reteach in small groups by method rather than reteaching the unit; the self-assessment grid tells you how to form those groups.",
+ support:["Reduce to three stations covering sharing, unit rate and tables.","Provide worked examples at each station as reference.","Allow the assessment across two sittings if sustained concentration is the barrier rather than the mathematics."],
+ extend:["Design a station task of your own, including the manipulative and the justification prompt.","Write a problem requiring three of the unit's methods in sequence, then solve it and write the key."],
+ access:["Motor: stations are arranged so each can be completed seated, with materials brought to the student.","Attention: twelve-minute rotations with a clear signal give predictable structure.","Vision: every station card uses the same layout so the format is never re-learned.","Language: the self-assessment grid pairs picture icons with topic names so it can be completed without heavy reading.","Hearing: the rotation signal is both visual and audible."]
+}
+];
+</script>
+<script src="curriculum-core.js"></script>
+</body>
+</html>

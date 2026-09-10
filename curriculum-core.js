@@ -464,15 +464,327 @@ function factors(host){
   buildRects();buildGcf();
 }
 
+
+/* ===== promoted from unit files (Unit 2 decimal grid, Unit 3 rate line) =====
+   Kept in one IIFE so their helpers cannot collide with the core's. */
+const __PROMOTED__=(function(){
+const rm=()=>(!!window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a);
+const lcm=(a,b)=>a*b/gcd(a,b);
+const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#5B7189", LINE="#D3DCE4";
+/* mixed-number string from an improper fraction */
+function mixed(n,d){
+  const g=gcd(n,d)||1,N=n/g,D=d/g;
+  if(D===1)return String(N);
+  if(N<D)return `${N}/${D}`;
+  const w=Math.floor(N/D),r=N%D;
+  return r?`${w} ${r}/${D}`:String(w);
+}
+function simp(n,d){const g=gcd(n,d)||1;return[n/g,d/g];}
+
+const fmt=n=>{
+  if(!isFinite(n))return"—";
+  const r=Math.round(n*1000)/1000;
+  return Number.isInteger(r)?r.toLocaleString("en-US"):String(r);
+};
+/* label a quantity with its unit, unit before the number for currency */
+const q=(n,u)=>u==="$"?"$"+fmt(n):fmt(n)+(u?" "+u:"");
+
+
+/* ---------- 10. DECIMAL GRID ---------- */
+function decimalGrid(host){
+  const box=el("div","tool");
+  box.innerHTML=`<h3>Decimal grid<span class="mins">tool</span></h3>
+    <p class="sense">sight · area</p>
+    <p class="how">One square is one whole. A column is a tenth, a small cell is a hundredth. Every decimal question below is answered by shading the same square.</p>
+    <div class="ctl">
+      <label for="dgm">what are we doing</label>
+      <select id="dgm">
+        <option value="show">showing a decimal</option>
+        <option value="cmp">comparing two decimals</option>
+        <option value="add">adding or subtracting</option>
+        <option value="mul">multiplying</option>
+      </select>
+      <label for="dga">first</label><input id="dga" type="number" value="0.4" step="0.01" min="0" max="9">
+      <span id="dgops" hidden><select id="dgop"><option value="+">+</option><option value="-">−</option></select></span>
+      <span id="dgb2" hidden><label for="dgb">second</label><input id="dgb" type="number" value="0.25" step="0.01" min="0" max="9"></span>
+      <button class="btn go" id="dggo">Shade it</button>
+    </div>
+    <div class="stage-area"><svg viewBox="0 0 700 250" role="img" style="width:100%;height:auto"></svg></div>
+    <div class="out" id="dgout"></div>
+    <p class="note">Line up the decimal points, never the last digits. On the grid the reason is visible: tenths sit above tenths because they are the same size of piece.</p>`;
+  host.appendChild(box);
+  const svg=box.querySelector("svg"),out=box.querySelector("#dgout"),q=s=>box.querySelector(s);
+  const $m=q("#dgm");
+  const r2=x=>Math.round(x*100)/100;
+
+  function grid(x,y,S,val,fill,label,second,fill2){
+    const c=S/10;let s=`<rect x="${x}" y="${y}" width="${S}" height="${S}" fill="#fff" stroke="${INK}" stroke-width="1.5"/>`;
+    const cells=Math.round(Math.min(1,val)*100);
+    for(let i=0;i<cells;i++){
+      const r=Math.floor(i/10),k=i%10;
+      s+=`<rect class="bmseg" x="${x+k*c}" y="${y+r*c}" width="${c}" height="${c}" fill="${fill}" opacity=".9"/>`;
+    }
+    if(second!=null){
+      const c2=Math.round(Math.min(1,second)*100);
+      for(let i=0;i<c2;i++){
+        const r=Math.floor((99-i)/10),k=(99-i)%10;
+        s+=`<rect class="bmseg" x="${x+k*c}" y="${y+r*c}" width="${c}" height="${c}" fill="${fill2}" opacity=".9"/>`;
+        for(let t=2;t<c;t+=5)s+=`<line x1="${x+k*c+t}" y1="${y+r*c}" x2="${x+k*c+t-c}" y2="${y+r*c+c}" stroke="#fff" stroke-width="1" opacity=".5"/>`;
+      }
+    }
+    for(let i=1;i<10;i++){
+      const w=i===5?1.4:.7;
+      s+=`<line x1="${x+i*c}" y1="${y}" x2="${x+i*c}" y2="${y+S}" stroke="${INK}" stroke-width="${w}" opacity=".5"/>`;
+      s+=`<line x1="${x}" y1="${y+i*c}" x2="${x+S}" y2="${y+i*c}" stroke="${INK}" stroke-width="${w}" opacity=".5"/>`;
+    }
+    if(label)s+=`<text x="${x+S/2}" y="${y+S+22}" font-family="Inconsolata" font-size="14" fill="${INK}" text-anchor="middle">${label}</text>`;
+    return s;
+  }
+  function vis(){q("#dgb2").hidden=$m.value==="show";q("#dgops").hidden=$m.value!=="add";}
+
+  function draw(){
+    const a=Math.max(0,r2(+q("#dga").value||0)),b=Math.max(0,r2(+q("#dgb").value||0));
+    svg.classList.remove("anim");void svg.offsetWidth;if(!rm())svg.classList.add("anim");
+    const m=$m.value,S=180;
+
+    if(m==="show"){
+      const wholes=Math.floor(a),frac=r2(a-wholes);
+      let s="",x=40;const n=Math.min(3,wholes)+(frac>0?1:0);
+      for(let i=0;i<Math.min(3,wholes);i++){s+=grid(x,30,S*0.62,1,T,"1 whole");x+=S*0.62+22;}
+      if(frac>0)s+=grid(x,30,S*0.62,frac,A,frac.toFixed(2).replace(/0+$/,"").replace(/\.$/,""));
+      s+=`<text x="40" y="${30+S*0.62+52}" font-family="Inconsolata" font-size="13" fill="${MUT}">tenths = full columns · hundredths = single cells</text>`;
+      svg.innerHTML=s;
+      const t=Math.round(frac*10)/1,h=Math.round(frac*100);
+      svg.setAttribute("aria-label",`${wholes} full unit squares shaded, plus a square with ${h} of its 100 cells shaded, representing ${a}.`);
+      out.innerHTML=`<b>${a}</b> = ${wholes?wholes+" whole"+(wholes>1?"s":"")+" and ":""}${h} hundredths.<br>
+        As a fraction: <b>${wholes?mixed(Math.round(a*100),100):""}${wholes?"":Math.round(a*100)+"/100 = "+mixed(Math.round(a*100),100)}</b>.<br>
+        <span style="color:${MUT}">Say it as "${wholes?wholes+" and ":""}${h} hundredths", not "point ${String(a).split(".")[1]||"0"}". The place name is the whole idea.</span>`;
+      return;
+    }
+
+    if(m==="mul"){
+      const GX=60,GY=26,c=S/10;
+      const ac=Math.round(Math.min(1,a)*10),bc=Math.round(Math.min(1,b)*10);
+      let s=`<rect x="${GX}" y="${GY}" width="${S}" height="${S}" fill="#fff" stroke="${INK}" stroke-width="1.5"/>`;
+      s+=`<rect x="${GX}" y="${GY}" width="${S}" height="${ac*c}" fill="${T}" opacity=".28"/>`;
+      s+=`<rect x="${GX}" y="${GY}" width="${bc*c}" height="${S}" fill="${A}" opacity=".28"/>`;
+      s+=`<rect class="bmseg" x="${GX}" y="${GY}" width="${bc*c}" height="${ac*c}" fill="${INK}"/>`;
+      for(let i=1;i<10;i++){
+        s+=`<line x1="${GX+i*c}" y1="${GY}" x2="${GX+i*c}" y2="${GY+S}" stroke="${INK}" stroke-width=".7" opacity=".5"/>`;
+        s+=`<line x1="${GX}" y1="${GY+i*c}" x2="${GX+S}" y2="${GY+i*c}" stroke="${INK}" stroke-width=".7" opacity=".5"/>`;
+      }
+      const cells=ac*bc,val=r2(ac*bc/100);
+      s+=`<text x="${GX+S/2}" y="${GY+S+24}" font-family="Inconsolata" font-size="13" fill="${MUT}" text-anchor="middle">${(bc/10)} across</text>`;
+      s+=`<text x="${GX-14}" y="${GY+S/2}" font-family="Inconsolata" font-size="13" fill="${MUT}" text-anchor="middle" transform="rotate(-90 ${GX-14} ${GY+S/2})">${(ac/10)} down</text>`;
+      s+=`<text x="${GX+S+40}" y="${GY+70}" font-family="Inconsolata" font-size="14" fill="${INK}">overlap = ${cells} cells</text>`;
+      s+=`<text x="${GX+S+40}" y="${GY+94}" font-family="Inconsolata" font-size="14" fill="${INK}">each cell = 0.01</text>`;
+      s+=`<text x="${GX+S+40}" y="${GY+128}" font-family="Fraunces" font-size="22" fill="${T}">${val}</text>`;
+      svg.innerHTML=s;
+      svg.setAttribute("aria-label",`A unit square. ${ac} of ten rows shaded one way, ${bc} of ten columns the other. The ${cells} cells shaded both ways equal ${val}.`);
+      out.innerHTML=`${ac/10} × ${bc/10} = <b>${val}</b>.<br>
+        One digit after the point times one digit after the point gives ${cells} hundredths — two digits after the point. The count of decimal places is a count of how many times the cell was cut.<br>
+        <span style="color:${MUT}">Size check: multiplying by a number below 1 makes it smaller. ${val<Math.max(ac,bc)/10?"It did.":"Check your inputs."} This mode uses tenths only; go past 0.9 and it clips.</span>`;
+      return;
+    }
+
+    /* cmp and add */
+    if(m==="cmp"){
+      svg.innerHTML=grid(70,26,S,Math.min(1,a),T,String(a))+grid(330,26,S,Math.min(1,b),A,String(b))+
+        `<text x="350" y="${26+S+52}" font-family="Inconsolata" font-size="13" fill="${MUT}" text-anchor="middle">shade both, then look — no digit-counting required</text>`;
+      svg.setAttribute("aria-label",`Two unit squares side by side. The left has ${Math.round(a*100)} of 100 cells shaded for ${a}; the right has ${Math.round(b*100)} for ${b}. ${a===b?"They match.":a>b?"The left is larger.":"The right is larger."}`);
+      const pad=(x)=>x.toFixed(2);
+      out.innerHTML=`${a} ${a===b?"=":a>b?"&gt;":"&lt;"} ${b}.<br>
+        Written to the same place: ${pad(a)} and ${pad(b)}. ${a===b?"Identical shading.":`${Math.round(Math.max(a,b)*100)} hundredths beats ${Math.round(Math.min(a,b)*100)} hundredths.`}<br>
+        <span style="color:${MUT}">The trap: a longer decimal is not automatically bigger. 0.5 has fewer digits than 0.25 and is twice as large. Count hundredths, not digits.</span>`;
+      return;
+    }
+    const op=q("#dgop").value,res=r2(op==="+"?a+b:a-b);
+    svg.innerHTML=grid(70,26,S,Math.min(1,a),T,String(a),op==="+"?Math.min(1,b):null,A)+
+      grid(360,26,S,Math.max(0,Math.min(1,res)),T,`= ${res}`)+
+      `<text x="300" y="${26+S/2}" font-family="Fraunces" font-size="26" fill="${INK}" text-anchor="middle">${op==="+"?"+":"−"}</text>`;
+    svg.setAttribute("aria-label",`Left square shows ${a}${op==="+"?` shaded from the top and ${b} shaded from the bottom`:""}. The right square shows the result, ${res}.`);
+    out.innerHTML=`${a.toFixed(2)} ${op==="+"?"+":"−"} ${b.toFixed(2)} = <b>${res}</b>.<br>
+      Hundredths were added to hundredths, tenths to tenths. That is all "line up the decimal point" means.<br>
+      <span style="color:${MUT}">${res<0?"A negative result — the picture runs out of square. Unit 10 handles that.":op==="+"&&a+b>1?"The result passed one whole, so cells traded up into a full square — the same trade as the place-value discs in Unit 1.":"Both numbers stayed inside one whole."}</span>`;
+  }
+  $m.addEventListener("change",()=>{vis();draw();});
+  box.querySelector("#dggo").addEventListener("click",draw);
+  box.querySelectorAll("input,select").forEach(i=>i.addEventListener("input",draw));
+  vis();draw();
+}
+
+
+const PRESETS=[
+ {k:"3 kg for $12",      a:3,   ua:"kg",    b:12,  ub:"$"},
+ {k:"5 pens for $4",     a:5,   ua:"pens",  b:4,   ub:"$"},
+ {k:"150 km in 2 h",     a:2,   ua:"h",     b:150, ub:"km"},
+ {k:"240 km in 3 h",     a:3,   ua:"h",     b:240, ub:"km"},
+ {k:"2 flour : 3 water", a:2,   ua:"cups flour", b:3, ub:"cups water"},
+ {k:"4 blue : 6 yellow", a:4,   ua:"blue",  b:6,   ub:"yellow"}
+];
+
+function rateLine(host){
+  const box=el("div","tool");
+  box.innerHTML=`<h3>Rate line<span class="mins">tool</span></h3>
+    <p class="sense">sight · correspondence</p>
+    <p class="how">Two scales that move together. Every tick on the bottom has a partner directly above it, and the pair never stops being the same ratio — that is what makes the jump to a unit rate a step along the line rather than a rule.</p>
+    <div class="ctl">
+      <label for="rlm">what are we doing</label>
+      <select id="rlm">
+        <option value="equiv">finding equivalent ratios</option>
+        <option value="unit">finding the unit rate</option>
+        <option value="cmp">comparing two rates</option>
+      </select>
+      <label for="rla">for every</label>
+      <input id="rla" type="number" value="3" min="1" max="60" aria-label="first quantity">
+      <input id="rlua" type="text" value="kg" size="6" aria-label="first unit" style="min-width:70px">
+      <label for="rlb">you get</label>
+      <input id="rlb" type="number" value="12" min="1" max="999" aria-label="second quantity">
+      <input id="rlub" type="text" value="$" size="6" aria-label="second unit" style="min-width:70px">
+    </div>
+    <div class="ctl" id="rl2" hidden>
+      <label for="rlc">compare with: for every</label>
+      <input id="rlc" type="number" value="5" min="1" max="60" aria-label="third quantity">
+      <label for="rld">you get</label>
+      <input id="rld" type="number" value="18" min="1" max="999" aria-label="fourth quantity">
+    </div>
+    <div class="ctl picker" id="rlp"></div>
+    <div class="stage-area"><svg class="bm" viewBox="0 0 700 200" role="img"></svg></div>
+    <div id="rltab" style="margin-top:16px;overflow-x:auto"></div>
+    <div class="out" id="rlout"></div>
+    <p class="note">A ratio compares two amounts. A rate is a ratio with units attached, and a unit rate is the value of one — which is why the line always walks back to 1 before it does anything else.</p>`;
+  host.appendChild(box);
+  const svg=box.querySelector("svg"),out=box.querySelector("#rlout"),tab=box.querySelector("#rltab");
+  const $=s=>box.querySelector(s), $m=$("#rlm");
+  $("#rlp").innerHTML=PRESETS.map((p,i)=>`<button class="btn sm" data-i="${i}">${p.k}</button>`).join("");
+
+  const X0=74,W=560;
+  function scale(y,label,vals,unit,colour,dash){
+    let s=`<line x1="${X0}" y1="${y}" x2="${X0+W}" y2="${y}" stroke="${INK}" stroke-width="2"/>`;
+    s+=`<text x="${X0-10}" y="${y+4}" font-family="Inconsolata" font-size="12" fill="${MUT}" text-anchor="end">${label}</text>`;
+    vals.forEach((v,i)=>{
+      const x=X0+(i/(vals.length-1))*W;
+      s+=`<line x1="${x}" y1="${y-7}" x2="${x}" y2="${y+7}" stroke="${INK}" stroke-width="2"/>`;
+      s+=`<circle class="bmseg" cx="${x}" cy="${y}" r="4" fill="${colour}"/>`;
+      s+=`<text x="${x}" y="${y+(dash?24:-15)}" font-family="Inconsolata" font-size="12" fill="${INK}" text-anchor="middle">${q(v,unit)}</text>`;
+    });
+    return s;
+  }
+  function connectors(yTop,yBot,n,hi){
+    let s="";
+    for(let i=0;i<n;i++){
+      const x=X0+(i/(n-1))*W;
+      const on=hi===i;
+      s+=`<line x1="${x}" y1="${yTop+8}" x2="${x}" y2="${yBot-8}" stroke="${on?A:MUT}" stroke-width="${on?2:1}" stroke-dasharray="${on?"":"3 4"}" opacity="${on?1:.55}"/>`;
+    }
+    return s;
+  }
+  function table(rowsA,rowsB,ua,ub,hi){
+    const th=`padding:6px 12px;font-family:var(--mono);font-size:.78rem;color:${MUT};font-weight:400;text-align:left;border-bottom:1px solid ${LINE}`;
+    const td=i=>`padding:6px 12px;font-family:var(--mono);font-size:.9rem;color:${INK};border-bottom:1px solid ${LINE};${i===hi?`background:#FAEDD6;font-weight:600`:""}`;
+    let h=`<table style="border-collapse:collapse;min-width:320px"><caption style="caption-side:top;text-align:left;font-family:var(--mono);font-size:.76rem;color:${MUT};padding-bottom:6px">equivalent ratios</caption><thead><tr>
+      <th scope="col" style="${th}">${ua}</th><th scope="col" style="${th}">${ub}</th><th scope="col" style="${th}">${ub} per 1 ${ua}</th></tr></thead><tbody>`;
+    rowsA.forEach((v,i)=>{
+      h+=`<tr><td style="${td(i)}">${fmt(v)}</td><td style="${td(i)}">${fmt(rowsB[i])}</td><td style="${td(i)}">${v?fmt(rowsB[i]/v):"—"}</td></tr>`;
+    });
+    return h+"</tbody></table>";
+  }
+
+  function draw(){
+    const a=Math.max(1,+$("#rla").value||1), b=Math.max(1,+$("#rlb").value||1);
+    const ua=$("#rlua").value.trim()||"units", ub=$("#rlub").value.trim()||"units";
+    const m=$m.value;
+    $("#rl2").hidden=m!=="cmp";
+    svg.classList.remove("anim");void svg.offsetWidth;if(!rm())svg.classList.add("anim");
+
+    if(m==="cmp"){
+      const c=Math.max(1,+$("#rlc").value||1), d=Math.max(1,+$("#rld").value||1);
+      const r1=b/a, r2=d/c;
+      const n=4;
+      const unitsX=[0,1,2,3];
+      svg.setAttribute("viewBox","0 0 700 210");
+      let s=scale(46,"offer A",unitsX.map(u=>u*r1),ub,T,false);
+      s+=scale(104,ua,unitsX,ua,INK,false);
+      s+=scale(170,"offer B",unitsX.map(u=>u*r2),ub,P,true);
+      s+=connectors(46,104,n,1)+connectors(104,170,n,1);
+      svg.innerHTML=s;
+      svg.setAttribute("aria-label",`Three aligned scales. The middle scale counts ${ua} from 0 to 3. Above it, offer A reaches ${q(r1,ub)} at one ${ua}. Below it, offer B reaches ${q(r2,ub)} at one ${ua}. ${r1===r2?"The two offers match.":`Offer ${r1<r2?"A":"B"} gives less per ${ua}.`}`);
+      tab.innerHTML=table([1,2,3],[r1,r1*2,r1*3],ua,ub+" (A)",0)+
+        `<div style="height:12px"></div>`+table([1,2,3],[r2,r2*2,r2*3],ua,ub+" (B)",0);
+      const cheaper=r1===r2?null:(r1<r2?"A":"B");
+      out.innerHTML=`Offer A: ${q(b,ub)} for ${q(a,ua)} → <b>${q(r1,ub)} per ${ua}</b>.<br>
+        Offer B: ${q(d,ub)} for ${q(c,ua)} → <b>${q(r2,ub)} per ${ua}</b>.<br>
+        ${cheaper===null?"The two rates are equal — the same ratio written two ways."
+          :`Per single ${ua}, offer <b>${cheaper}</b> is the smaller amount of ${ub}.`}<br>
+        <span style="color:${MUT}">You cannot compare ${q(b,ub)} with ${q(d,ub)} directly — they buy different amounts. Walking both back to one ${ua} is what makes them comparable, exactly like a common denominator.</span>`;
+      return;
+    }
+
+    if(m==="unit"){
+      const r=b/a, n=Math.min(6,Math.max(3,a+1));
+      const bot=Array.from({length:n},(_,i)=>i);
+      svg.setAttribute("viewBox","0 0 700 170");
+      let s=scale(56,ub,bot.map(u=>u*r),ub,T,false);
+      s+=scale(122,ua,bot,ua,INK,true);
+      s+=connectors(56,122,n,1);
+      svg.innerHTML=s;
+      svg.setAttribute("aria-label",`Two aligned scales. The lower scale counts ${ua} from 0 to ${n-1}. The upper scale shows the matching amount of ${ub}, reaching ${q(r,ub)} directly above one ${ua}. The pair at one is marked.`);
+      tab.innerHTML=table(bot.slice(1),bot.slice(1).map(u=>u*r),ua,ub,0);
+      out.innerHTML=`${q(b,ub)} for ${q(a,ua)}. Step back along the line to <b>1 ${ua}</b>.<br>
+        Unit rate: <b>${q(r,ub)} per ${ua}</b> &nbsp;(${fmt(b)} ÷ ${fmt(a)})<br>
+        The other one: <b>${q(a/b,ua)} per ${ub}</b> &nbsp;(${fmt(a)} ÷ ${fmt(b)})<br>
+        <span style="color:${MUT}">Both are unit rates for the same situation. Which one you want depends on the question — read it before you divide, because dividing the wrong way round gives a number that looks fine.</span>`;
+      return;
+    }
+
+    /* equivalent ratios */
+    const g=gcd(a,b), n=5;
+    const ks=Array.from({length:n},(_,i)=>i);
+    svg.setAttribute("viewBox","0 0 700 170");
+    let s=scale(56,ub,ks.map(k=>k*b),ub,T,false);
+    s+=scale(122,ua,ks.map(k=>k*a),ua,INK,true);
+    s+=connectors(56,122,n,2);
+    /* multiplier bracket between the first and the highlighted pair */
+    const x1=X0, x2=X0+(2/(n-1))*W;
+    s+=`<path d="M${X0+(1/(n-1))*W} 150 L${X0+(1/(n-1))*W} 158 L${x2} 158 L${x2} 150" fill="none" stroke="#B87C1C" stroke-width="1.5"/>`;
+    svg.innerHTML=s;
+    svg.setAttribute("aria-label",`Two aligned scales showing equivalent ratios. The lower scale counts ${ua} in steps of ${fmt(a)}, the upper counts ${ub} in steps of ${fmt(b)}. Each pair down the line — ${fmt(a)} to ${fmt(b)}, ${fmt(2*a)} to ${fmt(2*b)}, ${fmt(3*a)} to ${fmt(3*b)} — is the same ratio.`);
+    tab.innerHTML=table(ks.slice(1).map(k=>k*a),ks.slice(1).map(k=>k*b),ua,ub,1);
+    out.innerHTML=`${fmt(a)} : ${fmt(b)} = ${fmt(2*a)} : ${fmt(2*b)} = ${fmt(3*a)} : ${fmt(3*b)} = ${fmt(4*a)} : ${fmt(4*b)}.<br>
+      Both scales were multiplied by the same number, so the pairing never changed. ${g>1?`In simplest form this ratio is <b>${fmt(a/g)} : ${fmt(b/g)}</b>.`:`This ratio is already in simplest form — ${fmt(a)} and ${fmt(b)} share no factor but 1.`}<br>
+      <span style="color:${MUT}">Every row of the table sits on one straight walk down the line. That is what "equivalent" means here — same walk, further along.</span>`;
+  }
+  $m.addEventListener("change",draw);
+  box.querySelectorAll("input,select").forEach(i=>i.addEventListener("input",draw));
+  $("#rlp").addEventListener("click",e=>{
+    const btn=e.target.closest("button[data-i]");if(!btn)return;
+    const p=PRESETS[+btn.dataset.i];
+    $("#rla").value=p.a;$("#rlua").value=p.ua;$("#rlb").value=p.b;$("#rlub").value=p.ub;draw();
+  });
+  draw();
+}
+
+return {decimalGrid,rateLine};
+})();
+
 const TOOLS=window.__EXTRA_TOOLS__||{};
-Object.assign(TOOLS,{placeValue,rounding,shift,stepper,power,barModel,factors});
-const NAMES=Object.assign(window.__EXTRA_NAMES__||{},{placeValue:"Place-value builder",rounding:"Rounding line",shift:"Shift machine",stepper:"Expression stepper",power:"Power blocks",barModel:"Bar model builder",factors:"Factor lab"});
+Object.assign(TOOLS,__PROMOTED__,{placeValue,rounding,shift,stepper,power,barModel,factors});
+const NAMES=Object.assign(window.__EXTRA_NAMES__||{},{placeValue:"Place-value builder",rounding:"Rounding line",shift:"Shift machine",stepper:"Expression stepper",power:"Power blocks",barModel:"Bar model builder",factors:"Factor lab",decimalGrid:"Decimal grid",rateLine:"Rate line"});
 
 window.MathTools=window.MathTools||{};
 Object.assign(window.MathTools,{
   mount(ids,host){
     if(!host)return;host.innerHTML="";
-    ids=ids==="all"?Object.keys(TOOLS):(ids||[]);
+    /* "all" means the tools THIS unit taught with, not every tool in the
+       registry — a review station must not offer a tool from a later unit. */
+    if(ids==="all"){
+      const map=(window.UNIT&&window.UNIT.tools)||{};
+      const seen=[];
+      Object.keys(map).forEach(d=>{const v=map[d];if(Array.isArray(v))v.forEach(id=>{if(TOOLS[id]&&seen.indexOf(id)<0)seen.push(id);});});
+      ids=seen.length?seen:Object.keys(TOOLS);
+    }else ids=ids||[];
     if(!ids.length)return;
     if(ids.length>3){
       const pick=el("div","tool");

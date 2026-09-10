@@ -1,7 +1,7 @@
 # MANIFEST — Grade 6 Singapore Math (CPA)
 
-**Bundle version:** through-u02
-**Built:** 2026-09-07
+**Bundle version:** through-u04
+**Built:** 2026-09-09
 
 The hub's `UNITS` array is the source of truth for what exists. This file is a
 convenience snapshot — if the two ever disagree, believe the hub.
@@ -30,14 +30,16 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 
 | file | bytes | sha256 (first 16) |
 |---|---|---|
-| `CLAUDE.md` | 4,824 | `11a5dc0b15d21b73` |
+| `CLAUDE.md` | 11,647 | `621942bf0055b345` |
 | `README.md` | 4,714 | `6d2d5ebf47ada6c8` |
-| `curriculum-core.js` | 31,634 | `a29618c09cf4ed24` |
+| `curriculum-core.js` | 51,921 | `bd010e838ba2a847` |
 | `curriculum.css` | 13,193 | `b67d7d1bf35ce4af` |
-| `singapore-math-6-hub.html` | 20,624 | `a3cd7b859a9c737a` |
-| `test-unit.js` | 3,789 | `8983497562dd96df` |
+| `singapore-math-6-hub.html` | 20,622 | `2ac17419a4fcaa3a` |
+| `test-unit.js` | 3,796 | `61769ae355dc319a` |
 | `unit-01-whole-numbers-and-operations.html` | 62,096 | `fd32edf62e0a2b75` |
 | `unit-02-fractions-and-decimals.html` | 158,134 | `794f8298cbf5223b` |
+| `unit-03-ratio-and-rate.html` | 104,085 | `e5ee14b100258515` |
+| `unit-04-percentage.html` | 87,767 | `54bd3f4dc7161ce6` |
 | `unit-template.html` | 5,434 | `136b856553bad138` |
 
 ## Unit status
@@ -46,8 +48,8 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 |---|---|---|---|
 | 01 | Whole Numbers & Order of Operations | 10 | ready |
 | 02 | Fractions & Decimals | 20 | ready |
-| 03 | Ratio & Rate | 15 | not built |
-| 04 | Percentage | 15 | not built |
+| 03 | Ratio & Rate | 15 | ready |
+| 04 | Percentage | 15 | ready |
 | 05 | Algebraic Expressions & Equations | 20 | not built |
 | 06 | Angles & Geometric Figures | 15 | not built |
 | 07 | Circles | 15 | not built |

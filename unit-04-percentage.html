@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit 4 &mdash; Percentage | Grade 6 CPA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="curriculum.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+    <h1>Unit 4 &mdash; Percentage</h1>
+    <p class="sub">Percent is not a fourth kind of number. It is the rate from Unit 3 with the second quantity fixed at one hundred, drawn on the hundredths grid from Unit 2. The question that runs through every lesson here is the same one: a percent of <i>what</i>? Most errors in this unit are answers to that question rather than to the arithmetic.</p>
+    <div class="facts">
+      <span><b>15</b> instructional days</span>
+      <span><b>3</b> weeks</span>
+      <span><b>55</b> minutes per lesson</span>
+      <span><b>6.RP</b> standards</span>
+    </div>
+  </div>
+  <div class="wrap"><nav class="daynav" id="daynav" aria-label="Lesson days"></nav></div>
+</header>
+
+<main class="wrap">
+  <div class="lesson">
+    <div id="content"></div>
+    <aside class="side" id="side"></aside>
+  </div>
+  <div class="pager">
+    <button id="prev">&larr; Previous lesson</button>
+    <button id="next">Next lesson &rarr;</button>
+  </div>
+</main>
+
+<script>
+/* All tools this unit needs are now in curriculum-core.js: decimalGrid and
+   rateLine were promoted there when this unit reused them. No extras needed. */
+window.UNIT={
+  number:4,
+  minutes:55,
+  tools:{
+     1:["decimalGrid"],  2:["decimalGrid"],  3:["barModel"],    4:["rateLine"],
+     5:["barModel"],     6:["barModel"],     7:["barModel"],    8:["barModel"],
+     9:["barModel"],    10:["rateLine"],    11:["barModel"],   12:["decimalGrid"],
+    13:["barModel","rateLine"],            14:["barModel","decimalGrid"],
+    15:"all"
+  }
+};
+
+window.LESSONS=
+[
+{
+ day:1, short:"Per hundred", title:"Percent as a rate per hundred",
+ objective:"Represent a percent on a hundredths grid and explain why percent is a rate rather than a new kind of number.",
+ standards:["6.RP.A.3c","6.RP.A.2"],
+ vocab:[["Percent","Per hundred. 35% means 35 for every 100."],["Rate per hundred","The Unit 3 idea, with the second quantity fixed at 100."],["Hundredths grid","The Unit 2 square, now read as a percent."],["Benchmark percent","50%, 25%, 10%, 1% — worth knowing on sight."]],
+ materials:["Hundredths grids, six per student","Hundred-bead strings","Coloured pencils","Real price tags showing percentage discounts"],
+ warmup:{mins:5,text:"Write 35%, 0.35 and 35/100 on the board without comment. Ask whether these are three facts or one fact written three ways. Take a vote and record the split. Say: you settled this exact question for fractions and decimals in Unit 2. Today the third notation joins them."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · shading a hundred",
+   moves:["Shade 35 cells of a hundredths grid and count them aloud.","State the same amount as 35 hundredths, 0.35 and 35%.","Shade 50%, 25% and 10% on separate grids and note how each looks.","Use a hundred-bead string to show 40% by counting beads."],
+   say:[["Teacher","Shade thirty-five cells. How many cells are there altogether?"],["Expected","A hundred."],["Teacher","So thirty-five out of a hundred. Say it three ways."],["Expected","Thirty-five hundredths, nought point three five, thirty-five percent."],["Teacher","Same shading, three names. Percent is not a new number — it is a rate where the second quantity is always one hundred."]],
+   watch:["Students who treat % as a unit like kg, saying 35% is a fixed amount. Ask 35% of what — a percent with nothing attached is a relationship waiting for a quantity. The grid must always be named."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · grid and line together",
+   moves:["Draw a hundredths grid shaded 35% beside a double number line from 0 to 100%.","Mark 0%, 25%, 50%, 75% and 100% on the line.","Place 35% on the line and confirm it sits below half.","Draw 100% and 0% as full and empty grids and name what each means."],
+   say:[["Teacher","Mark half first, every time — that habit is from Unit 2 and it still pays."],["Teacher","What does 100% mean on this grid?"],["Expected","All of it — the whole thing."],["Teacher","And can a percent be more than 100?"],["Expected","Only if you have more than the whole."],["Teacher","Hold that thought. It comes back on day twelve."]],
+   readaloud:["Say the picture aloud: 'A ten by ten grid with thirty-five cells shaded, filling three complete rows and half of a fourth. Beside it a horizontal scale runs from zero percent to one hundred percent, with a mark just past the one-third position labelled thirty-five percent.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · three notations",
+   moves:["Write percents as fractions over 100 and simplify.","Write percents as decimals by reading the place value.","Practise the benchmark set: 10%, 25%, 50%, 75%, 100%.","Establish that % means divided by 100, written as a symbol."],
+   say:[["Teacher","The percent sign is an instruction. It says divide by one hundred."],["Teacher","So 35% as a decimal?"],["Expected","0.35."],["Teacher","You did not shift the digits because someone told you to. You shifted them because dividing by a hundred moves digits two columns right, which is Unit 2 day fifteen."]],
+   watch:["Students who write 35% as 3.5 or 350, shifting the wrong way or the wrong distance. The size check settles it: a percent under 100 must give a decimal under 1."]}
+ ],
+ guided:[["Write 40% as a fraction and a decimal.","40/100 = 2/5; 0.4"],["Write 7% as a decimal.","0.07"],["Shade 60% — how many cells?","60"],["What does 100% mean?","The whole amount."]],
+ worksheet:[
+  {t:"A · Three notations",d:"Write each percent as a fraction in simplest form and as a decimal.",items:["25%","60%","8%","75%","5%","120%"]},
+  {t:"B · Read the grid",d:"A grid has this many cells shaded. Write the percent.",items:["45 cells","9 cells","80 cells","33 cells","100 cells","6 cells"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why 50% of a small pizza is not the same amount as 50% of a large one, even though the percent is identical.","Leo says 5% is bigger than 50% because 5 comes first when you count. Explain his mistake using a grid.","Why is percent useful for comparing two schools of different sizes? Give an example."]}],
+ exit:["Write 30% as a fraction and a decimal.","How many cells would you shade for 12%?","Explain why a percent always needs an amount attached to it."],
+ crit:"Mastery: both correct and item 3 says a percent describes part of something rather than a fixed quantity. Reteach if % is treated as a unit — that misconception makes every later problem in this unit unanswerable.",
+ support:["Keep grids available for every problem; shading answers most questions without notation.","Restrict to benchmark percents before arbitrary ones.","Provide a printed three-column reference: percent, fraction, decimal."],
+ extend:["Shade a grid to show 12.5%. What did you have to do to a cell, and what does that tell you?","Why does a percent over 100 make sense for a price increase but not for a test score out of the total?"],
+ access:["Touch: bead strings let a percent be counted by hand, and the hundred is physically bounded.","Vision: grids are printed with a heavier line at the halfway row so quantity is judged without counting every cell.","Language: 'per cent' is literally 'per hundred' — say the Unit 3 word 'per' aloud and connect it, since the whole idea is already familiar.","Memory: this is Unit 2's hundredths grid unchanged; naming that reduces the day to one new notation rather than a new topic."]
+},
+{
+ day:2, short:"Convert", title:"Converting between percent, fraction and decimal",
+ objective:"Convert fluently among percent, fraction and decimal, and choose the form that makes a given calculation easiest.",
+ standards:["6.RP.A.3c","6.NS.B.3"],
+ vocab:[["Convert","Rewrite in another notation without changing the value."],["Terminating","A decimal that ends — most benchmark percents do."],["Recurring","A decimal that repeats, as 1/3 does."],["Easiest form","The notation that makes the arithmetic shortest for the numbers in front of you."]],
+ materials:["Hundredths grids","Fraction strips from Unit 2","Benchmark reference cards","Calculators for the investigation only"],
+ warmup:{mins:5,text:"Post 3/8 and ask for it as a percent. Let students struggle briefly, then ask what they would need to know. The route is division — Unit 2 day one, again. Do not solve it; establish the route and move on."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · shading both ways",
+   moves:["Shade 3/5 on a hundredths grid by finding what a fifth is in cells.","Read the shaded cells as a percent: 60%.","Shade 45% and write it as a fraction over 100, then simplify to 9/20.","Build a benchmark reference card from the grids."],
+   say:[["Teacher","Three fifths on a hundred-cell grid. What is one fifth?"],["Expected","Twenty cells."],["Teacher","So three fifths is sixty cells, which is sixty percent. The grid converted it for you."],["Teacher","Now the other way. Forty-five percent is forty-five cells. As a fraction?"],["Expected","45 over 100, which is 9 over 20."]],
+   watch:["Students who convert 3/5 to 35% by writing the digits together. Compare the two shadings — 35 cells against 60 — and the error cannot survive the picture."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · one line, three labels",
+   moves:["Draw a 0-to-1 number line and label it three ways: percent, decimal and fraction.","Place 1/4, 1/2, 3/4, 1/5, 3/5 and read all three labels for each.","Add 1/3 and find that the percent is not tidy.","Mark 1/3 as approximately 33.3% and discuss what the dots mean."],
+   say:[["Teacher","One line, three sets of labels. Every point has all three names."],["Teacher","Now one third."],["Expected","Thirty-three point three three three percent."],["Teacher","So it is about thirty-three percent, not exactly. Those are different claims and the difference matters when you are dividing money."]],
+   readaloud:["Say the picture aloud: 'A number line from zero to one carries three rows of labels. The top row reads zero, twenty-five, fifty, seventy-five, one hundred percent. The middle row reads zero, nought point two five, nought point five, nought point seven five, one. The bottom row reads zero, one quarter, one half, three quarters, one.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · routes both ways",
+   moves:["Percent to decimal: divide by 100, shifting two columns right.","Decimal to percent: multiply by 100, shifting two columns left.","Fraction to percent: divide, then shift — or scale the denominator to 100 directly.","Choose the shorter route for 3/4, 7/20 and 3/8."],
+   say:[["Teacher","For three twentieths — sorry, seven twentieths. Would you divide, or scale the denominator?"],["Expected","Scale it — twenty times five is a hundred."],["Teacher","Thirty-five percent, in one step. For three eighths there is no whole-number scaling, so you divide. Read the denominator before you choose."]],
+   watch:["Students who shift one column instead of two. Per cent is per hundred, and a hundred is two columns. Require the size check: 0.4 must become 40%, not 4%."]}
+ ],
+ guided:[["Write 3/4 as a percent.","75%"],["Write 0.06 as a percent.","6%"],["Write 12% as a fraction in simplest form.","3/25"],["Write 5/8 as a percent.","62.5%"]],
+ worksheet:[
+  {t:"A · To percent",d:"Convert each.",items:["1/2","0.35","3/5","0.08","7/20","1.25"]},
+  {t:"B · From percent",d:"Give a fraction in simplest form and a decimal.",items:["20%","65%","4%","150%","12.5%","90%"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Order these smallest to largest: 0.6, 55%, 3/5. Show how you made them comparable.","Explain why 1/3 cannot be written as an exact percent, and what you would write instead.","Which denominators convert to a percent without dividing? Find the pattern and explain why it works."]}],
+ exit:["Write 2/5 as a percent.","Write 0.07 as a percent.","Explain why you shift two columns and not one."],
+ crit:"Mastery: both correct and item 3 refers to a hundred being two place-value columns. Reteach if the shift is one column — this is Unit 2 day fifteen resurfacing, so return there rather than teaching it fresh.",
+ support:["Provide the benchmark reference card and permit its use throughout.","Restrict to denominators dividing into 100 before introducing eighths and thirds.","Allow the grid method for every conversion instead of division."],
+ extend:["Convert 1/7 to a percent and describe the repeating pattern.","Explain why any fraction whose denominator has only 2s and 5s as factors gives an exact percent."],
+ access:["Vision: the triple-labelled number line puts all three notations in one place, so the connection is spatial rather than remembered.","Memory: the benchmark card is a permanent aid, not a crutch to withdraw.","Language: introduce 'terminating' and 'recurring' after students have seen the behaviour, never before.","Attention: the calculator investigation is bounded to six denominators so the pattern surfaces before attention runs out."]
+},
+{
+ day:3, short:"Benchmarks", title:"Benchmark percents and mental estimation",
+ objective:"Find 10%, 1%, 50% and 25% of a quantity mentally, and combine them to estimate any percent.",
+ standards:["6.RP.A.3c","6.NS.B.3"],
+ vocab:[["Benchmark","A percent easy enough to find in your head."],["Build up","Combining benchmarks: 35% is 25% plus 10%."],["Estimate","A rounded answer used to check a calculation."],["Ten percent","Divide by ten. The most useful single fact in this unit."]],
+ materials:["Price tags and receipts","Whiteboards for mental work","Hundredths grids"],
+ warmup:{mins:5,text:"Ask for 10% of 80, then 10% of 45, then 10% of 6.20. Take them fast, no writing. Then ask for 5% of 80 and watch the pace drop. Say: five percent is half of ten percent, and once you see that, most percents become two easy steps instead of one hard one."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · splitting a set",
+   moves:["Lay out 80 counters and split into ten equal groups to find 10%.","Halve one group to find 5%.","Split the 80 into four groups to find 25%, and into two for 50%.","Combine groups to make 35% and 75%."],
+   say:[["Teacher","Ten equal groups. One group is ten percent. How many?"],["Expected","Eight."],["Teacher","Now build thirty-five percent from the groups you already have."],["Expected","Three groups plus half a group — twenty-eight."],["Teacher","No calculation. You assembled it from parts you could already see."]],
+   watch:["Students who divide by 10 to find 1%. One percent is a hundredth, so divide by 100 — two shifts, not one. Have them count the columns."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · bar split into tenths",
+   moves:["Draw a bar labelled 100% and 80, divided into ten equal parts.","Label each part 10% and 8.","Shade combinations to show 30%, 45% and 70%.","Draw a second bar for a quantity that does not divide evenly and handle the decimal."],
+   say:[["Teacher","Ten parts, each one is ten percent. Everything else is picking parts."],["Teacher","Forty-five percent — which parts?"],["Expected","Four whole parts and half of another."],["Teacher","And for a quantity like sixty-two, one part is six point two. The decimals do not stop the method; they just come along."]],
+   readaloud:["Say the picture aloud: 'A single bar is divided into ten equal parts. Each part is labelled ten percent above and eight below. The first four parts and half of the fifth are shaded, spanning forty-five percent.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · building percents",
+   moves:["Write 10% as division by 10 and 1% as division by 100.","Build 35%, 15%, 45% and 99% from benchmarks and record the steps.","Estimate a percent of an awkward number by rounding first.","Check a calculated answer against a benchmark estimate."],
+   say:[["Teacher","Ninety-nine percent. Would you rather find ninety-nine ones, or take one away from the whole?"],["Expected","Take one percent off."],["Teacher","Reading the number before you start is the actual skill. The arithmetic was never the hard part."]],
+   watch:["Students who build 35% as 30% plus 10%. Have them add the percents aloud before combining amounts; the check is on the percents, not the results."]}
+ ],
+ guided:[["Find 10% of 260.","26"],["Find 5% of 80.","4"],["Find 35% of 200 using benchmarks.","20% is 40, 10% is 20, 5% is 10 — or 25%+10% = 50+20 = 70"],["Find 1% of 4500.","45"]],
+ worksheet:[
+  {t:"A · Benchmarks",d:"Mental only. No written working.",items:["10% of 350","50% of 84","25% of 120","1% of 700","10% of 6.40","50% of 15"]},
+  {t:"B · Build it up",d:"Show which benchmarks you combined.",items:["30% of 90","15% of 60","35% of 200","75% of 48","45% of 300","5% of 260"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A jacket costs $80 with 15% off. Estimate the saving mentally and explain the benchmarks you used.","Explain why finding 1% first makes any whole-number percent findable.","A tip of 18% on a $45 bill. Estimate it two different ways and say which was quicker."]}],
+ exit:["Find 10% of 420.","Find 25% of 64.","Explain how to find 5% once you know 10%."],
+ crit:"Mastery: both correct without written working, and item 3 says halve the ten percent. Reteach if 1% is found by dividing by 10 — that error scales every subsequent answer by ten and is worth catching now.",
+ support:["Provide a benchmark strip showing 1%, 10%, 25% and 50% of the numbers in use.","Restrict to quantities that divide by ten evenly.","Permit written working while the combinations are still new."],
+ extend:["Find 17.5% of 240 using only benchmarks. How many steps did it take?","Which percents can be built from 10%, 5% and 1% alone? Is there one that cannot?"],
+ access:["Touch: splitting counters into ten groups makes ten percent a physical action rather than a division fact.","Attention: mental-only work is capped at six items, since sustained mental arithmetic tires faster than written.","Language: 'of' means multiply, as in Unit 2 — say it aloud rather than assuming the transfer.","Vision: the tenths bar is labelled with both the percent and the amount inside each part."]
+},
+{
+ day:4, short:"Percent of", title:"Finding a percent of a quantity",
+ objective:"Find any percent of a quantity by three routes — benchmarks, decimal multiplication, and the unitary method — and choose between them.",
+ standards:["6.RP.A.3c","6.NS.B.3"],
+ vocab:[["Unitary method","Find 1%, then multiply. The Unit 3 unit-rate move in a new setting."],["Decimal multiplication","Convert the percent to a decimal and multiply."],["Of","Multiply — the same signal as Unit 2."],["Route","Any of the three valid methods; the choice depends on the numbers."]],
+ materials:["Hundredths grids","Calculators, permitted after the method is stated","Price lists"],
+ warmup:{mins:5,text:"Post: find 23% of 400. Ask for the method only, not the answer. Collect three different routes if they arise — benchmarks, one percent then multiply, and decimal multiplication. Write all three up. Say: all correct, and by the end of the lesson you will pick between them on purpose."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · one percent first",
+   moves:["Lay out 400 counters conceptually as 100 groups of 4, establishing 1% as 4.","Take 23 of those groups to find 23%.","Repeat for 8% and 60% from the same setup.","Compare with taking a quarter of the counters directly for 25%."],
+   say:[["Teacher","A hundred groups of four. One group is one percent. What is one percent of four hundred?"],["Expected","Four."],["Teacher","So twenty-three percent is twenty-three fours."],["Expected","Ninety-two."],["Teacher","That is the unitary method, and it is the unit rate from Unit 3. Find the value of one, then multiply. Same move, new setting."]],
+   watch:["Students who find 1% correctly then multiply by the wrong number, using the quantity rather than the percent. Label the two numbers before multiplying: one is a percent, one is an amount."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · double number line",
+   moves:["Draw a double number line with percent below and amount above.","Tick 0%, 100% and the given percent; read the amount.","Mark 1% and use it as the stepping stone.","Draw the same problem as a bar split into the percent and the remainder."],
+   say:[["Teacher","Percent on the bottom, amount on top. One hundred percent sits above the whole quantity."],["Teacher","Where does twenty-three percent land?"],["Expected","Just under a quarter of the way."],["Teacher","So the answer is a bit under a hundred. You knew the size before you calculated. That is the check built into the picture."]],
+   readaloud:["Say the picture aloud: 'Two aligned scales. The lower counts percent from zero to one hundred. The upper counts the amount from zero to four hundred. A vertical line at twenty-three percent meets the upper scale at ninety-two.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · three routes",
+   moves:["Route one: benchmarks, combining 10%, 5% and 1%.","Route two: convert to a decimal and multiply.","Route three: unitary, finding 1% then multiplying.","Work 23% of 400 by all three and compare the effort."],
+   say:[["Teacher","Three routes, one answer. Which was fastest here?"],["Expected","One percent then times twenty-three."],["Teacher","And for fifty percent of an awkward number?"],["Expected","Just halve it."],["Teacher","So the numbers choose the route. Say which one you used, so a reader can follow you."]],
+   watch:["Students who convert 23% to 2.3 and multiply, giving an answer larger than the whole. The size check catches it: a percent under 100 must give an answer smaller than the quantity."]}
+ ],
+ guided:[["Find 23% of 400.","92"],["Find 8% of 250.","20"],["Find 60% of 45.","27"],["Find 12% of 75.","9"]],
+ worksheet:[
+  {t:"A · Find the percent",d:"State the route you used.",items:["20% of 150","35% of 80","8% of 400","65% of 200","12% of 250","150% of 60"]},
+  {t:"B · In context",d:"Answer with units.",items:["15% tip on $60","30% off a $250 coat","8% tax on $75","40% of 350 students","5% of 1200 mL","70% of 90 minutes"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A class of 30 has 40% girls. How many boys? Show two routes to the answer.","Explain why finding 1% first works for any percent, however awkward.","Is 20% of 50 the same as 50% of 20? Calculate both and explain what you notice."]}],
+ exit:["Find 30% of 90.","Find 7% of 200.","Explain how to find any percent once you know 1%."],
+ crit:"Mastery: both correct and item 3 describes multiplying the one-percent value. Reteach if the decimal conversion is wrong by a factor of ten — the size check is the fix and should be written on every problem.",
+ support:["Provide the double number line pre-drawn with 0%, 1% and 100% ticked.","Restrict to the unitary route until it is fluent, then introduce alternatives.","Permit calculators once the route has been named."],
+ extend:["Find 37.5% of 96 by the route you think shortest, then by a second route. Which was actually quicker?","Explain why a% of b always equals b% of a, using the decimal form."],
+ access:["Touch: grouping counters into hundredths makes one percent a physical share.","Attention: naming the route before calculating gives a decision point that structures the work.","Language: 'of' means multiply for the third unit running; connect it rather than restating it.","Vision: double number lines carry the percent scale below and the amount above consistently, so the layout is never re-read."]
+},
+{
+ day:5, short:"Percent as bar", title:"Bar models for percent problems",
+ objective:"Model a percent problem with a bar divided into ten parts, and use it to find a part, the whole, or a remainder.",
+ standards:["6.RP.A.3c","6.RP.A.3"],
+ vocab:[["Percent bar","A bar representing 100%, usually split into ten parts of 10%."],["Remainder","The percent not accounted for: 100% minus the part."],["Whole","The quantity that 100% refers to. Naming it is the first step, always."],["Complement","35% and 65% are complements — they make a whole."]],
+ materials:["Blank percent bars printed ten to a page","Rulers","Counters","Highlighters"],
+ warmup:{mins:5,text:"Post: '60% of the students walk to school. There are 300 students.' Ask two questions the class could answer from this, then ask one they could not. The one they cannot answer usually involves a quantity nobody gave. Say: naming the whole is the first move in every percent problem."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · building the whole",
+   moves:["Build a bar of ten cubes representing 100% of 300, so each cube is 30.","Take six cubes for 60% and count: 180.","Identify the remaining four cubes as 40% and 120.","Rebuild with a whole of 250 and note that each cube changes value."],
+   say:[["Teacher","Ten cubes, three hundred students. What is one cube worth?"],["Expected","Thirty."],["Teacher","Take sixty percent."],["Expected","Six cubes — a hundred and eighty."],["Teacher","And what is left?"],["Expected","A hundred and twenty, which is forty percent."],["Teacher","Both answers came from the same bar. You did not calculate the second one at all."]],
+   watch:["Students who change the number of cubes when the whole changes. The bar is always ten cubes because it is always 100%; only the value per cube moves."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · labelled percent bar",
+   moves:["Draw a percent bar with 0% and 100% at the ends and ten divisions.","Label the whole beneath 100% and one division beneath 10%.","Shade the given percent and brace the remainder.","Solve for a part, then use the same bar to solve for the remainder."],
+   say:[["Teacher","Label the whole under one hundred percent before you shade anything. If you cannot, the problem has not given it to you and that is worth noticing."],["Teacher","Now the remainder. Do you need to calculate it?"],["Expected","No, it's what's left on the bar."],["Teacher","Subtracting from the whole is usually faster than finding forty percent from scratch."]],
+   readaloud:["Say the picture aloud: 'A bar divided into ten equal parts. Zero percent is marked at the left end and one hundred percent at the right, with three hundred written beneath. The first six parts are shaded and labelled one hundred eighty; a brace beneath the final four parts carries a question mark.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · from the model",
+   moves:["Write the calculation from the bar, one line per step.","Solve for the remainder by subtraction rather than by a second percent calculation.","Handle a percent not landing on a tenth, such as 35%.","Check that the part and the remainder sum to the whole."],
+   say:[["Teacher","Thirty-five percent does not land on a division. What do you do?"],["Expected","Split one part in half."],["Teacher","So the bar still works, it just needs one extra cut. The model bends before it breaks."]],
+   watch:["Students who calculate the remainder independently and get an answer that does not sum to the whole. Require the sum check on every problem; it catches both errors at once."]}
+ ],
+ guided:[["60% of 300 students walk. How many?","180"],["How many do not walk?","120"],["35% of 200. Find the part and the remainder.","70 and 130"],["Why is the bar always ten parts?","Because it always represents 100%, whatever the whole is worth."]],
+ worksheet:[
+  {t:"A · Part and remainder",d:"Draw the bar. Give both answers.",items:["40% of 250","75% of 80","30% of 420","15% of 600","55% of 140","90% of 70"]},
+  {t:"B · In context",d:"Draw the bar first.",wide:true,
+   items:["A school of 480 has 45% boys. How many girls?","A tank holds 250 L and is 60% full. How much more will it hold?","Of 320 tickets, 85% are sold. How many remain?"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why finding the remainder by subtraction is usually faster than calculating it directly.","A problem says 30% of the class are absent, but never says how many students there are. What can and cannot be answered?","Two schools both report 40% absent. Can you tell which had more absences? Explain."]}],
+ exit:["50% of 340. Find the part.","Find the remainder.","Explain why you label the whole before shading."],
+ crit:"Mastery: both correct and item 3 says the whole is what the percent refers to. Reteach if part and remainder do not sum to the whole — require the sum check in writing, since it catches errors without new teaching.",
+ support:["Provide bars pre-divided with 10% marked so only labelling remains.","Restrict to percents landing on a tenth before introducing 35% and 55%.","Keep cubes available for building the bar physically."],
+ extend:["A bar shows 30% as 45. Find the whole without calculating 1% first. Explain your route.","Design a percent bar for a whole of 360 and mark every benchmark on it."],
+ access:["Touch: ten cubes make the bar rebuildable for any whole, with only the cube value changing.","Vision: the shaded part and the braced remainder use distinct line styles, not colour alone.","Attention: the sum check gives a definite endpoint to every problem.","Language: 'the whole' is named explicitly on every model; post the phrase, since the concept carries the unit."]
+},
+{
+ day:6, short:"Find the whole", title:"Finding the whole when you know a part",
+ objective:"Find the whole quantity given a part and its percent, using the unitary method and a bar model.",
+ standards:["6.RP.A.3c","6.RP.A.3"],
+ vocab:[["Working backwards","Given the part, find the whole — the reverse of days 4 and 5."],["One percent","The stepping stone. Divide the part by its percent."],["Whole","100%. The thing you are solving for today."],["Reasonable","The whole must be larger than the part, whenever the percent is under 100."]],
+ materials:["Percent bars","Counters","Calculators after the model is drawn"],
+ warmup:{mins:5,text:"Post: '20% of a number is 30.' Ask whether the number is bigger or smaller than 30, before anything else. Everyone should say bigger. Say: hold that. Half the errors in today's lesson are answers smaller than the part, and you have just made them impossible to miss."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · rebuilding the whole",
+   moves:["Lay out 30 counters and declare them 20% of an unknown whole.","Work out that 20% is two of the ten bar parts, so one part is 15.","Build all ten parts to reveal the whole: 150.","Repeat with 40 counters as 25% of a whole."],
+   say:[["Teacher","Thirty counters are twenty percent. How many parts of the bar is that?"],["Expected","Two."],["Teacher","So one part is fifteen. Build the other eight."],["Expected","A hundred and fifty altogether."],["Teacher","You built the whole from a piece of it. Notice you found ten percent on the way, not one percent — because twenty divides by ten neatly. Read the numbers first."]],
+   watch:["Students who multiply the part by the percent, giving 30 × 20. The size check catches it, but so does asking what operation undoes taking a percent."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · bar with the unknown whole",
+   moves:["Draw a percent bar with the known part shaded and labelled.","Mark 100% at the right end with a question mark beneath.","Divide the shaded portion to find one part's value.","Multiply out to fill the whole bar."],
+   say:[["Teacher","This time the question mark is under one hundred percent, not under a piece. That is the only difference from yesterday."],["Teacher","Which end do you know?"],["Expected","The shaded part."],["Teacher","So work from the part outwards. The direction changed; the model did not."]],
+   readaloud:["Say the picture aloud: 'A bar of ten equal parts. The first two are shaded and labelled thirty. Zero percent is at the left end and one hundred percent at the right, with a question mark written beneath the right end.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · unitary backwards",
+   moves:["Divide the part by its percent to find 1%.","Multiply by 100 to find the whole.","Work a case where the percent is over 100.","Check by taking the original percent of your answer."],
+   say:[["Teacher","Divide by the percent, multiply by a hundred. Two steps, always the same two."],["Teacher","Now check it. Take twenty percent of a hundred and fifty."],["Expected","Thirty — that's what we started with."],["Teacher","Working backwards has a free check built in. Use it every time; it costs ten seconds."]],
+   watch:["Students who find 1% correctly and report it as the whole. The bar shows one small part against ten — the visual gap between them is the reminder."]}
+ ],
+ guided:[["20% of a number is 30. Find the number.","150"],["25% of a number is 40. Find the number.","160"],["60% of a number is 48. Find the number.","80"],["Check: is 60% of 80 equal to 48?","Yes — the check confirms it."]],
+ worksheet:[
+  {t:"A · Find the whole",d:"Show the one-percent step. Check your answer.",items:["10% is 7","25% is 30","50% is 84","20% is 46","40% is 100","75% is 60"]},
+  {t:"B · In context",d:"Draw the bar first.",wide:true,
+   items:["30% of a class are absent — that is 9 students. How many in the class?","A coat is reduced by 20%, saving $16. What was the original price?","15% of a tank is 45 L. What is the tank's capacity?"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why the whole must be larger than the part when the percent is under 100.","A student says 20% of a number is 30, so the number is 6. Explain what they did and why it is wrong.","120% of a number is 60. Find the number and explain why it is smaller than the part."]}],
+ exit:["25% of a number is 20. Find the number.","10% of a number is 6.5. Find the number.","Explain how to check an answer when working backwards."],
+ crit:"Mastery: both correct and item 3 describes taking the original percent of the answer. Reteach if the part is multiplied by the percent — require the bigger-or-smaller sentence before any calculation, since it makes the error visible immediately.",
+ support:["Provide bars with the part pre-shaded and 100% marked.","Restrict to percents dividing into 100 evenly before others.","Permit calculators once the bar is drawn."],
+ extend:["A 15% deposit is $75. Find the full price, then find what a 25% deposit would be.","Why does the method still work when the percent is over 100? Work an example and explain the picture."],
+ access:["Touch: physically building the missing parts of the bar makes 'finding the whole' a construction rather than an inverse operation.","Attention: the bigger-or-smaller sentence is a required first written step, giving early traction on each problem.","Vision: the question mark sits under 100% in a consistent position across every diagram today.","Language: 'working backwards' is named and contrasted with yesterday explicitly, since the models look nearly identical."]
+},
+{
+ day:7, short:"Percent change", title:"Percent increase and decrease",
+ objective:"Calculate a percent increase or decrease, and find the new amount by two routes.",
+ standards:["6.RP.A.3c","6.NS.B.3"],
+ vocab:[["Increase","The amount goes up. New amount is more than 100% of the original."],["Decrease","The amount goes down."],["Original","The starting amount — always 100%, and always the thing the percent refers to."],["Multiplier","The single number that does the whole job: 1.15 for a 15% increase."]],
+ materials:["Price tags before and after a sale","Percent bars","Calculators after the model is drawn"],
+ warmup:{mins:5,text:"Post: a $50 item goes up by 20%, then down by 20%. Ask whether it returns to $50. Take a vote and record it. Do not resolve it — this is day nine's question, and the split is more useful left open."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · adding to and taking from",
+   moves:["Build 50 counters as 100% of an original price.","Add 20% by building 10 more counters and count the new total.","Separately, remove 20% from the original and count.","Note that the original bar is the reference for both."],
+   say:[["Teacher","Fifty counters, one hundred percent. Add twenty percent."],["Expected","Ten more — sixty."],["Teacher","Now start again from fifty and take twenty percent off."],["Expected","Forty."],["Teacher","Both times, twenty percent meant ten. Because both times you took it from the same fifty. Watch what happens when that stops being true."]],
+   watch:["Students who take the percent of the new amount rather than the original. The original is the reference until a problem says otherwise; underline it before starting."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · bar past 100%",
+   moves:["Draw a percent bar to 100% and extend it past the end for an increase.","Label the extension 20% and the total 120%.","Draw a decrease as an unshaded portion, labelling the remainder 80%.","Read the new amount from each diagram."],
+   say:[["Teacher","An increase runs past the end of the bar. What percent is the new amount, altogether?"],["Expected","A hundred and twenty."],["Teacher","And the decrease?"],["Expected","Eighty percent."],["Teacher","So both are just a percent of the original — one over a hundred, one under. That is the second route, and it is one step instead of two."]],
+   readaloud:["Say the picture aloud: 'A bar of ten equal parts is labelled one hundred percent, with two further parts drawn beyond its right end in a different style. A brace spans all twelve parts and is labelled one hundred twenty percent.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · two routes",
+   moves:["Route one: find the change, then add or subtract.","Route two: find the new percent, then take it of the original in one step.","Work a 15% increase and a 30% decrease by both routes.","Introduce the multiplier form and connect it to the bar."],
+   say:[["Teacher","Route two is one calculation instead of two. Why does it work?"],["Expected","Because the new amount is a hundred and fifteen percent of the old one."],["Teacher","And 1.15 is that percent as a decimal. The multiplier is not a trick — it is the bar written as one number."]],
+   watch:["Students who add the percent to the amount rather than to 100% — computing 50 + 20 for a 20% increase on $50. Ask what the units of each number are; you cannot add a percent to dollars."]}
+ ],
+ guided:[["Increase 50 by 20%.","60"],["Decrease 80 by 25%.","60"],["Increase 240 by 15%.","276"],["What multiplier gives a 30% decrease?","0.7"]],
+ worksheet:[
+  {t:"A · Increase",d:"Use whichever route you prefer; state which.",items:["60 by 10%","150 by 20%","45 by 40%","320 by 5%","90 by 150%","24 by 25%"]},
+  {t:"B · Decrease",d:"Use whichever route you prefer; state which.",items:["80 by 25%","200 by 15%","64 by 50%","350 by 20%","45 by 60%","120 by 5%"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A $240 bike has 15% off. Find the sale price by both routes and say which you would use in a shop.","Explain why a 20% increase is the same as multiplying by 1.2.","A price rises 10% then falls 10%. Predict whether it returns to the original, then test with $200."]}],
+ exit:["Increase 40 by 25%.","Decrease 150 by 20%.","Explain why a 15% increase means finding 115% of the original."],
+ crit:"Mastery: both correct and item 3 links the increase to a percent over 100. Reteach if the percent is added to the amount directly — asking what each number measures fixes this faster than a restated rule.",
+ support:["Provide the two-route frame with both methods laid out and only the numbers to fill.","Restrict to route one until it is fluent, then introduce the multiplier.","Permit calculators once the route is named."],
+ extend:["Find the multiplier for a 12.5% decrease and use it. Why is the multiplier route better when there are several changes in a row?","A price increases by 25%. What percent decrease returns it to the original? It is not 25% — explain why."],
+ access:["Touch: building the extension past the original bar makes 'over 100%' physically visible rather than notional.","Vision: the extension beyond 100% is drawn in a distinct style so an increase is recognisable at a glance.","Language: 'of the original' is the phrase carrying the whole lesson; post it and require it in every spoken answer.","Attention: the two routes are laid out in a fixed frame so choosing between them is the only decision."]
+},
+{
+ day:8, short:"Discount & tax", title:"Discount, tax and tip in context",
+ objective:"Solve real-money problems involving discount, tax and tip, and decide whether an estimate or an exact answer is needed.",
+ standards:["6.RP.A.3c","6.NS.B.3"],
+ vocab:[["Discount","A percent taken off the price."],["Sale price","What you actually pay after the discount."],["Tax","A percent added to the price."],["Tip","A percent added by choice, usually estimated rather than calculated."]],
+ materials:["Real receipts and sale advertisements","Menus","Calculators after the estimate is written","Percent bars"],
+ warmup:{mins:5,text:"Show a real advertisement reading '30% off, was $80'. Ask for the sale price mentally, then ask how confident they are. Then show one reading '30% off, was $83.40' and ask the same. Say: one of those needed a calculator and one did not, and knowing which is a skill."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · working with real prices",
+   moves:["Sort real advertisements by whether the saving can be found mentally.","Calculate the saving and the sale price for three of them.","Add a tax percent to a price and compare with a printed receipt.","Estimate a tip on a menu total using benchmarks."],
+   say:[["Teacher","Which of these can you do in your head?"],["Expected","The ones with round prices and easy percents."],["Teacher","And for the others, you estimate first and then calculate. Estimating is not the lazy option; it is how you know the calculator did not lie to you."]],
+   watch:["Students who find the discount amount and report it as the sale price. Ask what the question asked for — the saving or the price. Underline it, as in Unit 3."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · bar for the sale price",
+   moves:["Draw a bar for the original price with the discount shaded off.","Label the remaining portion as the sale price percent.","Draw a tax problem as an extension past 100%.","Draw a two-stage problem: discount first, then tax on the sale price."],
+   say:[["Teacher","For the two-stage one, which amount does the tax apply to?"],["Expected","The sale price, not the original."],["Teacher","So the second bar starts where the first one ended. Draw them in order and the trap disappears."]],
+   readaloud:["Say the picture aloud: 'Two bars stacked. The upper is the original price of eighty dollars, with thirty percent shaded off at the right end and the remaining seventy percent braced and labelled fifty-six. The lower bar begins at fifty-six and extends beyond it by a small labelled portion for tax.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · estimate then calculate",
+   moves:["Estimate every answer with benchmarks before calculating.","Calculate the exact value and compare with the estimate.","Work a two-stage discount-then-tax problem.","Decide for three situations whether an estimate suffices."],
+   say:[["Teacher","Estimate first, in writing. Then calculate. If they disagree by a lot, one of them is wrong and you will find out now instead of at the till."],["Teacher","When is an estimate enough?"],["Expected","For a tip, or checking if you can afford something."],["Teacher","And when is it not?"],["Expected","When you're actually paying an exact amount."]],
+   watch:["Students who apply the tax to the original price in a two-stage problem. Draw the second bar starting from the sale price; the order is visible and the error becomes hard to make."]}
+ ],
+ guided:[["$80 with 30% off. Find the sale price.","$56"],["$56 plus 8% tax. Find the total.","$60.48"],["Estimate an 18% tip on $45.","About $8 — 10% is 4.50, 20% is 9"],["$120 with 25% off. Find the saving and the sale price.","$30 saved, $90 to pay"]],
+ worksheet:[
+  {t:"A · Discount",d:"Give the saving and the sale price.",items:["$60, 20% off","$45, 10% off","$250, 30% off","$84, 25% off","$150, 15% off","$36, 50% off"]},
+  {t:"B · Tax and tip",d:"Estimate first, then calculate.",items:["$40 plus 8% tax","$85 plus 5% tax","15% tip on $60","20% tip on $47","$120 plus 12% tax","18% tip on $35"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A $200 jacket has 25% off, then 8% tax is added. Find the final price, showing both stages.","Explain why the tax is applied to the sale price and not the original.","A shop offers 20% off or $15 off a $70 item. Which is better, and at what price would they be equal?"]}],
+ exit:["$90 with 20% off. Find the sale price.","Estimate a 15% tip on $40.","Explain why you estimate before calculating a discount."],
+ crit:"Mastery: both correct, with the estimate within a dollar or two of the exact value. Reteach if the discount amount is reported as the sale price — that is a reading error and the underline-the-question routine is the fix.",
+ support:["Provide a frame with 'saving' and 'sale price' as separate labelled boxes.","Restrict to single-stage problems before discount-then-tax.","Permit calculators once the estimate is written."],
+ extend:["A shop offers 20% off, then a further 10% off at the till. Is that the same as 30% off? Test it on $100 and explain.","When is a $15-off coupon better than 20% off? Find the crossover price."],
+ access:["Touch: real advertisements and receipts make the mathematics recognisably the same thing students meet outside school.","Attention: the estimate-then-calculate pairing splits each problem into two short tasks with a checkpoint between.","Language: 'saving' and 'sale price' are easy to conflate; label both explicitly on every frame.","Motor: calculators are permitted after the estimate, so effort goes to the reasoning."]
+},
+{
+ day:9, short:"Successive change", title:"Two changes in a row, and why they don't cancel",
+ objective:"Calculate the result of two successive percent changes, and explain why an increase and a decrease of the same percent do not return to the original.",
+ standards:["6.RP.A.3c","6.NS.B.3"],
+ vocab:[["Successive","One change after another, each applied to the amount before it."],["Reference amount","What the percent is taken of — it changes between the first and second step."],["Multiplier","1.2 for up 20%, 0.8 for down 20%. Multiply them to combine."],["Net change","The single percent change equivalent to both steps together."]],
+ materials:["Counters","Percent bars, two per problem","Calculators after the prediction is written"],
+ warmup:{mins:5,text:"Return to day seven's open question: $50 up 20%, then down 20%. Ask for a written prediction from every student before any calculation — yes or no, returns to $50. Collect the tally. Then say: we settle it today, and the interesting part is not the answer but why so many of us expected the other one."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · rebuilding between steps",
+   moves:["Build 50 counters. Add 20% by building 10 more, giving 60.","Now take 20% off — but count out 20% of 60, not of 50.","Find that 12 are removed, leaving 48.","Compare the 10 added with the 12 removed and name the difference."],
+   say:[["Teacher","Twenty percent of sixty. Count it out."],["Expected","Twelve."],["Teacher","But you only added ten. Why is the second twenty percent bigger?"],["Expected","Because it's twenty percent of a bigger number."],["Teacher","There it is. The percent stayed the same; the thing it was a percent of did not. That is the whole lesson and you found it by counting."]],
+   watch:["Students who take the second percent of the original. This is the error the whole day exists to expose — do not correct it before they have built both versions and compared."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · two bars in sequence",
+   moves:["Draw bar one for the original, with the increase extending past 100%.","Draw bar two beginning at the new amount, redrawn as its own 100%.","Shade the decrease off bar two.","Compare the final length with the original bar drawn to the same scale."],
+   say:[["Teacher","Bar two starts fresh. Its one hundred percent is sixty, not fifty."],["Teacher","Why redraw it?"],["Expected","Because the second percent is of the new amount."],["Teacher","Every successive change gets its own bar. The moment you reuse the first bar, you have made the mistake."]],
+   readaloud:["Say the picture aloud: 'Two bars drawn to the same scale, one above the other. The upper begins at fifty and extends by a fifth to sixty. The lower begins at sixty and has a fifth removed from its right end, ending at forty-eight, visibly shorter than the upper bar started.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · multipliers",
+   moves:["Write the two steps as multipliers: 1.2 then 0.8.","Multiply them: 1.2 × 0.8 = 0.96, a 4% net decrease.","Verify against the counted answer of 48.","Work two increases and two decreases in sequence."],
+   say:[["Teacher","One point two times nought point eight."],["Expected","Nought point nine six."],["Teacher","Ninety-six percent of the original. A four percent loss overall. And forty-eight is ninety-six percent of fifty, so the multipliers agree with the counters."],["Teacher","Two changes, one multiplication. That is why multipliers earn their keep here and not on day seven."]],
+   watch:["Students who add the percent changes, giving 20% up and 20% down as zero. The counters already showed otherwise; send them back to the two piles rather than repeating the rule."]}
+ ],
+ guided:[["$50 up 20%, then down 20%.","$48"],["$200 down 10%, then up 10%.","$198"],["Multiplier for up 25% then down 20%.","1.25 × 0.8 = 1, so no net change"],["Why don't they cancel?","The second percent is taken of a different amount."]],
+ worksheet:[
+  {t:"A · Two steps",d:"Show both stages. Give the final amount.",items:["$80 up 10%, then down 10%","$150 down 20%, then up 20%","$60 up 50%, then down 50%","$400 down 25%, then up 25%"]},
+  {t:"B · Multipliers",d:"Write both multipliers, then the net multiplier.",items:["up 20%, up 10%","down 10%, down 30%","up 50%, down 20%","down 25%, up 40%"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain in your own words why a 20% rise then a 20% fall loses money overall.","Find a pair of changes that genuinely cancel. What must be true of the multipliers?","A shop advertises 20% off, then another 10% off at the till. Is that 30% off? Show the calculation and explain the advertising."]}],
+ exit:["$100 up 10%, then down 10%. Find the final amount.","Write the two multipliers for that.","Explain why the two changes do not cancel."],
+ crit:"Mastery: both correct and item 3 identifies the changing reference amount. Reteach if percents are added — return to the two counter piles, since the difference between ten added and twelve removed is the argument, not the rule.",
+ support:["Provide a two-bar frame with the second bar's 100% left blank to be filled from step one.","Restrict to the multiplier route once the two-bar route is understood.","Permit calculators after the written prediction."],
+ extend:["Find two successive changes that produce exactly a 10% net increase. How many answers are there?","A population falls 10% a year for three years. What is the net change? Why is it not 30%?"],
+ access:["Touch: counting out twelve where ten were added is the entire argument, available without any notation.","Vision: the two bars are drawn to the same scale and vertically aligned so the shortfall is directly visible.","Attention: the written prediction before calculating gives every student a stake in the result.","Language: 'of what?' is the question to ask at every step; post it, since it is also day five's and day eleven's key question."]
+},
+{
+ day:10, short:"Percent change", title:"Expressing a change as a percent",
+ objective:"Express an actual change as a percentage of the original amount, and explain why the original is always the denominator.",
+ standards:["6.RP.A.3c","6.RP.A.3"],
+ vocab:[["Percent change","The change expressed as a percent of the original."],["Original","The starting amount, and always the denominator."],["Increase or decrease","The direction, which must be stated with the number."],["Change","New amount minus original — positive or negative."]],
+ materials:["Price comparison cards","Percent bars","Calculators after the estimate"],
+ warmup:{mins:5,text:"Post two price rises: $10 to $12, and $100 to $105. Ask which is the bigger rise. Both answers appear — $5 is more money, but $2 is a bigger share. Say: both are true, and today is about which question you are actually being asked."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · comparing the change to the start",
+   moves:["Build 10 counters, then add 2, and lay the 2 against the original 10.","Group the original into fives to see that 2 is one fifth of it.","Repeat with 100 to 105 and compare the change to the original.","Compare the two fractions and rank the changes."],
+   say:[["Teacher","Lay the two extra counters against the original ten. What fraction is that?"],["Expected","One fifth."],["Teacher","Twenty percent. Now the other one — five against a hundred."],["Expected","Five percent."],["Teacher","So the smaller amount of money was the bigger change. Both statements were true and they answer different questions."]],
+   watch:["Students who compare the change to the new amount, giving 2 out of 12. The original is the reference — it is what the change happened to. Ask which number came first in time."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · change against the original bar",
+   moves:["Draw the original as a bar labelled 100%.","Draw the change as an extension or a removal, labelled with its amount.","Express the change as a fraction of the original bar, then as a percent.","Draw a decrease case and note that the method is unchanged."],
+   say:[["Teacher","The original bar is one hundred percent. Always. What is the extension worth as a fraction of it?"],["Expected","Two out of ten."],["Teacher","And for a decrease, the removed piece is still measured against the original bar. The direction changes; the denominator does not."]],
+   readaloud:["Say the picture aloud: 'A bar of ten units is labelled original, one hundred percent. Two further units are drawn beyond its right end in a different style and labelled increase. A brace beneath those two units carries the label twenty percent.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · change over original",
+   moves:["Write percent change as the change divided by the original, times 100.","Calculate for an increase and a decrease, stating the direction each time.","Estimate first using benchmarks.","Compare two changes of different sizes on different originals."],
+   say:[["Teacher","Change over original, times a hundred. And say the direction — a twenty percent change tells me nothing on its own."],["Teacher","Why is the original the denominator and not the new amount?"],["Expected","Because you're saying how much it changed compared to where it started."],["Teacher","That sentence is the definition. Keep it."]],
+   watch:["Students who divide by the new amount. It produces a plausible number and no size check will catch it, so it must be caught by asking which value is the starting point."]}
+ ],
+ guided:[["$10 rises to $12. Find the percent increase.","20%"],["$80 falls to $60. Find the percent decrease.","25%"],["$100 rises to $105. Find the percent increase.","5%"],["Which is the bigger change: $10 to $12, or $100 to $105?","The first — 20% against 5%."]],
+ worksheet:[
+  {t:"A · Percent change",d:"State increase or decrease with your answer.",items:["20 to 25","50 to 40","80 to 100","150 to 120","36 to 45","200 to 190"]},
+  {t:"B · In context",d:"Estimate first.",wide:true,
+   items:["A shirt drops from $40 to $30. Find the percent decrease.","A class grows from 25 to 28 students. Find the percent increase.","A journey time falls from 90 min to 72 min. Find the percent decrease."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why the original amount is always the denominator when finding percent change.","A price goes from $20 to $25, then back to $20. Find both percent changes and explain why they differ.","Two shops raise prices by $5. In one the item was $20, in the other $50. Which raised prices more? Justify with percentages."]}],
+ exit:["$40 rises to $50. Find the percent increase.","$60 falls to $45. Find the percent decrease.","Explain why you divide by the original."],
+ crit:"Mastery: both correct with direction stated, and item 3 says the original is the starting point being compared against. Reteach if the new amount is used as the denominator — no size check catches this, so it needs direct attention.",
+ support:["Provide a frame with 'change' and 'original' as pre-labelled boxes to fill before dividing.","Restrict to increases before decreases.","Permit calculators once the two numbers are identified."],
+ extend:["A price rises 25% then falls back to the original. What percent decrease was that? Explain why it is not 25%.","Can a percent decrease be more than 100%? What about an increase? Explain both."],
+ access:["Touch: laying the change physically alongside the original makes the comparison a direct one rather than a division.","Attention: the two-box frame forces the identification step before the arithmetic.","Language: the direction word is part of the answer; require 'increase' or 'decrease' in every response.","Vision: the change is drawn in a distinct style against the original bar, never distinguished by colour alone."]
+},
+{
+ day:11, short:"Percent & ratio", title:"Percent, ratio and fraction together",
+ objective:"Move between percent, ratio and fraction descriptions of the same situation, and choose the most useful one for a given question.",
+ standards:["6.RP.A.3c","6.RP.A.1","6.RP.A.3"],
+ vocab:[["Part-whole","The form percent always takes: a part out of the whole."],["Part-part","The form a ratio usually takes — and the source of most errors here."],["Complement","If 40% are girls, 60% are boys."],["Translate","Rewrite the same relationship in another notation."]],
+ materials:["Percent bars","Counters in two colours","Fraction strips"],
+ warmup:{mins:5,text:"Post: '40% of a class are girls.' Ask for the ratio of girls to boys. Collect answers; 40 : 100 and 2 : 5 and 2 : 3 will all appear. Say: only one is right, and the reason is the same one that caught us in Unit 3 — a percent is part to whole and a ratio is usually part to part."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · one set, three descriptions",
+   moves:["Build 40 red and 60 blue counters and lay them in one row.","Describe the reds as a percent of the total, then as a ratio to the blues.","Simplify both and lay them side by side.","Name what changed between the two descriptions."],
+   say:[["Teacher","Forty out of a hundred. As a percent?"],["Expected","Forty percent."],["Teacher","Now reds to blues."],["Expected","Forty to sixty, which is two to three."],["Teacher","Two to three, not two to five. What was the whole in each case?"],["Expected","All hundred for the percent, just the blues for the ratio."]],
+   watch:["Students who write the ratio as 40 : 100 without noticing they have compared part to whole. Ask what the second number counts — the blues, or everything?"]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · one bar, two braces",
+   moves:["Draw a bar split 40 : 60 with the whole labelled 100%.","Brace the whole for the percent reading.","Brace only the blue portion for the part-part ratio reading.","Read all three notations off the single diagram."],
+   say:[["Teacher","One picture, two braces, three notations. The picture never changed."],["Teacher","Which brace gives the percent?"],["Expected","The one over everything."],["Teacher","So before you write anything, point at the brace you are using. That is the whole discipline."]],
+   readaloud:["Say the picture aloud: 'A bar divided into two sections, the left forty units and the right sixty. One brace spans the entire bar labelled one hundred percent. A second brace spans only the right-hand sixty units, labelled boys.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · translating",
+   moves:["Percent to ratio: write part : remainder, then simplify.","Ratio to percent: find the total units, then each part over the total.","Handle a three-term ratio converted to three percents.","Confirm the percents sum to 100."],
+   say:[["Teacher","Ratio two to three. What percent is the first part?"],["Expected","Two out of five — forty percent."],["Teacher","And the second?"],["Expected","Sixty."],["Teacher","They sum to a hundred. If yours do not, you have found your own mistake without me."]],
+   watch:["Students who convert 2 : 3 into 20% and 30%. The denominator is the total units, five, not ten. The sum check catches it every time."]}
+ ],
+ guided:[["40% are girls. Find the ratio of girls to boys.","2 : 3"],["Ratio 3 : 5. What percent is the first part?","37.5%"],["Ratio 1 : 4. Write both percents.","20% and 80%"],["Ratio 2 : 3 : 5. Write all three percents.","20%, 30%, 50%"]],
+ worksheet:[
+  {t:"A · Percent to ratio",d:"Give the part-to-part ratio in simplest form.",items:["25% are red","60% are boys","10% are damaged","75% passed","80% are ripe","50% are new"]},
+  {t:"B · Ratio to percent",d:"Give a percent for each part. Check they sum to 100.",items:["1 : 3","2 : 3","3 : 7","1 : 1","2 : 3 : 5","1 : 2 : 2"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why 40% girls gives the ratio 2 : 3 and not 2 : 5.","A ratio is 3 : 5 and there are 64 items. Find both amounts and both percents.","Why must the percents from a ratio always add to 100? What would it mean if they did not?"]}],
+ exit:["30% are red. Find the ratio of red to blue.","Ratio 1 : 4. What percent is the first part?","Explain why the percents from a ratio must sum to 100."],
+ crit:"Mastery: both correct and item 3 says the parts together make the whole. Reteach if part-whole and part-part are confused — this is Unit 3 day one and day eleven resurfacing, so return to that bar rather than teaching it again.",
+ support:["Provide bars with both braces pre-drawn and labelled.","Restrict to two-term ratios before three.","Allow the sum-to-100 check to be done with a calculator."],
+ extend:["A ratio gives percents of 37.5% and 62.5%. Recover the ratio in simplest form.","Can a three-term ratio give three whole-number percents? Find one that does and one that does not."],
+ access:["Touch: one set of counters described two ways shows the numbers did not change, only the question.","Language: 'a percent of what?' and 'a ratio to what?' are the two questions; post both.","Memory: name the Unit 3 connection explicitly — this is one idea appearing a third time, not a third idea.","Vision: the two braces use distinct line styles and sit at different heights so they cannot be conflated."]
+},
+{
+ day:12, short:"Over 100%", title:"Percents greater than 100 and less than 1",
+ objective:"Interpret percents above 100 and below 1, and explain what each means in context.",
+ standards:["6.RP.A.3c","6.NS.B.3"],
+ vocab:[["Over 100%","More than the whole — possible for growth, impossible for a share of a fixed total."],["Under 1%","A very small share: 0.5% is a two-hundredth."],["Context decides","Whether a percent over 100 makes sense depends on what is being measured."],["Growth","The usual setting for percents above 100."]],
+ materials:["Percent bars, extendable","Counters","News items quoting large percentage rises","Calculators"],
+ warmup:{mins:5,text:"Post two headlines: 'profits up 250%' and '250% of students passed'. Ask which one makes sense. The first does; the second cannot. Say: the arithmetic is identical and only one is meaningful, so today is as much about reading as calculating."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · building past the whole",
+   moves:["Build 20 counters as 100% and add another 20 to make 200%.","Add ten more to reach 250% and count the total.","Build 0.5% of 400 by finding 1% first and halving it.","Compare the physical size of 250% and 0.5% of the same quantity."],
+   say:[["Teacher","Two hundred percent is twice the whole. Build it."],["Teacher","And nought point five percent of four hundred?"],["Expected","One percent is four, so half of that is two."],["Teacher","Two counters against a hundred. Percents run from very small to very large, and both ends turn up in real reporting."]],
+   watch:["Students who read 0.5% as 50% or as 5%. The decimal point inside a percent is easy to lose. Read it aloud as 'half of one percent' and require that phrasing."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · extended bar",
+   moves:["Draw a bar to 100% and extend it to 250%, marking each 100%.","Label the original amount beneath 100% and the total beneath 250%.","Draw a second diagram showing 0.5% as a sliver of one bar.","Contrast the two diagrams side by side."],
+   say:[["Teacher","Two and a half whole bars. That is what two hundred fifty percent looks like."],["Teacher","Now the small one. Can you even see nought point five percent on this bar?"],["Expected","Barely."],["Teacher","Which is why they are usually quoted as decimals or fractions instead. The notation people choose tells you something about the size."]],
+   readaloud:["Say the picture aloud: 'Two and a half bars are drawn end to end, each divided into ten parts. Marks at the end of the first and second bars are labelled one hundred percent and two hundred percent, with the final half bar ending at two hundred fifty percent.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · calculating and interpreting",
+   moves:["Convert percents over 100 to decimals and fractions.","Calculate 250% of a quantity and 0.5% of a quantity.","Decide for four statements whether a percent over 100 is possible.","Interpret a reported percent increase over 100 in words."],
+   say:[["Teacher","Profits up two hundred fifty percent. Are profits now two hundred fifty percent of what they were?"],["Expected","No — up by that much, so three hundred fifty percent."],["Teacher","That is the reporting trap. 'Up by' and 'now is' differ by exactly one hundred percent, and newspapers get it wrong often."]],
+   watch:["Students who read 'up 250%' as 'now 250% of the original'. Draw the bar: the increase sits beyond the original, so the total is 350%."]}
+ ],
+ guided:[["Find 250% of 40.","100"],["Find 0.5% of 600.","3"],["A price rises 150%. What percent of the original is it now?","250%"],["Can 120% of a class have passed? Explain.","No — you cannot have more passes than students."]],
+ worksheet:[
+  {t:"A · Calculate",d:"Give the exact value.",items:["200% of 35","150% of 60","250% of 12","0.5% of 800","2.5% of 400","300% of 7"]},
+  {t:"B · Possible or not",d:"State yes or no with a reason.",wide:true,
+   items:["120% of the students passed the test","Sales rose by 400% this year","135% of the tank is full","The population is now 180% of what it was"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain the difference between 'up 200%' and 'now 200% of the original'.","A price rises from $20 to $70. Express this as a percent increase, and as a percent of the original.","Why is 0.5% usually written as a decimal or fraction rather than a percent in scientific writing?"]}],
+ exit:["Find 150% of 80.","Find 0.5% of 200.","Explain when a percent over 100 makes sense and when it does not."],
+ crit:"Mastery: both correct and item 3 distinguishes a growing quantity from a share of a fixed total. Reteach if 'up 250%' is read as 'now 250%' — the extended bar makes the difference visible and no verbal explanation matches it.",
+ support:["Provide extendable bars pre-marked at each 100%.","Restrict to whole percents over 100 before introducing fractional percents.","Give the phrase 'half of one percent' as the required reading for 0.5%."],
+ extend:["A quantity doubles. What percent increase is that? What if it triples?","Find a real news headline quoting a percent over 100 and check whether it says 'up by' or 'now is'."],
+ access:["Vision: each 100% boundary is marked distinctly so the count of whole bars is readable at a glance.","Language: reading 0.5% aloud as 'half of one percent' prevents the most common misreading; require it.","Attention: the possible-or-not sorting task is short and gives a break from calculation.","Touch: building past the whole with counters makes 'more than everything' concrete rather than paradoxical."]
+},
+{
+ day:13, short:"Percent problems", title:"Multi-step percent problems",
+ objective:"Solve multi-step problems combining percent with ratio, rate and decimals, choosing a model before calculating.",
+ standards:["6.RP.A.3c","6.RP.A.3","6.NS.B.3"],
+ vocab:[["Multi-step","The first answer feeds the second."],["Model first","Draw before calculating — the routine from Units 2 and 3."],["Reference","What each percent is taken of. It can change between steps."],["Report","Answer the question asked, not the value found on the way."]],
+ materials:["Percent bars","Bar-model paper","Highlighters","Calculators after the model is drawn"],
+ warmup:{mins:5,text:"Post a three-step problem and ask only for the sequence of steps, not any numbers. Take two different orderings if they arise and discuss whether both work. Some do; some do not, because a later step depends on an earlier answer."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · acting out the sequence",
+   moves:["Act out a two-step situation with counters: find a percent, then a percent of the result.","Record each step's answer before starting the next.","Repeat with a step that returns to the original amount instead.","Name which steps used the original and which used the new amount."],
+   say:[["Teacher","Step one gave you thirty. Step two asks for a percent — of what?"],["Expected","Of the thirty, not the original."],["Teacher","Read each step and ask 'of what?' before you calculate. That question has now caught you out on days five, nine and eleven. It is the question of this unit."]],
+   watch:["Students who apply every percent to the original. Ask them to point at the amount each step refers to in the problem text before calculating."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · one model per step",
+   moves:["Draw a percent bar for step one and a fresh bar for step two.","Label each bar's 100% with the correct reference amount.","Combine a percent bar with a ratio bar in a single problem.","Check that each bar's 100% matches the text."],
+   say:[["Teacher","New step, new bar, new hundred percent. Never reuse the first bar."],["Teacher","This problem has a ratio and a percent. Which do you draw first?"],["Expected","Whichever the problem gives first."],["Teacher","Usually. But sometimes the second gives you the number the first one needs. Read the whole thing before drawing anything."]],
+   readaloud:["Say the page aloud: 'Two bars are drawn one above the other. The upper is a percent bar for a total of two hundred, with thirty percent shaded. The lower is a separate bar whose full length equals the shaded portion of the upper, sixty, and is split in the ratio two to three.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · chained calculation",
+   moves:["Write one line per step, labelling each answer.","Estimate the final answer before calculating.","Convert between percent, fraction and decimal where it shortens the work.","Re-read the question and confirm the reported quantity."],
+   say:[["Teacher","Estimate first. Roughly what should this come to?"],["Expected","About forty."],["Teacher","So four hundred means a decimal-point error and you will catch it here, not on the last line."],["Teacher","And the last thing, always?"],["Expected","Read the question again."]],
+   watch:["Students who report an intermediate value. The underline-and-report routine has now run for three units; name it as the same habit rather than a new instruction."]}
+ ],
+ guided:[["30% of 200, then 25% of that.","60, then 15"],["$80 with 20% off, then 10% tax on the sale price.","$64, then $70.40"],["40% of a class of 30 are girls; 25% of the girls play sport. How many?","12 girls, 3 play sport"],["A ratio 2 : 3 splits 150; find 20% of the larger part.","90, so 18"]],
+ worksheet:[
+  {t:"A · Two steps",d:"Draw a model for each step. Estimate first.",wide:true,
+   items:["A class of 40 has 45% boys. 20% of the boys wear glasses. How many is that?","A $250 coat has 30% off, then 8% tax is added. Find the final price.","A tank of 400 L is 60% full. 25% of the water is used. How much remains in the tank?"]},
+  {t:"B · Mixed with ratio and rate",d:"Name the models you used.",wide:true,
+   items:["$180 is shared 4 : 5. Find 15% of the larger share.","A 3 kg bag costs $18. The price rises 20%. Find the new price per kilogram.","Of 240 students, 35% walk. Of those who walk, the ratio of boys to girls is 3 : 4. How many girls walk?"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain how you decide which amount each percent in a multi-step problem refers to.","Write a two-step problem combining a percent and a ratio, then solve it.","Why is estimating especially useful on multi-step percent problems?"]}],
+ exit:["50% of 120, then 25% of that.","$60 with 10% off, then 5% tax. Find the total.","Explain why each step may have a different 100%."],
+ crit:"Mastery: both correct and item 3 identifies the reference amount changing between steps. Reteach if every percent is applied to the original — this is day nine's error in a longer problem, so revisit the two-bar picture.",
+ support:["Provide a two-box frame labelled step 1 and step 2, each with its own bar.","Reduce to single-step problems and build up.","Permit calculators for all arithmetic so effort goes into the modelling."],
+ extend:["Write a three-step problem using a percent, a ratio and a rate. Solve it and write the key.","A problem can be done percent-first or ratio-first. Solve it both ways and say which was shorter."],
+ access:["Attention: the step-per-line format and the two-box frame externalise sequencing rather than requiring it be held in memory.","Language: word problems carry the heaviest reading load in the unit; read each aloud before independent work.","Motor: calculators are permitted once the model is drawn.","Vision: each step's bar is drawn in a fixed position so the page layout is predictable across problems."]
+},
+{
+ day:14, short:"Mixed practice", title:"Mixed practice across percent",
+ objective:"Select and apply the right percent method across mixed unlabelled problems, and justify each choice.",
+ standards:["6.RP.A.3c","6.RP.A.3","6.NS.B.3"],
+ vocab:[["Method selection","Deciding which approach fits before starting — today's actual skill."],["Signal words","Off, plus tax, of, rose to, was, find the original."],["Justify","State why the chosen method fits."],["Check","Confirm the answer is plausible and answers the question asked."]],
+ materials:["Mixed problem cards","Percent bars and blank number lines","Highlighters","Calculators after the model is drawn"],
+ warmup:{mins:5,text:"Post four unlabelled problems — a percent-of, a find-the-whole, a percent change and a successive change. Ask students only to sort them by type, not to solve. Compare sortings and discuss disagreements; the disagreements identify exactly which distinction is still fuzzy."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · sorting by type",
+   moves:["Sort problem cards into four piles: percent of, find the whole, percent change, successive change.","Compare with another pair and discuss differences.","Identify the signal words that drove each decision.","Build a class signal-word list on chart paper."],
+   say:[["Teacher","Sort first, solve later. What word put that one in the find-the-whole pile?"],["Expected","'Was' — it gives you the part and asks for the start."],["Teacher","Collect those words. They are how the question tells you its shape."]],
+   watch:["Students who sort by context — putting all the money problems together — rather than by structure. Ask what is given and what is asked, not what the objects are."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · model before arithmetic",
+   moves:["Draw the chosen model for four mixed problems without solving them.","Swap with a partner and check each model against its problem.","Revise any model that does not fit.","Then solve all four."],
+   say:[["Teacher","All four models first, no arithmetic. Then swap and check each other's."],["Teacher","If your partner cannot reconstruct the problem from your model, the model is not finished."]],
+   readaloud:["Say the page aloud: 'Four diagrams in a two-by-two grid. Upper left, a percent bar with a shaded portion and a labelled whole. Upper right, a percent bar with the whole marked by a question mark. Lower left, an original bar with an extension. Lower right, two bars in sequence, the second beginning where the first ended.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · solving and justifying",
+   moves:["Solve the four modelled problems with one line per step.","Estimate before each calculation.","Check each answer against the question asked.","Write one sentence per problem justifying the method."],
+   say:[["Teacher","One sentence per problem on why that method. That sentence is what transfers to next week's numbers."],["Teacher","The arithmetic you already have. The choosing is what we are building."]],
+   watch:["Students who solve correctly but cannot articulate the choice. Have them explain to a partner; the explanation is the object of the lesson."]}
+ ],
+ guided:[["35% of 240.","84"],["20% of a number is 46. Find the number.","230"],["$60 rises to $75. Find the percent increase.","25%"],["$100 up 20%, then down 20%.","$96"]],
+ worksheet:[
+  {t:"A · Mixed, unlabelled",d:"Name the type, then solve.",wide:true,
+   items:["A $180 bike has 25% off. What is the sale price?","15% of a number is 45. What is the number?","A price rises from $80 to $92. What is the percent increase?","A class of 36 has 25% absent. How many are present?"]},
+  {t:"B · Mixed, harder",d:"Estimate first, then solve.",wide:true,
+   items:["A $240 item has 20% off, then 10% tax. Find the final price.","A population of 5000 falls 12%, then rises 5%. Find the final population.","30% of a school of 620 walk to school. Of those, 40% are boys. How many girls walk?"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["List three signal words and the method each points to.","Write two problems with the same numbers but different types, and explain the difference.","Which percent method have you found most reliable, and why?"]}],
+ exit:["40% of 150.","25% of a number is 30. Find the number.","Name one signal word and the method it points to."],
+ crit:"Mastery: both correct and item 3 links a signal word to a method. Reteach by type rather than by topic — the sorting activity identifies exactly which distinction each student is missing.",
+ support:["Provide the signal-word list as a permanent reference.","Reduce to two problem types before mixing four.","Allow the sorting step to be done with a partner throughout."],
+ extend:["Write four problems, one of each type, using the same two numbers throughout.","Find a problem solvable by two methods and write both solutions."],
+ access:["Attention: sorting before solving splits one long task into two shorter ones with a clear boundary.","Language: the signal-word list is built with the class rather than handed over, which makes it usable.","Vision: models are drawn in a fixed grid position so the page layout is predictable.","Memory: the signal-word list stays available during the assessment — recognising the type is the skill, not recalling the list."]
+},
+{
+ day:15, short:"Review", title:"Review stations and unit assessment",
+ objective:"Consolidate percent across all methods, and self-identify which topics need more work before the assessment.",
+ standards:["6.RP.A.3c","6.RP.A.3","6.NS.B.3"],
+ vocab:[["Self-assessment","Judging your own accuracy honestly — a skill, and one being assessed today."],["Station","A short focused task at one method, then rotate."],["Signal word","The phrase that tells you which method the question wants."],["Justify","Say why, not just what — required at every station."]],
+ materials:["All manipulatives from the unit","Station cards, one per method","Self-assessment grid","Assessment papers"],
+ warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: those are the stations to visit first, and the tally is data, not a confession."},
+ stages:[
+  {k:"c",label:"Concrete",mins:15,sense:"touch · rotation",
+   moves:["Five stations: converting notations, percent of a quantity, finding the whole, percent change, successive change and context problems.","Each station holds its manipulative and three graded tasks.","Students choose a starting station from the warm-up tally.","Every station requires one written justification, not just answers."],
+   say:[["Teacher","Start where you are least confident, not where you are quickest."],["Teacher","One sentence per station explaining why your method works. Answers alone do not count as finished."],["Teacher","Twelve minutes per station. Rotate on the signal whether or not you have finished."]],
+   watch:["Students who visit only easy stations. The private warm-up slip is the accountability tool — ask them to show which station addresses what they wrote."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · one model per method",
+   moves:["On a single page, draw one model for each of the five station topics.","Annotate each with its explaining sentence and the signal word that triggers it.","Keep the page as the revision sheet.","Identify any model that could not be drawn and return to that station."],
+   say:[["Teacher","One page, five models, five sentences. Better than any notes you could copy."],["Teacher","A model you cannot draw names the topic to go back to. The blank space is the useful part."]],
+   readaloud:["Say the page aloud: 'Five diagrams across two rows. A hundredths grid; a percent bar with a shaded part; a percent bar with a question mark under one hundred percent; an original bar with an extension beyond it; and two sequential bars, the second beginning where the first ended.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · assessment",
+   moves:["Complete the written assessment covering all fifteen days.","Self-mark section A against a displayed key.","Record scores by topic on the self-assessment grid.","Identify two weakest topics and write one specific next step for each."],
+   say:[["Teacher","Self-mark honestly. Marking generously only costs you later, and the gaps show up in Unit 5 anyway."],["Teacher","One specific next step per weak topic. 'Practise percents' is not a step. 'Redraw the find-the-whole bar for three problems' is."]],
+   watch:["Students whose self-assessment does not match their station work. The mismatch signals either low confidence or an unnoticed gap, and those need opposite responses."]}
+ ],
+ guided:[["Write 3/8 as a percent.","37.5%"],["Find 45% of 260.","117"],["30% of a number is 42. Find the number.","140"],["$120 up 15%, then down 10%.","$124.20"]],
+ worksheet:[
+  {t:"A · Convert and calculate",d:"Show your working.",items:["7/20 as a percent","0.045 as a percent","65% as a fraction","30% of 450","8% of 250","125% of 60"]},
+  {t:"B · Find the whole and the change",d:"State direction where relevant.",items:["25% is 35 — find the whole","60% is 108 — find the whole","40 rises to 52 — percent change","90 falls to 63 — percent change","$70 with 20% off","$45 plus 6% tax"]},
+  {t:"C · Two steps",d:"Draw a model for each step.",wide:true,
+   items:["A $320 coat has 25% off, then 8% tax. Find the final price.","A town of 8000 grows 15%, then falls 10%. Find the population.","Of 500 students, 42% take the bus. Of those, 3 : 7 are boys to girls. How many boys?"]},
+  {t:"D · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why a 20% rise followed by a 20% fall does not return to the original.","Explain why the original amount is the denominator when finding percent change.","Choose the topic you found hardest this unit. Explain it with a picture, as if teaching someone who missed the lesson."]}],
+ exit:["Name the topic you are most confident with and give one reason.","Name the topic you want more practice on and give one specific next step.","Complete: percent means ___."],
+ crit:"Mastery: assessment sections A and B at 80 percent or better, with self-assessment matching actual performance within one band. Reteach in small groups by method rather than reteaching the unit; the self-assessment grid tells you how to form those groups.",
+ support:["Reduce to three stations covering conversion, percent of, and finding the whole.","Provide worked examples at each station as reference.","Allow the assessment across two sittings if sustained concentration is the barrier rather than the mathematics."],
+ extend:["Design a station task of your own, including the manipulative and the justification prompt.","Write a problem requiring three of the unit's methods in sequence, then solve it and write the key."],
+ access:["Motor: stations are arranged so each can be completed seated, with materials brought to the student.","Attention: twelve-minute rotations with a clear signal give predictable structure.","Vision: every station card uses the same layout so the format is never re-learned.","Language: the self-assessment grid pairs picture icons with topic names so it can be completed without heavy reading.","Hearing: the rotation signal is both visual and audible."]
+}
+];
+</script>
+<script src="curriculum-core.js"></script>
+</body>
+</html>
