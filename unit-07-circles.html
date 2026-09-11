@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit 7 &mdash; Circles | Grade 6 CPA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="curriculum.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+    <h1>Unit 7 &mdash; Circles</h1>
+    <p class="sub">&pi; is not handed over in this unit &mdash; it is measured. Students wrap string around tins for two days, divide circumference by diameter, and find the same number coming back from a coin and a bucket alike. The area formula is built the same way, by cutting a circle into wedges and fanning them into a shape they already know how to measure. The scatter in their measurements is kept, not tidied away: a pattern that survives messy data is one worth believing.</p>
+    <div class="facts">
+      <span><b>13</b> instructional days</span>
+      <span><b>3</b> weeks</span>
+      <span><b>55</b> minutes per lesson</span>
+      <span><b>6.G</b> standards</span>
+    </div>
+  </div>
+  <div class="wrap"><nav class="daynav" id="daynav" aria-label="Lesson days"></nav></div>
+</header>
+
+<main class="wrap">
+  <div class="lesson">
+    <div id="content"></div>
+    <aside class="side" id="side"></aside>
+  </div>
+  <div class="pager">
+    <button id="prev">&larr; Previous lesson</button>
+    <button id="next">Next lesson &rarr;</button>
+  </div>
+</main>
+
+<!-- Unit-specific manipulatives. Must load before curriculum-core.js. -->
+<script>
+/* circleUnroll — Unit 7 (Circles).
+   Two tools in one file. This one derives pi by measurement, not assertion:
+   the circumference straightens out against a line marked in diameter-lengths,
+   and lands a little past the third mark every time, whatever the circle.
+   Declare before curriculum-core.js. */
+window.__EXTRA_TOOLS__=Object.assign(window.__EXTRA_TOOLS__||{},(function(){
+const rm=()=>(!!window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#5B7189", ROSE="#C2536B";
+const r2=x=>Math.round(x*100)/100;
+
+/* Real classroom measurements are never exactly pi. These are plausible
+   hand-measured values for common round objects, with the scatter left in —
+   the lesson depends on students seeing the spread, not a clean 3.14. */
+const OBJECTS=[
+ {k:"jar lid",        d:7.4,  c:23.5},
+ {k:"tin can",        d:10.2, c:31.8},
+ {k:"dinner plate",   d:26.0, c:82.0},
+ {k:"coin",           d:2.4,  c:7.4},
+ {k:"bucket",         d:29.5, c:93.0},
+ {k:"roll of tape",   d:9.8,  c:30.5}
+];
+
+function circleUnroll(host){
+  const box=el("div","tool");
+  box.innerHTML=`<h3>Unrolling a circle<span class="mins">tool</span></h3>
+    <p class="sense">sight · measurement</p>
+    <p class="how">The circumference is straightened out along a line already marked off in diameter-lengths. It always lands just past the third mark — a bit more than three diameters, never exactly three, and never four.</p>
+    <div class="ctl">
+      <label for="cud">diameter</label>
+      <input id="cud" type="number" value="10" min="1" max="40" step="0.1" aria-label="diameter in centimetres">
+      <span aria-hidden="true">cm</span>
+      <label for="cuc">measured circumference</label>
+      <input id="cuc" type="number" value="31.4" min="1" max="200" step="0.1" aria-label="measured circumference in centimetres">
+      <span aria-hidden="true">cm</span>
+      <button class="btn go" id="cugo">Unroll it</button>
+    </div>
+    <div class="ctl picker" id="cup"></div>
+    <div class="stage-area"><svg viewBox="0 0 700 260" role="img" style="width:100%;height:auto"></svg></div>
+    <div class="out" id="cuout"></div>
+    <p class="note">Every real measurement here is slightly off, and that is honest. The ratio is the same for every circle ever measured; the wobble is in the string and the ruler, not in the circle.</p>`;
+  host.appendChild(box);
+  const svg=box.querySelector("svg"), out=box.querySelector("#cuout"), $=s=>box.querySelector(s);
+  $("#cup").innerHTML=OBJECTS.map((o,i)=>`<button class="btn sm" data-i="${i}">${o.k}</button>`).join("");
+
+  function draw(){
+    const d=Math.max(0.1,+$("#cud").value||1);
+    const c=Math.max(0.1,+$("#cuc").value||1);
+    const ratio=c/d;
+    const X0=60, W=580;
+    /* the line is scaled so 4 diameter-lengths span the full width */
+    const per = W/4;
+    const cLen = Math.min(W, per*ratio);
+    const noAnim=rm();
+
+    let s="";
+    /* the circle, drawn to a fixed display size regardless of real diameter */
+    const R=52, cx=110, cy=68;
+    s+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${INK}" stroke-width="2.5"/>`;
+    s+=`<line x1="${cx-R}" y1="${cy}" x2="${cx+R}" y2="${cy}" stroke="${A}" stroke-width="2.5"/>`;
+    s+=`<text x="${cx}" y="${cy-8}" font-family="Inconsolata" font-size="12" fill="${A}" text-anchor="middle">d = ${r2(d)}</text>`;
+    s+=`<text x="${cx}" y="${cy+R+20}" font-family="Inconsolata" font-size="12" fill="${MUT}" text-anchor="middle">circumference ${r2(c)}</text>`;
+
+    /* the measuring line, marked in diameter-lengths */
+    const LY=190;
+    s+=`<line x1="${X0}" y1="${LY}" x2="${X0+W}" y2="${LY}" stroke="${MUT}" stroke-width="1.5"/>`;
+    for(let i=0;i<=4;i++){
+      const x=X0+i*per;
+      s+=`<line x1="${x}" y1="${LY-9}" x2="${x}" y2="${LY+9}" stroke="${INK}" stroke-width="2"/>`;
+      s+=`<text x="${x}" y="${LY+26}" font-family="Inconsolata" font-size="12" fill="${MUT}" text-anchor="middle">${i}d</text>`;
+      if(i<4){
+        s+=`<line x1="${x+3}" y1="${LY+13}" x2="${x+per-3}" y2="${LY+13}" stroke="${A}" stroke-width="1" opacity=".5"/>`;
+      }
+    }
+    /* the unrolled circumference laid along it */
+    s+=`<rect class="bmseg" x="${X0}" y="${LY-24}" width="${cLen}" height="14" rx="3" fill="${T}" opacity=".85"${noAnim?"":' style="transform-origin:left center"'}/>`;
+    s+=`<line x1="${X0+cLen}" y1="${LY-30}" x2="${X0+cLen}" y2="${LY+9}" stroke="${ROSE}" stroke-width="2"/>`;
+    s+=`<text x="${X0+cLen}" y="${LY-38}" font-family="Inconsolata" font-size="13" fill="${ROSE}" text-anchor="middle">lands here</text>`;
+    /* the leftover past 3d, called out */
+    if(ratio>3&&ratio<4){
+      const x3=X0+3*per;
+      s+=`<path d="M${x3} ${LY+44} L${x3} ${LY+52} L${X0+cLen} ${LY+52} L${X0+cLen} ${LY+44}" fill="none" stroke="${ROSE}" stroke-width="1.5"/>`;
+      s+=`<text x="${(x3+X0+cLen)/2}" y="${LY+68}" font-family="Inconsolata" font-size="12" fill="${ROSE}" text-anchor="middle">a bit more: ${r2(ratio-3)} of a diameter</text>`;
+    }
+    svg.innerHTML=s;
+    svg.setAttribute("aria-label",
+      `A circle of diameter ${r2(d)} centimetres beside a horizontal line marked at zero, one, two, three and four diameter-lengths. The circumference of ${r2(c)} centimetres is drawn as a bar laid along that line, reaching ${r2(ratio)} diameter-lengths — past the third mark but short of the fourth.`);
+
+    const off=Math.abs(ratio-Math.PI);
+    out.innerHTML=`Circumference ÷ diameter = ${r2(c)} ÷ ${r2(d)} = <b>${r2(ratio)}</b>.<br>
+      The bar reached past the <b>3d</b> mark but nowhere near <b>4d</b>${ratio>3&&ratio<4?`, overshooting three diameters by ${r2(ratio-3)} of one`:""}.<br>
+      <span style="color:${MUT}">${off<0.02
+        ? "That is about as close to the true ratio as hand measurement gets."
+        : off<0.08
+          ? `Off the true ratio by ${r2(off)} — normal for string and a ruler. The circle is exact; the measuring is not.`
+          : `Off by ${r2(off)}, which is more than measuring error usually explains. Worth re-measuring — did the string slip, or was the diameter taken off-centre?`}</span><br>
+      <span style="color:${T}">Whatever circle you pick, this number keeps coming out the same. That is why it earned its own name.</span>`;
+  }
+  $("#cugo").addEventListener("click",draw);
+  box.querySelectorAll("input").forEach(i=>i.addEventListener("input",draw));
+  $("#cup").addEventListener("click",e=>{
+    const b=e.target.closest("button[data-i]");if(!b)return;
+    const o=OBJECTS[+b.dataset.i];
+    $("#cud").value=o.d;$("#cuc").value=o.c;draw();
+  });
+  draw();
+}
+
+/* ---------- circle area by rearranging wedges ---------- */
+function circleWedges(host){
+  const box=el("div","tool");
+  box.innerHTML=`<h3>Rearranging a circle<span class="mins">tool</span></h3>
+    <p class="sense">sight · decomposition</p>
+    <p class="how">Cut the circle into wedges and fan them out, points alternating up and down. The more wedges you cut, the flatter the top and bottom get — until it is a shape you already know how to measure.</p>
+    <div class="ctl">
+      <label for="cwr">radius</label>
+      <input id="cwr" type="number" value="5" min="1" max="20" step="0.5" aria-label="radius in centimetres">
+      <span aria-hidden="true">cm</span>
+      <label for="cwn">number of wedges</label>
+      <input id="cwn" type="range" min="4" max="40" step="2" value="8" aria-label="number of wedges" style="width:180px">
+      <span id="cwnv" style="font-family:var(--mono);font-size:.9rem;color:var(--ink-2)">8</span>
+    </div>
+    <div class="stage-area"><svg viewBox="0 0 700 300" role="img" style="width:100%;height:auto"></svg></div>
+    <div class="out" id="cwout"></div>
+    <p class="note">Drag the slider up slowly. Nothing about the circle changes — the same paper is on the table throughout. Only how it is arranged changes, and the rearrangement is what makes it measurable.</p>`;
+  host.appendChild(box);
+  const svg=box.querySelector("svg"), out=box.querySelector("#cwout"), $=s=>box.querySelector(s);
+
+  function wedgePath(cx,cy,r,a0,a1,flip){
+    const rad=a=>Math.PI*a/180;
+    const x0=cx+r*Math.cos(rad(a0)), y0=cy-r*Math.sin(rad(a0));
+    const x1=cx+r*Math.cos(rad(a1)), y1=cy-r*Math.sin(rad(a1));
+    const large=(a1-a0)>180?1:0;
+    return `M${cx} ${cy} L${x0} ${y0} A${r} ${r} 0 ${large} 0 ${x1} ${y1} Z`;
+  }
+
+  function draw(){
+    const r=Math.max(0.5,+$("#cwr").value||1);
+    const n=Math.max(4,+$("#cwn").value||8);
+    $("#cwnv").textContent=n;
+    const per=360/n;
+    const R=64;
+
+    let s="";
+    /* left: the intact circle, cut into wedges */
+    const cx=120, cy=90;
+    for(let i=0;i<n;i++){
+      const fill = i%2 ? T : A;
+      s+=`<path d="${wedgePath(cx,cy,R,i*per,(i+1)*per)}" fill="${fill}" opacity=".8" stroke="#fff" stroke-width="1"/>`;
+    }
+    s+=`<text x="${cx}" y="${cy+R+24}" font-family="Inconsolata" font-size="12" fill="${MUT}" text-anchor="middle">radius ${r2(r)}</text>`;
+    s+=`<text x="${cx}" y="${cy+R+42}" font-family="Inconsolata" font-size="12" fill="${MUT}" text-anchor="middle">${n} wedges</text>`;
+
+    /* right: the same wedges fanned into a near-parallelogram */
+    const BX=270, BY=150, halfW=190, wW=(halfW*2)/(n/2);
+    for(let i=0;i<n;i++){
+      const up = i%2===0;
+      const slot=Math.floor(i/2);
+      const x = BX + slot*wW + (up?0:wW/2);
+      const fill = up ? A : T;
+      /* each wedge drawn as a thin triangle of height R, alternating direction */
+      const y0 = up ? BY+R : BY-R;
+      const apex = up ? BY-R : BY+R;
+      s+=`<path class="bmseg" d="M${x} ${y0} L${x+wW} ${y0} L${x+wW/2} ${apex} Z" fill="${fill}" opacity=".8" stroke="#fff" stroke-width="1"/>`;
+    }
+    /* the bounding shape it is approaching */
+    s+=`<rect x="${BX}" y="${BY-R}" width="${halfW*2}" height="${R*2}" fill="none" stroke="${INK}" stroke-width="2" stroke-dasharray="6 4"/>`;
+    s+=`<line x1="${BX-14}" y1="${BY-R}" x2="${BX-14}" y2="${BY+R}" stroke="${P}" stroke-width="2"/>`;
+    s+=`<text x="${BX-22}" y="${BY}" font-family="Inconsolata" font-size="12" fill="${P}" text-anchor="middle" transform="rotate(-90 ${BX-22} ${BY})">height = r</text>`;
+    s+=`<line x1="${BX}" y1="${BY+R+22}" x2="${BX+halfW*2}" y2="${BY+R+22}" stroke="${P}" stroke-width="2"/>`;
+    s+=`<text x="${BX+halfW}" y="${BY+R+40}" font-family="Inconsolata" font-size="12" fill="${P}" text-anchor="middle">base = half the circumference = πr</text>`;
+    svg.innerHTML=s;
+
+    const area=Math.PI*r*r;
+    const flatness = n>=20 ? "almost perfectly flat" : n>=12 ? "noticeably flatter" : "still visibly bumpy";
+    svg.setAttribute("aria-label",
+      `On the left, a circle of radius ${r2(r)} divided into ${n} equal wedges, alternately shaded. On the right, the same ${n} wedges fanned out in a row with points alternating up and down, forming a shape close to a rectangle. Its height is one radius and its base is half the circumference. With ${n} wedges the top and bottom edges are ${flatness}.`);
+
+    out.innerHTML=`With <b>${n} wedges</b>, the top and bottom edges are ${flatness}.<br>
+      The rearranged shape has height <b>r</b> and base <b>half the circumference</b>, which is <b>πr</b>.<br>
+      So its area is <b>πr × r = πr²</b> = π × ${r2(r)}² = <b>${r2(area)} cm²</b>.<br>
+      <span style="color:${MUT}">${n<12
+        ? "Push the slider higher. The bumps along the top are the only thing standing between this and an exact rectangle."
+        : n<24
+          ? "Nearly there. Each extra cut makes the wedge points narrower and the edges straighter."
+          : "At this many wedges the difference from a true rectangle is too small to draw. That is the argument: it never quite becomes a rectangle, but it gets as close as you like."}</span>`;
+  }
+  box.querySelectorAll("input").forEach(i=>i.addEventListener("input",draw));
+  draw();
+}
+
+return {circleUnroll,circleWedges};
+})());
+window.__EXTRA_NAMES__=Object.assign(window.__EXTRA_NAMES__||{},{circleUnroll:"Unrolling a circle",circleWedges:"Rearranging a circle"});
+</script>
+
+<script>
+/* Core tools: placeValue, rounding, shift, stepper, power, barModel, factors,
+   decimalGrid, rateLine. This unit adds circleUnroll and circleWedges. */
+window.UNIT={
+  number:7,
+  minutes:55,
+  tools:{
+     1:["circleUnroll"],  2:["circleUnroll"],  3:["circleUnroll"],  4:["circleUnroll"],
+     5:["circleUnroll"],  6:["circleUnroll"],  7:["circleWedges"],  8:["circleWedges"],
+     9:["circleWedges"], 10:["circleWedges"], 11:["circleWedges"], 12:["circleWedges"],
+    13:"all"
+  }
+};
+
+window.LESSONS=
+[
+{
+ day:1, short:"Parts of a circle", title:"Centre, radius, diameter",
+ objective:"Identify and measure the radius and diameter of a circle, and explain why the diameter is always exactly twice the radius.",
+ standards:["6.G.A.1"],
+ vocab:[["Centre","The point every part of the circle is the same distance from."],["Radius","The distance from the centre to the edge. Plural: radii."],["Diameter","A straight line right across, through the centre — two radii laid end to end."],["Circumference","The distance all the way round the edge. Not called the perimeter, though it is one."]],
+ materials:["Circular lids, tins and plates, several sizes per pair","Rulers","String","Paper circles to fold","Compasses if available"],
+ warmup:{mins:5,text:"Hold up a paper circle and ask where its centre is. Someone will point. Ask how they could be sure rather than eyeballing it. Hand out paper circles and let pairs try folding to find it before saying anything — two folds does it, and finding that out is better than being told."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · folding and measuring",
+   moves:["Fold a paper circle exactly in half, then in half again; the crossing point of the creases is the centre.","Measure from the centre to the edge in several directions and confirm the distance never changes.","Measure straight across through the centre and compare with the radius measurement.","Repeat with a different-sized circle and check the doubling holds."],
+   say:[["Teacher","Fold in half, then in half again. Where the creases cross is the centre — and you found it rather than guessed it."],["Teacher","Now measure from the centre to the edge, three different directions."],["Expected","Same distance every time."],["Teacher","That is what makes a circle a circle. Every point on the edge is exactly the same distance from the centre. Nothing else is true of every point on a square."],["Teacher","Now straight across through the centre."],["Expected","Double the radius."]],
+   watch:["Students who measure a chord that misses the centre and call it a diameter. A diameter must pass through the centre — check the crease. A line across that misses the centre is shorter, and that is worth seeing rather than just being warned about."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · labelled diagram",
+   moves:["Draw a circle and mark the centre with a dot.","Draw and label a radius, then a second radius in a different direction.","Draw a diameter and mark it as two radii end to end.","Draw a chord that does not pass through the centre and label it as not a diameter."],
+   say:[["Teacher","Two radii in a straight line through the centre make a diameter. That is the whole relationship — d equals two r, and you can see why on the drawing."],["Teacher","Now this line across. Is it a diameter?"],["Expected","No, it misses the centre."],["Teacher","And it is shorter. The diameter is the longest line you can draw across a circle, and it is the only one that goes through the middle."]],
+   readaloud:["Say the picture aloud: 'A circle with a dot marked at its centre. One line runs from the centre to the edge, labelled r. A second line runs all the way across through the centre, labelled d, and is visibly twice as long as the first.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · the relationship",
+   moves:["Write d = 2r and r = d ÷ 2.","Find the diameter given the radius, for five values.","Find the radius given the diameter, including a case giving a decimal answer.","Handle a worded case where only one measurement is stated."],
+   say:[["Teacher","Two formulas, but really one relationship read in two directions."],["Teacher","A circle has a diameter of 9 cm. What is its radius?"],["Expected","Four and a half."],["Teacher","Halves are fine. The radius does not have to be a whole number just because the diameter was."]],
+   watch:["Students who double when they should halve. Ask which is bigger before calculating — the diameter is always the longer one, so if the answer came out bigger than the diameter, the operation went the wrong way."]}
+ ],
+ guided:[["Radius 6 cm. Find the diameter.","12 cm"],["Diameter 14 cm. Find the radius.","7 cm"],["Diameter 9 cm. Find the radius.","4.5 cm"],["Why is the diameter always twice the radius?","A diameter is two radii laid end to end through the centre."]],
+ worksheet:[
+  {t:"A · Radius to diameter",d:"Include units.",items:["r = 4 cm","r = 11 cm","r = 2.5 cm","r = 20 cm","r = 7.5 cm","r = 0.5 m"]},
+  {t:"B · Diameter to radius",d:"Include units.",items:["d = 10 cm","d = 18 cm","d = 7 cm","d = 25 cm","d = 3 m","d = 1.6 cm"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain how folding a paper circle twice finds its centre, and why that works.","A line across a circle measures 8 cm but is not a diameter. What can you say about the circle's diameter? Explain.","A circular table has a radius of 60 cm. Will it fit through a doorway 1.1 m wide? Show your reasoning."]}],
+ exit:["Radius 8 cm. Find the diameter.","Diameter 15 cm. Find the radius.","Explain why a line across a circle that misses the centre is not a diameter."],
+ crit:"Mastery: both correct with units, and item 3 refers to passing through the centre. Reteach if radius and diameter are swapped — have them measure both on a real lid rather than restating the rule, since the physical difference in length settles it immediately.",
+ support:["Keep real circular objects on the desk for measuring throughout, not just in the concrete stage.","Provide circles with the centre already marked before asking students to find it.","Give a diagram reference card showing radius, diameter and a non-diameter chord side by side."],
+ extend:["How many diameters does a circle have? Explain your answer.","A circle's radius is r. Write an expression for the perimeter of a square that would exactly enclose it."],
+ access:["Touch: creased fold lines are readable by finger, so the centre can be located without sight.","Vision: radius and diameter are drawn in distinct line styles as well as labelled, and the non-diameter chord is dashed.","Language: 'radii' is an unfamiliar plural; use it alongside 'radiuses' being wrong, and post both forms.","Motor: pre-folded circles are available for students for whom accurate folding is the barrier rather than the mathematics."]
+},
+{
+ day:2, short:"Measuring round", title:"Measuring the distance round a circle",
+ objective:"Measure the circumference of a real circular object accurately, and recognise that measurement always carries some error.",
+ standards:["6.G.A.1"],
+ vocab:[["Circumference","The distance all the way around a circle."],["Measurement error","The small difference between a measured value and the true one. Always present, never a mistake in itself."],["Method","How you measured — string, rolling, or a tape. Each has its own sources of error."],["Record honestly","Write what you measured, not what you think it should have been."]],
+ materials:["Circular objects, at least six varied sizes","String or wool","Rulers and measuring tapes","Masking tape for the rolling method","Class results table on the board"],
+ warmup:{mins:5,text:"Hold up a tin and ask how you would measure the distance around it with a straight ruler. Take suggestions. Someone will say string. Ask what could go wrong with string, and collect the answers — slipping, stretching, overlap. Say: those are real, and today you will see them in your own numbers."},
+ stages:[
+  {k:"c",label:"Concrete",mins:13,sense:"touch · three methods",
+   moves:["Measure a tin's circumference by wrapping string and then measuring the string.","Measure the same tin by rolling it one full turn along a taped line.","Measure a third time with a flexible tape.","Compare the three results and record all of them, without averaging yet."],
+   say:[["Teacher","Three methods, same tin. Write down all three numbers even if they disagree."],["Expected","They're close but not identical."],["Teacher","Which do you trust most, and why?"],["Expected","The tape, maybe — less to go wrong."],["Teacher","Good reasoning. Now, the differences between your numbers are not failures. They are the size of your measuring error, and knowing that number is useful."]],
+   watch:["Students who quietly adjust a measurement to match their neighbour's. Record what you actually got — the whole point of day four depends on having honest, slightly scattered data rather than tidied numbers."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · unrolling the circumference",
+   moves:["Open the unrolling tool and enter a measured diameter and circumference.","Watch the circumference straighten out along the diameter-marked line.","Note where the bar lands relative to the 3d mark.","Try a second object's measurements and note where that one lands."],
+   say:[["Teacher","The tool lays your measurement out straight against a line marked in diameters. Where does it land?"],["Expected","Just past the three mark."],["Teacher","Try your second object. Where does that one land?"],["Expected","Also just past three."],["Teacher","Hold onto that. Two different circles, same landing spot. Day four asks why."]],
+   readaloud:["Say the picture aloud: 'A circle sits on the left with its diameter marked across. To the right, a horizontal line is marked at zero, one, two, three and four diameter-lengths. A bar representing the circumference is laid along it, ending just past the three mark.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · recording results",
+   moves:["Build a class results table: object, diameter, circumference, all measured by hand.","Record at least six objects across the class.","Note the spread in repeated measurements of the same object.","Leave the table on display for day four."],
+   say:[["Teacher","Every row is somebody's real measurement, including its error. We are not cleaning these up."],["Teacher","Why keep the messy numbers rather than the neat ones?"],["Expected","Because that's what we actually measured."],["Teacher","And because a pattern that survives messy data is a pattern you can believe. A pattern you only see after tidying might be something you created."]],
+   watch:["Students who round aggressively — writing 10 cm for 10.3 cm. Record to the precision the instrument allows, since day four's ratio calculation needs the detail."]}
+ ],
+ guided:[["A tin's circumference measured 31.5, 31.2 and 31.8 cm. What is the spread?","0.6 cm between the largest and smallest"],["Which method is least likely to slip?","A flexible tape, since it does not need transferring to a ruler."],["Why not just average the three straight away?","The individual values show how much error the method carries; averaging hides that."],["Is a measurement of 31.5 cm 'wrong' if the true value is 31.4?","No — it is within normal measuring error for string and a ruler."]],
+ worksheet:[
+  {t:"A · Record your measurements",d:"Measure each object three ways. Write all three.",wide:true,
+   items:["Object 1: diameter and circumference, three methods each.","Object 2: diameter and circumference, three methods each.","Object 3: diameter and circumference, three methods each."]},
+  {t:"B · Spread",d:"For each set of three, state the largest, smallest and spread.",items:["Set A: 22.1, 22.4, 22.0","Set B: 15.8, 16.2, 15.9","Set C: 40.5, 40.5, 41.0","Set D: 8.2, 8.0, 8.3"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Describe one source of error for each of the three measuring methods you used.","Two students measure the same plate and get 81.5 cm and 82.5 cm. Is one of them wrong? Explain.","Why is it better to record a messy measurement than to round it to a neat number?"]}],
+ exit:["State the circumference you measured for one object and the method you used.","Give one source of error in that method.","Explain why measuring error is not the same as making a mistake."],
+ crit:"Mastery: a real measurement recorded with its method, and item 3 distinguishing error from mistake. Reteach if measurements are being tidied or copied — the honesty of this data is what makes day four work, so it is worth protecting now.",
+ support:["Pair students so one measures and one records, rotating roles.","Provide flexible tapes for students who find the string transfer difficult.","Give a pre-drawn results table with columns labelled."],
+ extend:["Measure the same object ten times. What is the spread, and does averaging more measurements narrow it?","Design a measuring method more accurate than the three used today. What makes it better?"],
+ access:["Touch: string wrapping gives a tactile length that can be compared against a ruler by feel as well as sight.","Motor: the rolling method needs less fine control than string, and the flexible tape less still — offer all three so every student has a workable route.","Language: 'error' in everyday speech means a mistake; say explicitly that here it means the unavoidable imprecision of measuring.","Attention: three measurements per object is the cap, so the recording stays manageable."]
+},
+{
+ day:3, short:"The ratio", title:"Circumference ÷ diameter, every time",
+ objective:"Calculate the ratio of circumference to diameter for several circles, and notice that the result is the same regardless of the circle's size.",
+ standards:["6.G.A.1","6.RP.A.2"],
+ vocab:[["Ratio","Circumference divided by diameter — the Unit 3 idea applied here."],["Constant","A value that stays the same however the circles change."],["Scatter","The spread in the results, caused by measuring rather than by the circles."],["Invariant","A plainer word for the same idea: the thing that does not vary."]],
+ materials:["Day two's class results table","Calculators","Unrolling tool","Whiteboards"],
+ warmup:{mins:5,text:"Put yesterday's class results table back on the board. Ask what the biggest circle and the smallest circle have in common, if anything. Let the guessing run. Say: there is something, you have already measured it, and one division will reveal it."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · dividing every row",
+   moves:["Each pair calculates circumference ÷ diameter for their own measured objects.","Write every result on the board beside the object's name.","Order the results from smallest to largest.","Identify the range the whole class's results fall within."],
+   say:[["Teacher","Divide your circumference by your diameter. Every pair, every object."],["Teacher","Put your answers up. What do you notice?"],["Expected","They're all about three point one something."],["Teacher","A coin and a bucket. Wildly different sizes. Same ratio. Why on earth would that be?"],["Expected","Maybe it's always the same for circles."],["Teacher","That is exactly the claim, and you just found it in your own data rather than being handed it."]],
+   watch:["Students who divide diameter by circumference and get roughly 0.32. Ask which is bigger — the way round is longer than the way across, so the ratio must be more than one."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · why it lands past three",
+   moves:["Use the unrolling tool with several of the class's measurement pairs.","Note that every one lands past the 3d mark and short of 4d.","Try a deliberately wrong measurement and see the tool flag it.","Relate the landing point to the calculated ratio."],
+   say:[["Teacher","Every circle the class measured lands in the same narrow strip of that line. Try to find one that does not."],["Teacher","Now enter a deliberately bad measurement — say the circumference is 38 when the diameter is 10."],["Expected","The tool says that is more than measuring error explains."],["Teacher","So the ratio is stable enough that you can use it to catch a bad measurement. That is a real thing scientists do."]],
+   readaloud:["Say the picture aloud: 'The unrolled circumference bar reaches past the three-diameter mark by a small amount, with a bracket beneath that gap labelled with how much of a diameter the overshoot is.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · naming the constant",
+   moves:["Calculate the class average of all the ratios.","Compare with the accepted value 3.14159...","Introduce the symbol π as the name for this ratio.","Write C = πd and note it is just the ratio rearranged."],
+   say:[["Teacher","Your class average is close to three point one four. That number has a name, because people have been finding it for thousands of years."],["Teacher","π is not a mysterious constant handed down. It is the answer to 'how many diameters fit around a circle', and you measured it this week."],["Teacher","If C ÷ d equals π, what is C?"],["Expected","π times d."]],
+   watch:["Students who treat π as exactly 3.14. It is not — 3.14 is a rounding. Say explicitly that the decimal never ends and never repeats, and that this is why it gets a symbol rather than a value."]}
+ ],
+ guided:[["C = 31.4, d = 10. Find the ratio.","3.14"],["C = 23.5, d = 7.4. Find the ratio.","3.18"],["Class ratios: 3.10, 3.18, 3.14, 3.16. What is the average?","3.145"],["Why do the results scatter rather than all being identical?","The scatter comes from measuring error, not from the circles differing."]],
+ worksheet:[
+  {t:"A · Find the ratio",d:"Give each to two decimal places.",items:["C = 15.7, d = 5","C = 44, d = 14","C = 9.4, d = 3","C = 62.8, d = 20","C = 31.8, d = 10.2","C = 7.4, d = 2.4"]},
+  {t:"B · Spot the bad measurement",d:"State which are plausible and which need re-measuring.",items:["C = 30, d = 10","C = 36, d = 10","C = 25, d = 8","C = 20, d = 8"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain in your own words what π actually is, without using the word 'constant'.","Why does the ratio come out the same for a coin and for a bucket?","A student measures a circle and gets a ratio of 2.8. What most likely went wrong, and how would you check?"]}],
+ exit:["C = 47.1, d = 15. Find the ratio.","What is this ratio called?","Explain why the ratio is the same for every circle."],
+ crit:"Mastery: ratio correct, π named, and item 3 stating the ratio holds for all circles. Reteach if π is thought to be exactly 3.14 — that misconception causes trouble later when accuracy matters, so correct it explicitly now.",
+ support:["Provide calculators and a pre-drawn ratio column on the results table.","Restrict to the class's own measurements before textbook values.","Give the division set up as C ÷ d written out, so only the arithmetic remains."],
+ extend:["Look up how many decimal places of π have been calculated. Why would anyone bother?","If a circle's diameter doubles, what happens to its circumference? Predict, then test with the ratio."],
+ access:["Vision: the class results table uses one row per object with the ratio column added, so the pattern is a vertical scan.","Attention: calculating one ratio per pair, then pooling, keeps individual workload small while the class dataset stays large.","Language: π is a Greek letter and unfamiliar as a symbol; write it, name it aloud, and post it beside the words 'the circle ratio'.","Memory: connecting to Unit 3's ratio work makes this one application of a known idea, not a new topic."]
+},
+{
+ day:4, short:"Circumference", title:"Calculating circumference from the radius or diameter",
+ objective:"Calculate a circle's circumference using C = πd or C = 2πr, and estimate before calculating.",
+ standards:["6.G.A.1"],
+ vocab:[["C = πd","Circumference equals π times diameter."],["C = 2πr","The same formula written for a radius, since d = 2r."],["Estimate","Using π ≈ 3 to check the answer's size before calculating exactly."],["Exact vs rounded","Answers given as a decimal are rounded; π itself never is."]],
+ materials:["Calculators","Circular objects for checking","Formula reference card","Whiteboards"],
+ warmup:{mins:5,text:"Post: a circle has diameter 10 cm. Ask for a rough circumference before anyone touches a calculator. Someone will say about 30. Ask how they got it. Multiplying by three is the estimate that should precede every calculation this week."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · predict then measure",
+   moves:["Choose a real circular object and measure only its diameter.","Predict its circumference by multiplying by 3, then by 3.14.","Measure the actual circumference with string.","Compare the prediction with the measurement and account for the difference."],
+   say:[["Teacher","Measure the diameter only. Now predict the way round before you measure it."],["Expected","About three times as far."],["Teacher","Now measure and see how close you were."],["Expected","Pretty close."],["Teacher","So the formula predicts the real world. That is worth noticing — this is not a classroom trick, it works on actual tins."]],
+   watch:["Students who measure a radius but use it as a diameter in the formula. Ask which measurement they took — centre-to-edge or edge-to-edge — before they calculate."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · both versions of the formula",
+   moves:["Draw a circle labelled with its diameter and write C = πd beside it.","Draw the same circle labelled with its radius instead and write C = 2πr.","Show the two formulas are the same by substituting d = 2r.","Work one problem both ways and confirm the same answer."],
+   say:[["Teacher","Two formulas, one relationship. If d equals 2r, then πd equals π times 2r, which is 2πr."],["Teacher","So which one do you use?"],["Expected","Whichever measurement you were given."],["Teacher","Exactly. Read what you have before choosing, and you never need to convert first."]],
+   readaloud:["Say the picture aloud: 'Two identical circles side by side. The left one has a line across through the centre labelled d, with C equals pi d written beneath. The right one has a line from centre to edge labelled r, with C equals two pi r written beneath.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · calculating",
+   moves:["Calculate circumference from a diameter, using 3.14 for π.","Calculate from a radius using 2πr.","Estimate first on every problem using π ≈ 3.","Round answers sensibly and state the units."],
+   say:[["Teacher","Estimate first, every time. Diameter 8, so about 24. Then calculate exactly."],["Expected","25.12."],["Teacher","Close to 24, so the answer is in the right neighbourhood. If you had got 251 or 2.5, the estimate would have caught it immediately."]],
+   watch:["Students who use 2πr when given a diameter, doubling it unnecessarily. The estimate catches this — the answer comes out roughly six times the diameter instead of three, which is visibly wrong."]}
+ ],
+ guided:[["Diameter 10 cm. Find the circumference.","31.4 cm"],["Radius 5 cm. Find the circumference.","31.4 cm — the same circle"],["Diameter 7 cm. Estimate then calculate.","About 21; exactly 21.98 cm"],["Radius 12 cm. Find the circumference.","75.36 cm"]],
+ worksheet:[
+  {t:"A · From the diameter",d:"Estimate first, then calculate. Use π ≈ 3.14.",items:["d = 6 cm","d = 15 cm","d = 9 cm","d = 20 cm","d = 4.5 cm","d = 100 m"]},
+  {t:"B · From the radius",d:"Estimate first, then calculate.",items:["r = 3 cm","r = 8 cm","r = 10 cm","r = 2.5 cm","r = 14 cm","r = 0.5 m"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A bicycle wheel has a diameter of 66 cm. How far does it travel in one full turn? Show your estimate first.","Explain why C = πd and C = 2πr must give the same answer for the same circle.","A circular pond has a radius of 4 m. How much fencing is needed to go all the way round? Would you buy exactly that much? Explain."]}],
+ exit:["Diameter 12 cm. Find the circumference.","Radius 7 cm. Find the circumference.","Explain why you estimate before calculating."],
+ crit:"Mastery: both correct with units, and item 3 mentioning catching a large error. Reteach if the radius and diameter formulas are confused — the estimate check identifies it reliably, so require it in writing on every problem.",
+ support:["Provide the formula reference card with a labelled diagram for each version.","Restrict to diameter problems before introducing the radius version.","Permit calculators once the estimate is written."],
+ extend:["A circle's circumference is 50 cm. Find its diameter. What operation did you need?","Two circles have radii of 3 cm and 6 cm. Predict the ratio of their circumferences, then check."],
+ access:["Touch: measuring a real object and checking the formula's prediction against it grounds the abstraction in something verifiable.","Attention: the estimate-first rule gives a quick early success on every problem before the longer calculation.","Vision: both formula versions appear on the reference card with their own labelled diagram, never as bare symbols.","Language: 'circumference' is long and easily confused with 'circle'; use it in full every time rather than shortening to C in speech."]
+},
+{
+ day:5, short:"Working backwards", title:"Finding the diameter or radius from the circumference",
+ objective:"Find a circle's diameter or radius given its circumference, and check the answer by working forwards.",
+ standards:["6.G.A.1","6.EE.B.7"],
+ vocab:[["Working backwards","Given the circumference, find the diameter — the reverse of day four."],["Inverse operation","Dividing by π undoes multiplying by π."],["Check forwards","Put the answer back into C = πd to confirm it."],["Reasonable","The diameter must be roughly a third of the circumference."]],
+ materials:["Calculators","String and circular objects","Whiteboards","Formula reference card"],
+ warmup:{mins:5,text:"Post: a circle's circumference is 31.4 cm. Ask whether its diameter is bigger or smaller than 31.4, before anything else. Everyone should say smaller. Ask roughly how much smaller. About a third — and that estimate makes the whole lesson self-checking."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · from string to circle",
+   moves:["Cut a length of string to a stated circumference, say 30 cm.","Form it into a circle and measure the diameter across.","Compare the measured diameter with 30 ÷ 3.14.","Repeat with a different string length."],
+   say:[["Teacher","Thirty centimetres of string, made into a circle. Predict the diameter before you measure."],["Expected","About ten."],["Teacher","Measure it."],["Expected","Just under ten."],["Teacher","And 30 divided by 3.14 is 9.55. Your string agrees with the arithmetic, which is a good sign for both."]],
+   watch:["Students who multiply by π instead of dividing. The size check settles it — the diameter must be smaller than the circumference, and multiplying makes it bigger."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · the balance again",
+   moves:["Write C = πd as an equation with d unknown.","Draw it as a balance, as in Unit 5: πd on one side, the circumference on the other.","Divide both sides by π to isolate d.","Repeat for C = 2πr, dividing by 2π."],
+   say:[["Teacher","This is a Unit 5 equation with a Greek letter in it. What do you do to both sides?"],["Expected","Divide by π."],["Teacher","And for the radius version?"],["Expected","Divide by 2π."],["Teacher","Nothing new. The balance does not care whether the coefficient is 3 or π."]],
+   readaloud:["Say the picture aloud: 'A balance with pi times d on the left pan and thirty-one point four on the right. An arrow shows both sides being divided by pi, leaving d alone on the left and ten on the right.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · dividing by π",
+   moves:["Find the diameter from the circumference by dividing by π.","Find the radius by dividing by 2π, or by halving the diameter.","Check every answer by multiplying back.","Handle a worded problem where the circumference is given in context."],
+   say:[["Teacher","Check forwards every time. You found a diameter of 10; does 10 times π give you back 31.4?"],["Expected","Yes."],["Teacher","Then you are certainly right. Working backwards always has that check available, and it costs ten seconds."]],
+   watch:["Students who find the diameter and report it when the radius was asked for. Underline the question first — the same routine that has run since Unit 2."]}
+ ],
+ guided:[["C = 31.4 cm. Find the diameter.","10 cm"],["C = 62.8 cm. Find the radius.","10 cm"],["C = 44 cm. Find the diameter.","14.01 cm, about 14 cm"],["Check: does 14 × 3.14 give about 44?","Yes — 43.96, confirming the answer."]],
+ worksheet:[
+  {t:"A · Find the diameter",d:"Divide by π. Check forwards.",items:["C = 15.7 cm","C = 25.12 cm","C = 47.1 cm","C = 9.42 cm","C = 100 cm","C = 6.28 m"]},
+  {t:"B · Find the radius",d:"Divide by 2π, or find d first and halve it.",items:["C = 31.4 cm","C = 18.84 cm","C = 62.8 cm","C = 12.56 cm"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A circular running track is 400 m around. Find its diameter, and say whether the answer seems reasonable for a track.","Explain why dividing by π undoes multiplying by π, connecting it to the balance model from Unit 5.","A tree's trunk measures 157 cm around. Find its diameter. Why might a forester want this rather than the circumference?"]}],
+ exit:["C = 37.68 cm. Find the diameter.","C = 31.4 cm. Find the radius.","Explain how you check an answer when working backwards."],
+ crit:"Mastery: both correct with a forward check shown, and item 3 describing multiplying back. Reteach if multiplication is used instead of division — require the bigger-or-smaller sentence before calculating, since it makes the error impossible to miss.",
+ support:["Provide the equation pre-written with the division step set up.","Restrict to finding the diameter before the radius.","Keep the Unit 5 balance diagram visible as a reference for the inverse operation."],
+ extend:["A circle's circumference equals its diameter multiplied by π. Is there a circle where the circumference is a whole number and the diameter is too? Investigate.","The Earth's circumference is about 40,000 km. Find its diameter."],
+ access:["Touch: forming a measured string into a circle and measuring across makes the inverse operation physical.","Attention: the bigger-or-smaller sentence is a required first written step, giving early traction.","Memory: naming this as a Unit 5 equation reduces it to a known procedure rather than a new one.","Language: 'working backwards' is contrasted explicitly with day four, since the two look similar on the page."]
+},
+{
+ day:6, short:"Circumference problems", title:"Circumference in real contexts",
+ objective:"Solve multi-step circumference problems in real contexts, deciding what to calculate before calculating it.",
+ standards:["6.G.A.1","6.RP.A.3"],
+ vocab:[["Revolution","One complete turn of a wheel, covering one circumference."],["Context","The real situation the numbers describe."],["Multi-step","The first answer feeds the second."],["Sensible rounding","Rounding to a precision the situation can actually use."]],
+ materials:["Calculators","A bicycle wheel or circular lid for demonstration","Measuring tape","Whiteboards"],
+ warmup:{mins:5,text:"Roll a circular lid along the floor for exactly one full turn, marking start and end. Measure the distance covered. Ask what that distance is, in circle language. It is the circumference — and that connection is what makes every wheel problem work."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · rolling a wheel",
+   moves:["Mark a point on a circular lid and roll it along the floor for one full turn.","Measure the distance travelled and compare with the calculated circumference.","Roll it five turns and measure again.","Divide by five and compare with one turn."],
+   say:[["Teacher","One turn covers one circumference. How far in five turns?"],["Expected","Five circumferences."],["Teacher","So distance equals turns times circumference. That is the whole of wheel problems, and you just rolled it."]],
+   watch:["Students who calculate the circumference correctly but forget to multiply by the number of turns. Ask what the question is actually asking for — one turn or many?"]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · modelling the context",
+   moves:["Draw a wheel with its diameter labelled and the distance for one turn marked alongside.","Draw a bar model for a multi-turn journey.","Draw a fencing problem: a circular pond with fence around the edge.","Draw a problem needing circumference then a cost per metre."],
+   say:[["Teacher","Draw it before you calculate. Which measurement does the problem give you, and which does it want?"],["Teacher","This one gives the radius and asks for the cost of fencing. How many steps?"],["Expected","Two — circumference first, then cost."]],
+   readaloud:["Say the picture aloud: 'A circle labelled as a pond with its radius marked as four metres. An arrow follows the circle's edge all the way round, labelled fencing required.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · multi-step working",
+   moves:["Solve a wheel-revolutions problem with the working set out one step per line.","Solve a fencing problem including a cost per metre.","Estimate before each calculation.","Round the final answer to suit the context and justify the rounding."],
+   say:[["Teacher","You calculated 25.12 metres of fencing. How much would you buy?"],["Expected","Twenty-six, probably."],["Teacher","Why round up rather than to the nearest?"],["Expected","Because you can't have a gap."],["Teacher","The context decides the rounding, not the arithmetic. That is worth saying explicitly in your answer."]],
+   watch:["Students who round to the nearest whole number when the context requires rounding up. Ask what happens physically if the answer is short — for fencing or fabric, short means unusable."]}
+ ],
+ guided:[["A wheel of diameter 60 cm. How far in one turn?","188.4 cm"],["How far in 10 turns?","1884 cm, or 18.84 m"],["A pond of radius 4 m. How much fencing?","25.12 m, so buy 26 m"],["Fencing costs $8 per metre. Cost for the pond?","26 × 8 = $208"]],
+ worksheet:[
+  {t:"A · Wheels and turns",d:"Estimate first.",items:["d = 70 cm, 1 turn","d = 70 cm, 5 turns","r = 35 cm, 10 turns","d = 26 inches, 3 turns","r = 40 cm, 20 turns","d = 2 m, 100 turns"]},
+  {t:"B · Fencing and edging",d:"Round sensibly and justify.",wide:true,
+   items:["A circular garden has radius 6 m. How much edging is needed, and how much would you buy?","A round table has diameter 1.4 m. How much ribbon to go around its edge?","A circular pool has radius 3.5 m. Fencing costs $12 per metre. Find the total cost."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A bicycle wheel has diameter 66 cm. How many turns to travel 1 km? Show your working.","Explain why fencing answers are usually rounded up rather than to the nearest whole number.","A wheel travels 100 m in 50 turns. Find its diameter."]}],
+ exit:["A wheel of diameter 50 cm. How far in 4 turns?","A circular bed of radius 2 m needs edging. How much would you buy?","Explain why the context decides how you round."],
+ crit:"Mastery: both correct with sensible rounding justified. Reteach if the number of turns is ignored — the rolling demonstration makes the multiplication concrete, and it is faster than re-explaining.",
+ support:["Provide a two-box frame labelled 'circumference' and 'then what'.","Restrict to single-turn problems before multi-turn.","Permit calculators throughout so the reasoning is the work."],
+ extend:["A wheel makes 500 turns over 1 km. Find its diameter. Is that a plausible wheel size?","Why do bicycle computers need the wheel size entered before they can measure distance?"],
+ access:["Touch: rolling a real lid and measuring the distance makes one revolution a physical event.","Attention: the two-box frame externalises the two steps rather than requiring them be held in mind.","Language: word problems carry the reading load; read each aloud before independent work.","Motor: a partner can roll and mark while another measures, with both calculating."]
+},
+{
+ day:7, short:"Semicircles", title:"Perimeter of semicircles and part-circles",
+ objective:"Find the perimeter of a semicircle or quarter-circle, remembering to include the straight edges.",
+ standards:["6.G.A.1"],
+ vocab:[["Semicircle","Half a circle, cut along a diameter."],["Arc","The curved part of a part-circle."],["Perimeter","The whole distance around, curved parts and straight parts together."],["The forgotten edge","The diameter across a semicircle — part of its perimeter, and the most commonly omitted piece."]],
+ materials:["Paper circles to cut in half","String","Rulers","Calculators"],
+ warmup:{mins:5,text:"Cut a paper circle in half and hold up one piece. Ask students to trace its perimeter with a finger in the air. Watch whether anyone stops at the curve. Say: the straight edge counts too, and forgetting it is the single most common error in this lesson."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · tracing the whole edge",
+   moves:["Cut a paper circle in half and lay string all the way around one half.","Note the string covers both the curve and the straight edge.","Measure the string and compare with half the full circumference.","Find the difference and identify it as the diameter."],
+   say:[["Teacher","Lay string around the whole edge of the semicircle. Every part of it."],["Teacher","Now measure. Is it exactly half the full circumference?"],["Expected","No, it's more."],["Teacher","How much more?"],["Expected","One diameter's worth."],["Teacher","Because cutting the circle created a new edge that was not there before. Half the curve plus the cut."]],
+   watch:["Students who calculate half the circumference and stop. Have them lay string around their paper semicircle; the string is visibly longer than half the circle's string, and that settles it physically."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · marking every edge",
+   moves:["Draw a semicircle and trace its perimeter in two colours: curve and straight edge.","Label the curve as half the circumference and the straight edge as the diameter.","Write the total as πd ÷ 2 + d.","Draw a quarter-circle and identify its three edges: arc plus two radii."],
+   say:[["Teacher","Trace the whole outline. How many separate pieces did your finger travel?"],["Expected","Two — the curve and the straight bit."],["Teacher","Now the quarter-circle. How many pieces?"],["Expected","Three — the arc and two straight edges."],["Teacher","So count the edges before you calculate. The formula follows from the count, not the other way round."]],
+   readaloud:["Say the picture aloud: 'A semicircle with its curved edge drawn as a solid arc and its straight bottom edge drawn as a bold line. The arc is labelled half the circumference; the straight edge is labelled the diameter.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · building the formula",
+   moves:["Write the semicircle perimeter as (πd ÷ 2) + d.","Calculate for three semicircles.","Write the quarter-circle perimeter as (πd ÷ 4) + 2r.","Compare a semicircle's perimeter with half a full circle's circumference and state the difference."],
+   say:[["Teacher","Do not memorise these as separate formulas. Count the edges each time and build it."],["Teacher","Why is that better than memorising?"],["Expected","Because you can do any shape, not just the two we did."],["Teacher","And because a memorised formula you half-remember is worse than no formula at all."]],
+   watch:["Students who add a radius instead of a diameter to a semicircle's arc. Point at the drawing — the straight edge of a semicircle runs all the way across through where the centre was."]}
+ ],
+ guided:[["Semicircle, d = 10 cm. Find the perimeter.","15.7 + 10 = 25.7 cm"],["Semicircle, r = 6 cm. Find the perimeter.","18.84 + 12 = 30.84 cm"],["Quarter-circle, r = 8 cm. Find the perimeter.","12.56 + 16 = 28.56 cm"],["Why isn't a semicircle's perimeter just half the circumference?","Cutting the circle creates a new straight edge that must be included."]],
+ worksheet:[
+  {t:"A · Semicircles",d:"Include the straight edge.",items:["d = 8 cm","d = 14 cm","r = 5 cm","r = 10 cm","d = 20 cm","r = 3.5 cm"]},
+  {t:"B · Quarter-circles",d:"Count the edges first.",items:["r = 4 cm","r = 12 cm","r = 7 cm","r = 2.5 cm"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why a semicircle's perimeter includes the diameter, using the cutting idea in your explanation.","A window is a semicircle on top of a rectangle. Describe which edges you would include to find the total perimeter of the window frame.","A quarter-circle has perimeter 25.7 cm. Working backwards, find its radius."]}],
+ exit:["Semicircle, d = 12 cm. Find the perimeter.","Explain why you add the diameter.","A quarter-circle: how many edges does its perimeter have?"],
+ crit:"Mastery: correct perimeter including the straight edge, and item 2 explaining the cut edge. Reteach with the string-around-paper demonstration — this error is stubborn and the physical comparison is what fixes it.",
+ support:["Provide diagrams with every edge already traced in a different style, so only the calculation remains.","Restrict to semicircles before quarter-circles.","Require the edge-count to be written before any formula."],
+ extend:["A shape is three-quarters of a circle. Find its perimeter formula by counting edges.","A running track is two straights and two semicircular ends. Find its total perimeter given the straight length and the semicircle diameter."],
+ access:["Touch: laying string around a paper semicircle makes the extra edge undeniable in a way that a diagram does not.","Vision: curved and straight portions are drawn in distinct line styles and labelled separately on every diagram.","Attention: counting the edges before calculating gives a fixed first action on every problem.","Language: 'perimeter' is contrasted explicitly with 'circumference' — the first includes straight edges, the second does not."]
+},
+{
+ day:8, short:"Area by wedges", title:"Deriving the area of a circle",
+ objective:"Derive the circle area formula by cutting a circle into wedges and rearranging them into a near-rectangle.",
+ standards:["6.G.A.1"],
+ vocab:[["Wedge","A sector — a slice from the centre, like a pizza slice."],["Rearrange","Move the pieces without adding or removing any, so the area is unchanged."],["Approaches","Gets closer and closer to, without ever exactly arriving."],["πr²","The formula this lesson builds, rather than states."]],
+ materials:["Paper circles, at least two per student","Scissors","Rulers","Glue sticks","Wedge-rearranging tool"],
+ warmup:{mins:5,text:"Hold up a paper circle and ask for its area. Nobody has a formula yet. Ask what shapes they can already find the area of — rectangle, triangle, parallelogram. Say: the plan is to turn this circle into one of those without losing any paper."},
+ stages:[
+  {k:"c",label:"Concrete",mins:13,sense:"touch · cutting and fanning",
+   moves:["Fold a paper circle into 8 equal wedges and cut them apart.","Arrange the wedges in a row, points alternating up and down.","Observe the shape is roughly a parallelogram, but with bumpy edges.","Repeat with a circle cut into 16 wedges and compare the flatness."],
+   say:[["Teacher","Eight wedges, points alternating up and down. What shape is it roughly?"],["Expected","A wonky rectangle."],["Teacher","Now sixteen wedges. Same circle's worth of paper, more cuts."],["Expected","Much flatter on top."],["Teacher","Did you add any paper when you made more cuts?"],["Expected","No."],["Teacher","So the area never changed. Only the shape got easier to measure."]],
+   watch:["Students who cut unequal wedges, producing a lopsided arrangement. Fold carefully before cutting — halves, then quarters, then eighths — since equal wedges are what make the rearrangement work."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · the wedge tool",
+   moves:["Open the wedge-rearranging tool with 8 wedges and observe the bumpy edges.","Increase the wedge count gradually and watch the top and bottom flatten.","Identify the height of the rearranged shape as one radius.","Identify the base as half the circumference."],
+   say:[["Teacher","Slide it up slowly. What is happening to the top edge?"],["Expected","Getting flatter."],["Teacher","What is the height of this shape?"],["Expected","The radius — each wedge is a radius tall."],["Teacher","And the base?"],["Expected","Half the circumference, since half the wedges point up and half point down."]],
+   readaloud:["Say the picture aloud: 'On the left, a circle divided into alternately shaded wedges. On the right, the same wedges fanned into a row with points alternating up and down, forming a near-rectangle whose height is one radius and whose base is half the circumference.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · assembling the formula",
+   moves:["Write the rearranged shape's area as base × height.","Substitute base = half the circumference = πr.","Substitute height = r.","Conclude area = πr × r = πr²."],
+   say:[["Teacher","Base times height. The base is half the circumference — and what is the full circumference?"],["Expected","2πr."],["Teacher","So half of it is πr. And the height is r. Multiply them."],["Expected","πr²."],["Teacher","You did not memorise that. You built it out of a formula you already had and a pair of scissors."]],
+   watch:["Students who write πr² as π × r × 2. The square means r times r, not r times 2. Write it out longhand as πrr while the notation is new."]}
+ ],
+ guided:[["What is the height of the rearranged shape?","One radius"],["What is its base?","Half the circumference, which is πr"],["So what is its area?","πr × r = πr²"],["Why does more wedges make the argument stronger?","The shape gets closer to a true rectangle, so base × height becomes more exactly correct."]],
+ worksheet:[
+  {t:"A · Follow the derivation",d:"Fill in each step.",wide:true,
+   items:["The full circumference is ___. Half of it is ___.","The height of the rearranged shape is ___.","Area = base × height = ___ × ___ = ___.","Explain in one sentence why the area did not change when the circle was cut up."]},
+  {t:"B · Check the notation",d:"State whether each is the same as πr². Explain.",items:["π × r × r","π × r × 2","πr × r","2πr"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Describe the wedge derivation in your own words, as if explaining to someone who missed the lesson.","Why can the rearranged shape never be exactly a rectangle, no matter how many wedges you cut?","If the wedges were arranged all pointing the same way instead of alternating, what shape would you get? Would the area still be the same?"]}],
+ exit:["What is the base of the rearranged wedge shape?","What is its height?","Write the area formula you derived and explain where the square comes from."],
+ crit:"Mastery: base and height correctly identified, and the formula written as πr² with the square explained as r × r. Reteach with the physical cutting again — this derivation is the point of the lesson, and a student who only has the formula has missed it.",
+ support:["Provide pre-cut wedge sets so the arranging can be done without cutting.","Use the tool alongside the paper so the flattening can be seen at high wedge counts.","Write πrr alongside πr² on every board example."],
+ extend:["Arrange the wedges into a triangle shape instead. Does base × height ÷ 2 give the same area? Investigate.","Ancient mathematicians used this method with many-sided polygons. Why would more sides give a better estimate of π?"],
+ access:["Touch: cutting and fanning the wedges is the derivation itself, and works for any student regardless of reading level.","Motor: pre-cut wedge sets let students with limited scissor control do the arranging, which is where the insight lives.","Vision: alternating wedge shading makes the up-down arrangement visible, and is paired with position rather than colour alone.","Attention: comparing 8 wedges against 16 is a single bounded comparison rather than an open exploration."]
+},
+{
+ day:9, short:"Area of a circle", title:"Calculating the area of a circle",
+ objective:"Calculate a circle's area using A = πr², and distinguish it clearly from the circumference formula.",
+ standards:["6.G.A.1"],
+ vocab:[["A = πr²","Area equals π times radius squared."],["Squared units","Area is measured in cm², m² — because two lengths were multiplied."],["Square first","Square the radius before multiplying by π."],["Circumference vs area","One measures around, one measures inside. Different formulas, different units."]],
+ materials:["Calculators","Grid paper","Circular objects","Formula reference card"],
+ warmup:{mins:5,text:"Post a circle of radius 5 cm and ask for both its circumference and its area, without giving formulas. Let students look them up or recall. Then ask which answer should have 'squared' in its units and why. That distinction is today's whole risk."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · counting squares",
+   moves:["Draw a circle of radius 5 cm on centimetre grid paper.","Count the whole squares inside, then estimate the part-squares.","Total the estimate.","Compare with πr² = 78.5 and note how close the count came."],
+   say:[["Teacher","Count the whole squares first, then deal with the partial ones along the edge."],["Expected","Around seventy-eight or so."],["Teacher","And the formula gives 78.5. Your counting confirms the formula, and the formula saves you from ever counting again."]],
+   watch:["Students who count only whole squares and stop, getting a low estimate. The partial squares along the edge matter — pair them up roughly to make wholes."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · the two formulas side by side",
+   moves:["Draw two identical circles, one labelled for circumference and one for area.","Write C = 2πr under the first and A = πr² under the second.","Mark the circumference as the edge and the area as the shaded inside.","State the units for each: cm and cm²."],
+   say:[["Teacher","Trace the circumference with your finger. Now shade the area. Different things entirely."],["Teacher","Which one has squared units?"],["Expected","The area."],["Teacher","Because you multiplied two lengths. The unit tells you which formula you used — if your area answer is in plain centimetres, you did a circumference."]],
+   readaloud:["Say the picture aloud: 'Two identical circles side by side. The left has its edge traced in bold and is labelled C equals two pi r, in centimetres. The right is fully shaded and labelled A equals pi r squared, in square centimetres.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · order of operations",
+   moves:["Calculate area from a radius, squaring first then multiplying by π.","Calculate area from a diameter by halving to find the radius first.","Estimate using π ≈ 3 before each calculation.","State units as squared every time."],
+   say:[["Teacher","Square the radius first, then multiply by π. That is Unit 1's order of operations — the square is an index, so it comes before the multiplication."],["Teacher","Radius 5. What is the first step?"],["Expected","Five squared is twenty-five."],["Teacher","Then times π. Not fifteen squared — that would be squaring after multiplying, and it gives a completely different answer."]],
+   watch:["Students who calculate (πr)² by multiplying first and then squaring. The order matters enormously here; require the squared value to be written down as its own step."]}
+ ],
+ guided:[["Radius 5 cm. Find the area.","78.5 cm²"],["Radius 3 cm. Find the area.","28.26 cm²"],["Diameter 10 cm. Find the area.","r = 5, so 78.5 cm²"],["Radius 10 cm. Find the area.","314 cm²"]],
+ worksheet:[
+  {t:"A · From the radius",d:"Square first. Include squared units.",items:["r = 2 cm","r = 6 cm","r = 9 cm","r = 12 cm","r = 1.5 cm","r = 20 m"]},
+  {t:"B · From the diameter",d:"Find the radius first.",items:["d = 8 cm","d = 14 cm","d = 20 cm","d = 5 cm","d = 30 cm","d = 1 m"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A circular pizza has diameter 30 cm. Find its area, showing the radius step.","Explain the difference between circumference and area, including their units, as if to someone who keeps confusing them.","Two circles have radii 3 cm and 6 cm. Is the larger one twice the area? Calculate both and explain what you find."]}],
+ exit:["Radius 7 cm. Find the area.","Diameter 12 cm. Find the area.","Explain why area is measured in squared units."],
+ crit:"Mastery: both correct with squared units, and item 3 explaining two lengths multiplied. Reteach if the diameter is used directly as the radius — that error quadruples the answer, so the estimate check catches it if required.",
+ support:["Provide the formula card with both formulas and their units side by side.","Restrict to radius problems before diameter problems.","Require the squared value written as its own line before multiplying by π."],
+ extend:["A circle's area is 50.24 cm². Find its radius by working backwards.","Why does doubling the radius quadruple the area? Explain using the formula."],
+ access:["Touch: counting grid squares inside a drawn circle gives a physical sense of area that the formula then shortcuts.","Vision: the two formulas always appear with their own labelled diagram and units, never as bare symbols.","Language: 'squared' means both the operation and the unit; say which meaning is intended each time it is used.","Attention: writing the squared radius as its own step gives a checkpoint before the final multiplication."]
+},
+{
+ day:10, short:"Area and circumference", title:"Choosing between area and circumference",
+ objective:"Decide from a problem's wording whether area or circumference is required, and justify the choice.",
+ standards:["6.G.A.1"],
+ vocab:[["Around","Signals circumference: fencing, edging, ribbon, one turn of a wheel."],["Covering","Signals area: turf, paint, pizza, tablecloth."],["Signal words","The phrases that tell you which measure the situation needs."],["Units as a check","A covering answer must be in squared units; an around answer must not."]],
+ materials:["Mixed problem cards","Calculators","Formula reference card","Whiteboards"],
+ warmup:{mins:5,text:"Post four problems with no labels: fencing a pond, turfing a lawn, ribbon round a cake, icing the top of a cake. Ask students to sort into two piles without solving. Compare sortings and collect the words that gave each one away."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · around versus covering",
+   moves:["Take a circular lid and run a finger around its edge, then across its face.","Name each action: around is circumference, covering is area.","Sort problem cards into 'around' and 'covering' piles.","Identify the signal word in each card."],
+   say:[["Teacher","Finger around the edge. Now flat palm across the face. Two different measurements of the same lid."],["Teacher","Sort the cards. What word told you this one was covering?"],["Expected","'Paint' — you cover a surface with paint."],["Teacher","Collect those words. They are how the problem tells you which formula it wants."]],
+   watch:["Students who sort by whether the problem mentions radius or diameter. That tells you which measurement you have, not which one you need — those are separate questions."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · diagram the requirement",
+   moves:["Draw each problem's circle and mark what is being measured: the edge or the inside.","Trace the edge in bold for circumference problems.","Shade the interior for area problems.","Label the units expected before calculating."],
+   say:[["Teacher","Mark the diagram before you touch the formula. Bold edge, or shaded inside?"],["Teacher","And write the units you expect. If you expect square metres and your answer comes out in metres, something went wrong."]],
+   readaloud:["Say the page aloud: 'Four circles in a row. The first and third have their edges traced in bold, labelled metres. The second and fourth are fully shaded, labelled square metres.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · solving both types",
+   moves:["Solve two circumference problems and two area problems from the sorted cards.","State the formula chosen and the signal word that prompted it.","Check the units match the expectation set in the pictorial stage.","Handle a problem needing both measures."],
+   say:[["Teacher","This one asks for fencing and turf. How many calculations?"],["Expected","Two — circumference for the fence, area for the turf."],["Teacher","Same circle, two different questions. Read carefully which one each part wants."]],
+   watch:["Students who use the correct formula but state the wrong units. The units check is only useful if it is actually applied — require them written before the calculation, not after."]}
+ ],
+ guided:[["Fencing a circular pond of radius 5 m. Which formula?","Circumference: 2πr = 31.4 m"],["Turfing the same pond's surface. Which formula?","Area: πr² = 78.5 m²"],["Ribbon around a cake of diameter 20 cm.","Circumference: 62.8 cm"],["Icing the top of that cake.","Area: 314 cm²"]],
+ worksheet:[
+  {t:"A · Which measure",d:"State circumference or area, then solve.",wide:true,
+   items:["A circular rug of radius 2 m needs binding tape around its edge. How much?","The same rug needs cleaning. What area is cleaned?","A round pool of diameter 8 m needs a cover. What area?","A bicycle wheel of diameter 70 cm — how far in one turn?"]},
+  {t:"B · Both measures",d:"Calculate both for each circle.",items:["r = 4 cm","r = 10 cm","d = 12 cm","d = 30 cm"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["List four signal words for area and four for circumference, from the problems you have seen.","A circular garden of radius 5 m needs edging at $6 per metre and turf at $9 per square metre. Find the total cost.","Explain how the units of your answer can tell you whether you used the right formula."]}],
+ exit:["A circular table of diameter 1.2 m needs a cloth covering the top. Which measure, and what is it?","The same table needs trim around its edge. Which measure, and what is it?","Explain how units help you check you used the right formula."],
+ crit:"Mastery: both correctly identified and calculated with right units. Reteach by sorting rather than by re-explaining formulas — this day diagnoses reading comprehension of the context, not formula recall.",
+ support:["Provide the signal-word list as a permanent reference, built with the class.","Reduce to one problem type before mixing.","Require the expected units written before any calculation."],
+ extend:["Write two problems about the same circular object, one needing area and one circumference, using different signal words.","A problem says 'how much space inside the circle'. Which measure, and why might that wording be ambiguous?"],
+ access:["Touch: running a finger around the edge versus flat across the face distinguishes the two measures physically.","Language: the signal-word list is the reading support for this lesson and stays visible during the assessment.","Attention: sorting before solving splits the task into two shorter phases with a clear boundary.","Vision: diagrams use bold edges for circumference and shading for area consistently across every problem."]
+},
+{
+ day:11, short:"Part circles", title:"Area of semicircles and part-circles",
+ objective:"Find the area of a semicircle or quarter-circle by finding the full circle's area and taking the appropriate fraction.",
+ standards:["6.G.A.1","6.NS.A.1"],
+ vocab:[["Semicircle area","Half the full circle's area."],["Quarter-circle","A quarter of the circle, area πr² ÷ 4."],["Fraction of the whole","The move: find the full area first, then take the fraction."],["Area versus perimeter","For area, no extra straight edge is added — unlike day seven's perimeter."]],
+ materials:["Paper circles","Scissors","Grid paper","Calculators"],
+ warmup:{mins:5,text:"Cut a paper circle in half and ask what fraction of the original area each piece is. Everyone says half. Ask whether anything has to be added, as it did for the perimeter on day seven. Nothing does — and that contrast is worth drawing out explicitly."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · halving the area",
+   moves:["Draw a circle on grid paper and count squares to estimate its area.","Cut it in half and count the squares in one half.","Confirm the half has half the square count.","Contrast with day seven, where the perimeter gained a straight edge."],
+   say:[["Teacher","Count the squares in the whole circle, then in half of it."],["Expected","Half as many."],["Teacher","Did cutting create any new area?"],["Expected","No, the paper's the same."],["Teacher","But on day seven, cutting created a new edge for the perimeter. Area and perimeter behave differently when you cut, and that catches people out."]],
+   watch:["Students who add something to the area, importing day seven's straight edge. Cutting creates a new edge but no new surface — a semicircle covers exactly half the paper the circle did."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · fractions of the circle",
+   moves:["Draw a full circle, a semicircle and a quarter-circle from the same radius.","Shade each and label the fraction of the whole.","Write each area as πr² times the fraction.","Draw a composite shape: a rectangle with a semicircular end."],
+   say:[["Teacher","Same radius, three shapes, three fractions. The full area is the starting point for all of them."],["Teacher","This composite shape — a rectangle with a semicircle on the end. How do you find its area?"],["Expected","Rectangle area plus half a circle's area."],["Teacher","Split it into shapes you know. Same move as Unit 6 day twelve."]],
+   readaloud:["Say the picture aloud: 'Three shapes of the same radius in a row. A full shaded circle labelled pi r squared; a shaded semicircle labelled half of pi r squared; a shaded quarter-circle labelled a quarter of pi r squared.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · calculating",
+   moves:["Calculate semicircle areas as πr² ÷ 2.","Calculate quarter-circle areas as πr² ÷ 4.","Calculate a composite area combining a rectangle and a semicircle.","Check each against a rough estimate of the full circle's area."],
+   say:[["Teacher","Full circle first, then divide. Do not try to halve the radius instead — that is a different circle entirely."],["Teacher","Why not halve the radius?"],["Expected","Because half the area isn't the same as half the radius."],["Teacher","Right. Halving the radius quarters the area. The two are not the same move at all."]],
+   watch:["Students who halve the radius rather than the area. This is the most common error here and it gives an answer four times too small — ask them to check against the grid-square count."]}
+ ],
+ guided:[["Semicircle, r = 6 cm. Find the area.","113.04 ÷ 2 = 56.52 cm²"],["Quarter-circle, r = 4 cm. Find the area.","50.24 ÷ 4 = 12.56 cm²"],["Semicircle, d = 10 cm. Find the area.","r = 5, so 78.5 ÷ 2 = 39.25 cm²"],["Why not halve the radius for a semicircle?","Halving the radius quarters the area; a semicircle is half the area of the original circle."]],
+ worksheet:[
+  {t:"A · Semicircles",d:"Find the full area first.",items:["r = 4 cm","r = 10 cm","d = 12 cm","r = 7 cm","d = 20 cm","r = 2.5 cm"]},
+  {t:"B · Quarter-circles",d:"Find the full area first.",items:["r = 6 cm","r = 8 cm","d = 16 cm","r = 3 cm"]},
+  {t:"C · Composite shapes",d:"Split into known shapes.",wide:true,
+   items:["A rectangle 10 cm by 6 cm with a semicircle of diameter 6 cm on one end. Find the total area.","A square of side 8 cm with a quarter-circle of radius 8 cm removed from one corner. Find the remaining area.","A running track shape: a rectangle 20 m by 10 m with semicircles of diameter 10 m on both ends. Find the total area."]}],
+ exit:["Semicircle, r = 8 cm. Find the area.","Quarter-circle, r = 6 cm. Find the area.","Explain why you do not halve the radius to find a semicircle's area."],
+ crit:"Mastery: both correct with squared units, and item 3 distinguishing halving the area from halving the radius. Reteach with the grid-square count — comparing the counts for a half-circle against a half-radius circle makes the difference visible.",
+ support:["Require the full circle's area written as its own step before any division.","Restrict to semicircles before quarter-circles and composites.","Provide grid paper so answers can be sanity-checked by counting."],
+ extend:["A shape is three-quarters of a circle. Find its area for r = 8 cm.","Compare the area of a semicircle of radius 10 with a full circle of radius 5. Which is bigger, and by how much?"],
+ access:["Touch: cutting a grid-paper circle and counting the squares in each half makes the halving concrete and checkable.","Attention: writing the full circle's area as its own step gives a checkpoint before dividing.","Vision: the three fractions are shown at the same radius so the comparison is visual rather than numerical.","Memory: explicitly contrasting with day seven's perimeter prevents the two cutting behaviours from merging."]
+},
+{
+ day:12, short:"Circle problems", title:"Multi-step circle problems",
+ objective:"Solve problems combining circle measures with earlier units, choosing what to calculate before calculating.",
+ standards:["6.G.A.1","6.RP.A.3","6.NS.B.3"],
+ vocab:[["Multi-step","The first answer feeds the second."],["Composite shape","A shape built from a circle part and a straight-sided part."],["Difference of areas","Finding a ring or a leftover by subtracting one area from another."],["Justify the rounding","The context decides, as in day six."]],
+ materials:["Calculators","Grid paper","Formula reference card","Highlighters"],
+ warmup:{mins:5,text:"Post a diagram of a circular path around a circular pond — a ring shape. Ask how you would find the area of just the path. Let students think. Someone will suggest subtracting. That instinct is today's main technique."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · rings by subtraction",
+   moves:["Cut a large paper circle and a smaller one, and lay the small one on the large.","The visible ring is the path. Estimate its area by grid counting.","Calculate both circle areas and subtract.","Compare the calculation with the grid estimate."],
+   say:[["Teacher","Big circle, small circle on top. What is left showing?"],["Expected","A ring."],["Teacher","So the ring's area is the big area minus the small area. Nothing more complicated than that."],["Teacher","Check with the grid count. Does the subtraction agree?"]],
+   watch:["Students who subtract the radii and then find the area of that difference. Subtract the areas, not the radii — a ring between radius 5 and radius 3 is not a circle of radius 2."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · modelling composites",
+   moves:["Draw a ring with both radii labelled.","Mark the subtraction: outer area minus inner area.","Draw a composite shape combining a rectangle and a semicircle.","Draw a problem needing circumference then a cost calculation."],
+   say:[["Teacher","Label both radii before calculating anything. Which is outer, which is inner?"],["Teacher","And for the composite, mark the line where you split it. That line is your plan."]],
+   readaloud:["Say the picture aloud: 'Two concentric circles sharing a centre. The outer radius is labelled five metres and the inner radius three metres. The ring between them is shaded and labelled path.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · chained working",
+   moves:["Solve a ring-area problem with one line per step.","Solve a composite shape combining circle and rectangle areas.","Solve a problem combining circumference with a cost per metre.","Estimate before each calculation and check the units."],
+   say:[["Teacher","Estimate first. Outer circle about 75, inner about 27, so the ring is about 48."],["Teacher","Then calculate exactly and see if you land near that. If you get 4 or 400, you know before you finish."]],
+   watch:["Students who report an intermediate value — the outer area rather than the ring. Underline the question first, the same routine running since Unit 2."]}
+ ],
+ guided:[["Ring: outer r = 5 m, inner r = 3 m. Find the area.","78.5 − 28.26 = 50.24 m²"],["Rectangle 10×6 with semicircle d = 6 on the end. Total area.","60 + 14.13 = 74.13 cm²"],["Circular path circumference at r = 5 m, at $7 per metre.","31.4 m, so $219.80"],["Why subtract areas rather than radii for a ring?","The ring is the leftover region, which is the difference of the two areas, not the area of a circle with the difference of the radii."]],
+ worksheet:[
+  {t:"A · Rings",d:"Subtract the areas.",items:["outer r = 6, inner r = 4","outer r = 10, inner r = 8","outer d = 20, inner d = 14","outer r = 7, inner r = 5"]},
+  {t:"B · Composites",d:"Split into known shapes.",wide:true,
+   items:["A rectangle 12 cm by 8 cm with a semicircle of diameter 8 cm on one end. Find the area and the perimeter.","A square of side 10 cm with a circle of radius 4 cm cut out of the middle. Find the remaining area.","A track: rectangle 30 m by 20 m with semicircular ends of diameter 20 m. Find the total area."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A circular pond of radius 4 m is surrounded by a path 1 m wide. Find the path's area, showing your estimate.","Explain why you cannot find a ring's area by subtracting the radii first.","A circular lawn of radius 6 m needs turf at $11 per square metre and edging at $5 per metre. Find the total cost."]}],
+ exit:["Ring: outer r = 8, inner r = 6. Find the area.","A rectangle 10×4 with a semicircle of diameter 4 on the end. Find the area.","Explain why a ring's area is a subtraction of areas."],
+ crit:"Mastery: both correct with squared units, and item 3 explaining the subtraction. Reteach if radii are subtracted first — the paper demonstration with two overlaid circles makes the error visible immediately.",
+ support:["Provide a two-box frame labelled 'outer' and 'inner' for every ring problem.","Reduce to single-shape problems before composites.","Permit calculators throughout so the reasoning is the work."],
+ extend:["A path of constant width surrounds a circular pond. If the pond's radius doubles but the path width stays the same, does the path's area double? Investigate.","Design a composite shape needing three different area formulas, then find its area."],
+ access:["Touch: overlaying two paper circles makes the ring a physical region rather than an abstraction.","Attention: the two-box frame externalises which radius is which.","Vision: concentric circles are drawn with both radii labelled on the diagram, never in a separate key.","Memory: the split-into-known-shapes move is named as the same one from Unit 6 day twelve."]
+},
+{
+ day:13, short:"Review", title:"Review stations and unit assessment",
+ objective:"Consolidate circle measures across the unit, and self-identify which topics need more work before the assessment.",
+ standards:["6.G.A.1"],
+ vocab:[["Self-assessment","Judging your own accuracy honestly — a skill, and one being assessed today."],["Station","A short focused task at one topic, then rotate."],["Justify","Say why, not just what — required at every station."],["Next step","A specific action, not a topic name."]],
+ materials:["Both circle tools","Circular objects and string","Station cards, one per topic","Self-assessment grid","Assessment papers"],
+ warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: those are the stations to visit first, and the tally is data, not a confession."},
+ stages:[
+  {k:"c",label:"Concrete",mins:15,sense:"touch · rotation",
+   moves:["Five stations: parts of a circle, measuring and π, circumference, area, part-circles and composites.","Each station holds its materials and three graded tasks.","Students choose a starting station from the warm-up tally.","Every station requires one written justification, not just answers."],
+   say:[["Teacher","Start where you are least confident, not where you are quickest."],["Teacher","One sentence per station explaining why your method works. Answers alone do not count as finished."],["Teacher","Twelve minutes per station. Rotate on the signal whether or not you have finished."]],
+   watch:["Students who visit only easy stations. The private warm-up slip is the accountability tool — ask them to show which station addresses what they wrote."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · one diagram per topic",
+   moves:["On a single page, draw one diagram for each of the five station topics.","Annotate each with its formula and units.","Keep the page as the revision sheet.","Identify any diagram that could not be drawn and return to that station."],
+   say:[["Teacher","One page, five diagrams, five formulas. Better than any notes you could copy."],["Teacher","A diagram you cannot draw names the topic to go back to."]],
+   readaloud:["Say the page aloud: 'Five diagrams across two rows. A circle with radius and diameter labelled; a circumference unrolled against diameter-lengths; a circle with its edge traced in bold; a circle cut into wedges and rearranged; and a ring between two concentric circles.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · assessment",
+   moves:["Complete the written assessment covering all thirteen days.","Self-mark section A against a displayed key.","Record scores by topic on the self-assessment grid.","Identify two weakest topics and write one specific next step for each."],
+   say:[["Teacher","Self-mark honestly. Marking generously only costs you later."],["Teacher","One specific next step per weak topic. 'Practise circles' is not a step. 'Redo three area problems writing the squared radius as its own line' is."]],
+   watch:["Students whose self-assessment does not match their station work. The mismatch signals either low confidence or an unnoticed gap, and those need opposite responses."]}
+ ],
+ guided:[["Radius 9 cm. Find the circumference.","56.52 cm"],["Radius 9 cm. Find the area.","254.34 cm²"],["Semicircle r = 6 cm. Find the perimeter.","18.84 + 12 = 30.84 cm"],["Ring: outer r = 5, inner r = 3. Find the area.","50.24 cm²"]],
+ worksheet:[
+  {t:"A · Parts and π",d:"Show your working.",items:["r = 7, find d","d = 18, find r","C = 31.4, find d","C ÷ d equals what?","C = 44, find r","name the ratio C ÷ d"]},
+  {t:"B · Circumference and area",d:"Estimate first. Include units.",items:["r = 5, find C","d = 14, find C","r = 5, find A","d = 14, find A","r = 2.5, find A","r = 20, find C"]},
+  {t:"C · Part circles and composites",d:"Show every step.",wide:true,
+   items:["Semicircle r = 8 cm. Find the perimeter and the area.","Ring: outer r = 9 m, inner r = 6 m. Find the area.","A rectangle 14 cm by 6 cm with a semicircle of diameter 6 cm on one end. Find the total area."]},
+  {t:"D · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain what π actually is, in your own words.","Describe the wedge derivation of the circle area formula.","Choose the topic you found hardest this unit. Explain it with a diagram, as if teaching someone who missed the lesson."]}],
+ exit:["Name the topic you are most confident with and give one reason.","Name the topic you want more practice on and give one specific next step.","Complete: π is the number you get when you divide ___ by ___."],
+ crit:"Mastery: assessment sections A through C at 80 percent or better, with self-assessment matching actual performance within one band. Reteach in small groups by topic rather than reteaching the unit; the self-assessment grid tells you how to form those groups.",
+ support:["Reduce to three stations covering parts of a circle, circumference, and area.","Provide worked examples at each station as reference.","Allow the assessment across two sittings if sustained concentration is the barrier rather than the mathematics."],
+ extend:["Design a station task of your own, including the diagram and the justification prompt.","Write a problem requiring three of the unit's formulas in sequence, then solve it and write the key."],
+ access:["Motor: stations are arranged so each can be completed seated, with materials brought to the student.","Attention: twelve-minute rotations with a clear signal give predictable structure.","Vision: every station card uses the same layout so the format is never re-learned.","Language: the self-assessment grid pairs picture icons with topic names so it can be completed without heavy reading.","Hearing: the rotation signal is both visual and audible."]
+}
+];
+</script>
+<script src="curriculum-core.js"></script>
+</body>
+</html>
