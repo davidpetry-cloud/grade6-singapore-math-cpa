@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit 8 &mdash; Volume of Solids | Grade 6 CPA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="curriculum.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+    <h1>Unit 8 &mdash; Volume of Solids</h1>
+    <p class="sub">Boxes get filled with cubes before any formula appears, and nets get folded before they are judged. The folding tool exists for one reason paper cannot manage: when a net fails, it names which of the three conditions was broken, so a student learns why rather than just that. Volume and surface area are kept deliberately side by side, because the box is the same and only the question changes.</p>
+    <div class="facts">
+      <span><b>15</b> instructional days</span>
+      <span><b>3</b> weeks</span>
+      <span><b>55</b> minutes per lesson</span>
+      <span><b>6.G</b> standards</span>
+    </div>
+  </div>
+  <div class="wrap"><nav class="daynav" id="daynav" aria-label="Lesson days"></nav></div>
+</header>
+
+<main class="wrap">
+  <div class="lesson">
+    <div id="content"></div>
+    <aside class="side" id="side"></aside>
+  </div>
+  <div class="pager">
+    <button id="prev">&larr; Previous lesson</button>
+    <button id="next">Next lesson &rarr;</button>
+  </div>
+</main>
+
+<!-- Unit-specific manipulative. Must load before curriculum-core.js. -->
+<script>
+/* netFold — Unit 8 (Volume & Surface Area).
+   A net is only a net if it folds. This tool lets a student lay out squares on
+   a grid and find out whether theirs closes into a cube — and if it doesn't,
+   which specific rule it broke. Paper tells you it failed; this tells you why.
+   Declare before curriculum-core.js. */
+window.__EXTRA_TOOLS__=Object.assign(window.__EXTRA_TOOLS__||{},(function(){
+const rm=()=>(!!window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#5B7189", ROSE="#C2536B";
+
+/* A net folds into a cube iff: exactly 6 squares, all edge-connected, and no
+   two squares land on the same cube face when folded. We fold it for real —
+   walk the connected squares, carrying an orientation frame, and see which
+   cube face each one lands on. That catches overlaps that a shape-matching
+   lookup table would miss. */
+const DIRS=[{dx:0,dy:-1,k:"up"},{dx:1,dy:0,k:"right"},{dx:0,dy:1,k:"down"},{dx:-1,dy:0,k:"left"}];
+
+/* Cube faces as vectors. Start: front=+z toward viewer, up=+y, right=+x. */
+function foldNet(cells){
+  if(!cells.length) return {ok:false,reason:"empty",faces:null};
+  if(cells.length!==6) return {ok:false,reason:"count",faces:null,count:cells.length};
+  const key=(x,y)=>x+","+y;
+  const set=new Map(cells.map(c=>[key(c.x,c.y),c]));
+  /* connectivity */
+  const seen=new Set(), stack=[cells[0]];
+  seen.add(key(cells[0].x,cells[0].y));
+  while(stack.length){
+    const c=stack.pop();
+    for(const d of DIRS){
+      const k=key(c.x+d.dx,c.y+d.dy);
+      if(set.has(k)&&!seen.has(k)){seen.add(k);stack.push(set.get(k));}
+    }
+  }
+  if(seen.size!==6) return {ok:false,reason:"disconnected",faces:null,connected:seen.size};
+
+  /* fold: BFS carrying (normal, up) orientation vectors */
+  const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
+  const neg=v=>[-v[0],-v[1],-v[2]];
+  const vkey=v=>v.join(",");
+  const start=cells[0];
+  const faces=new Map();           /* cube-face vector -> grid cell */
+  const placed=new Map();          /* grid cell -> cube-face vector */
+  const q=[{c:start, normal:[0,0,1], up:[0,1,0]}];
+  faces.set(vkey([0,0,1]), start);
+  placed.set(key(start.x,start.y), [0,0,1]);
+  const visited=new Set([key(start.x,start.y)]);
+  while(q.length){
+    const {c,normal,up}=q.shift();
+    const right=cross(up,normal);          /* screen-right in 3D */
+    for(const d of DIRS){
+      const nk=key(c.x+d.dx,c.y+d.dy);
+      if(!set.has(nk)||visited.has(nk))continue;
+      /* rolling the cube in direction d: new normal is the old face we roll onto */
+      let nn,nu;
+      if(d.k==="up"){      nn=up;        nu=neg(normal); }
+      else if(d.k==="down"){ nn=neg(up); nu=normal; }
+      else if(d.k==="right"){ nn=right;  nu=up; }
+      else {                nn=neg(right); nu=up; }
+      const fk=vkey(nn);
+      if(faces.has(fk)){
+        return {ok:false,reason:"overlap",faces:null,
+                clash:[faces.get(fk), set.get(nk)]};
+      }
+      faces.set(fk, set.get(nk));
+      placed.set(nk, nn);
+      visited.add(nk);
+      q.push({c:set.get(nk), normal:nn, up:nu});
+    }
+  }
+  return {ok:true, reason:"folds", faces:placed};
+}
+
+const FACE_NAME={"0,0,1":"front","0,0,-1":"back","0,1,0":"top","0,-1,0":"bottom","1,0,0":"right","-1,0,0":"left"};
+
+/* the eleven cube nets, as preset layouts */
+const PRESETS=[
+ {k:"cross",   cells:[[1,0],[0,1],[1,1],[2,1],[1,2],[1,3]]},
+ {k:"T-shape", cells:[[0,0],[1,0],[2,0],[1,1],[1,2],[1,3]]},
+ {k:"staircase",cells:[[0,0],[0,1],[1,1],[1,2],[2,2],[2,3]]},
+ {k:"1-4-1",   cells:[[1,0],[0,1],[1,1],[2,1],[3,1],[3,2]]},
+ {k:"2-2-2",   cells:[[0,0],[1,0],[1,1],[2,1],[2,2],[3,2]]},
+ {k:"strip of 6 (fails)", cells:[[0,0],[1,0],[2,0],[3,0],[4,0],[5,0]]},
+ {k:"2x3 block (fails)",  cells:[[0,0],[1,0],[2,0],[0,1],[1,1],[2,1]]}
+];
+
+function netFold(host){
+  const box=el("div","tool");
+  box.innerHTML=`<h3>Folding a net<span class="mins">tool</span></h3>
+    <p class="sense">touch · spatial reasoning</p>
+    <p class="how">Click squares to lay out a net, then fold it. Paper tells you a bad net failed. This tells you which rule it broke — too few squares, a gap, or two faces trying to land in the same place.</p>
+    <div class="ctl picker" id="nfp"></div>
+    <div class="ctl">
+      <button class="btn go" id="nffold">Fold it</button>
+      <button class="btn sm" id="nfclear">Clear</button>
+      <span id="nfcount" style="font-family:var(--mono);font-size:.85rem;color:var(--muted)">0 of 6 squares</span>
+    </div>
+    <div class="stage-area"><svg viewBox="0 0 700 330" role="img" style="width:100%;height:auto"></svg></div>
+    <div class="out" id="nfout"></div>
+    <p class="note">There are exactly eleven nets that fold into a cube. Five are loaded as presets and two deliberate failures are too — try those on purpose, and read what the tool says is wrong with them.</p>`;
+  host.appendChild(box);
+  const svg=box.querySelector("svg"), out=box.querySelector("#nfout"), $=s=>box.querySelector(s);
+  $("#nfp").innerHTML=PRESETS.map((p,i)=>`<button class="btn sm" data-i="${i}">${p.k}</button>`).join("");
+
+  let cells=[], folded=null;
+  const COLS=8, ROWS=5, CW=54, GX=120, GY=24;
+  const has=(x,y)=>cells.some(c=>c.x===x&&c.y===y);
+
+  function draw(){
+    let s="";
+    /* grid */
+    for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
+      const on=has(x,y);
+      let fill="#fff", stroke="#D3DCE4", sw=1;
+      let label="";
+      if(on){
+        fill=T; stroke=INK; sw=2;
+        if(folded&&folded.ok){
+          const v=folded.faces.get(x+","+y);
+          if(v){label=FACE_NAME[v.join(",")]||"";}
+        }
+        if(folded&&folded.reason==="overlap"&&folded.clash&&
+           folded.clash.some(c=>c.x===x&&c.y===y)){ fill=ROSE; }
+      }
+      s+=`<rect class="nfsq" data-x="${x}" data-y="${y}" x="${GX+x*CW}" y="${GY+y*CW}" width="${CW}" height="${CW}" fill="${fill}" fill-opacity="${on?".85":"1"}" stroke="${stroke}" stroke-width="${sw}" style="cursor:pointer"/>`;
+      if(label){
+        s+=`<text x="${GX+x*CW+CW/2}" y="${GY+y*CW+CW/2+4}" font-family="Inconsolata" font-size="11" fill="#fff" text-anchor="middle" pointer-events="none">${label}</text>`;
+      }
+    }
+    svg.innerHTML=s;
+    $("#nfcount").textContent=`${cells.length} of 6 squares`;
+
+    const desc = cells.length
+      ? `A grid with ${cells.length} shaded square${cells.length===1?"":"s"} forming a net layout.`
+      : `An empty grid, ready for squares to be placed.`;
+    svg.setAttribute("aria-label", desc + (folded
+      ? (folded.ok
+         ? ` This net folds into a cube; each square is labelled with the cube face it becomes: front, back, top, bottom, left and right.`
+         : ` This net does not fold into a cube.`)
+      : ""));
+  }
+
+  function report(){
+    if(!folded){out.innerHTML=`<span style="color:${MUT}">Lay out six squares, then press Fold it.</span>`;return;}
+    if(folded.ok){
+      out.innerHTML=`<b style="color:${T}">It folds.</b> Every square landed on a different face of the cube — front, back, top, bottom, left and right, all six filled exactly once.<br>
+        <span style="color:${MUT}">The labels show where each square ends up. Notice that squares far apart on the flat net can end up next to each other on the cube; flat distance and folded distance are different things.</span>`;
+      return;
+    }
+    const R=folded.reason;
+    const msg = R==="count"
+      ? `<b style="color:${ROSE}">Not six squares.</b> You have ${folded.count}. A cube has six faces, so a net needs exactly six squares — no more, no fewer.`
+      : R==="disconnected"
+        ? `<b style="color:${ROSE}">The squares are not all joined.</b> Only ${folded.connected} of your 6 connect to each other along edges. A net has to be one piece — if you cut it out, it must come away in a single flat shape.`
+        : R==="overlap"
+          ? `<b style="color:${ROSE}">Two faces land in the same place.</b> When this folds, two of your squares try to occupy the same face of the cube — so some other face is left open. The shaded red squares are the pair that clash.`
+          : `<b style="color:${ROSE}">This one doesn't fold.</b>`;
+    out.innerHTML = msg + `<br><span style="color:${MUT}">Change one square and try again. Knowing which rule a net breaks is more useful than knowing it failed.</span>`;
+  }
+
+  svg.addEventListener("click",e=>{
+    const r=e.target.closest("rect[data-x]");if(!r)return;
+    const x=+r.dataset.x, y=+r.dataset.y;
+    if(has(x,y)) cells=cells.filter(c=>!(c.x===x&&c.y===y));
+    else cells.push({x,y});
+    folded=null; draw(); report();
+  });
+  $("#nffold").addEventListener("click",()=>{folded=foldNet(cells);draw();report();});
+  $("#nfclear").addEventListener("click",()=>{cells=[];folded=null;draw();report();});
+  $("#nfp").addEventListener("click",e=>{
+    const b=e.target.closest("button[data-i]");if(!b)return;
+    cells=PRESETS[+b.dataset.i].cells.map(([x,y])=>({x,y}));
+    folded=null;draw();report();
+  });
+  draw();report();
+}
+return {netFold};
+})());
+window.__EXTRA_NAMES__=Object.assign(window.__EXTRA_NAMES__||{},{netFold:"Folding a net"});
+</script>
+
+<script>
+/* Core tools: placeValue, rounding, shift, stepper, power, barModel, factors,
+   decimalGrid, rateLine. This unit adds netFold. */
+window.UNIT={
+  number:8,
+  minutes:55,
+  tools:{
+     1:["power"],      2:["power"],      3:["power"],      4:["decimalGrid"],
+     5:["power"],      6:["power"],      7:["netFold"],    8:["netFold"],
+     9:["netFold"],   10:["netFold"],   11:["netFold"],   12:["netFold"],
+    13:["netFold"],   14:["netFold"],
+    15:"all"
+  }
+};
+
+window.LESSONS=
+[
+{
+ day:1, short:"Volume by counting", title:"Volume as the number of unit cubes",
+ objective:"Find the volume of a rectangular prism by counting unit cubes, and explain what one cubic unit measures.",
+ standards:["6.G.A.2"],
+ vocab:[["Volume","How much space a solid takes up, measured in cubic units."],["Unit cube","A cube measuring one unit on every edge. Volume 1 cubic unit."],["Rectangular prism","A box shape — six rectangular faces, all corners square."],["Cubic units","cm³, m³. Three lengths multiplied, so three dimensions in the unit."]],
+ materials:["Interlocking unit cubes, at least 60 per pair","Small boxes to fill","Rulers","Isometric dot paper"],
+ warmup:{mins:5,text:"Hold up a single unit cube and a small box. Ask how many cubes would fit inside the box. Take guesses and write the range on the board. Say: we are going to find out by filling it, and then find a way to know without filling it."},
+ stages:[
+  {k:"c",label:"Concrete",mins:13,sense:"touch · filling a box",
+   moves:["Fill a small box completely with unit cubes, packing them tightly.","Count the cubes by emptying and counting, and record.","Refill in layers, counting one layer at a time.","Note the layer count and the cubes per layer."],
+   say:[["Teacher","Fill it completely, no gaps. Now count them."],["Expected","Twenty-four."],["Teacher","Now refill it one layer at a time. How many in a layer?"],["Expected","Eight, and there are three layers."],["Teacher","Eight times three is twenty-four. You just found a faster way to count than counting."]],
+   watch:["Students who leave gaps or stack cubes unevenly, giving a low count. Volume means the space completely filled — press the cubes together and check the top layer is level."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · drawing the layers",
+   moves:["Draw a prism on isometric dot paper showing its cube structure.","Shade one complete layer and count the cubes in it.","Count the number of layers.","Write the volume as cubes per layer times number of layers."],
+   say:[["Teacher","Shade the bottom layer. How many cubes?"],["Expected","Eight — four by two."],["Teacher","And how many layers stacked up?"],["Expected","Three."],["Teacher","So the picture gives you the same twenty-four the cubes did, without needing the cubes."]],
+   readaloud:["Say the picture aloud: 'A box drawn in three dimensions, four cubes long, two cubes deep and three cubes tall. The bottom layer of eight cubes is shaded, and the two layers above it are drawn in outline.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · cubic units",
+   moves:["Write volume as a count with cubic units: 24 cm³.","Compare with area's squared units and length's plain units.","Find volumes from stated layer structures.","Explain why the unit is cubed."],
+   say:[["Teacher","Length is centimetres. Area is centimetres squared. Volume is?"],["Expected","Centimetres cubed."],["Teacher","Because you multiplied three lengths. The little three in the unit is a count of how many directions you measured."]],
+   watch:["Students who write cm² for volume. The exponent counts the dimensions multiplied — ask how many measurements went into the answer."]}
+ ],
+ guided:[["A box holds 6 cubes per layer, 4 layers. Find the volume.","24 cubic units"],["A box holds 12 cubes per layer, 3 layers.","36 cubic units"],["Why is volume measured in cubic units?","Three lengths were multiplied, so the unit carries a three."],["A prism is 5 by 2 by 3 cubes. How many in one layer?","10, with 3 layers"]],
+ worksheet:[
+  {t:"A · From layers",d:"Find the volume in cubic units.",items:["8 per layer, 5 layers","12 per layer, 2 layers","6 per layer, 6 layers","15 per layer, 4 layers","9 per layer, 3 layers","20 per layer, 7 layers"]},
+  {t:"B · From dimensions",d:"Find cubes per layer first, then the volume.",items:["4 by 3 by 2","5 by 5 by 2","6 by 2 by 4","3 by 3 by 3","8 by 2 by 3","10 by 4 by 2"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why counting in layers is faster than counting every cube individually.","A box is 4 by 3 by 5. Describe two different ways of splitting it into layers, and show both give the same volume.","Why can't a box holding 24 cubes always be described by just one set of dimensions? Give two possibilities."]}],
+ exit:["A prism has 10 cubes per layer and 4 layers. Find the volume.","A prism is 3 by 4 by 2. Find the volume.","Explain why volume is measured in cubic units."],
+ crit:"Mastery: both correct with cubic units, and item 3 explaining three dimensions. Reteach with physical filling if layers are not being used — counting one cube at a time works but does not generalise to the formula on day two.",
+ support:["Keep cubes available for building every prism before calculating.","Restrict to prisms with a small layer count before larger ones.","Provide isometric dot paper with the prism outline pre-drawn."],
+ extend:["A box holds 36 cubes. List every possible set of whole-number dimensions.","If you double one dimension, what happens to the volume? Test with cubes."],
+ access:["Touch: physically filling and emptying a box is the definition of volume, available without any notation.","Vision: isometric drawings shade one layer distinctly so the layer structure is visible, not inferred.","Language: 'cubic' and 'cubed' are used for the same idea; post both alongside 'three measurements multiplied'.","Motor: pre-built prisms can be counted and described by students who find stacking difficult."]
+},
+{
+ day:2, short:"Volume formula", title:"The volume formula for a rectangular prism",
+ objective:"Derive V = l × w × h from the layer structure, and use it to find volumes.",
+ standards:["6.G.A.2"],
+ vocab:[["Length, width, height","The three edge measurements of a prism."],["V = lwh","Volume equals length times width times height."],["Base area","Length times width — the cubes in one layer."],["V = Bh","An equivalent form: base area times height."]],
+ materials:["Unit cubes","Rulers","Boxes of various sizes","Calculators"],
+ warmup:{mins:5,text:"Post a prism 6 by 4 by 5 and ask for its volume, without cubes. Most will multiply. Ask why multiplying works — what is each number counting? That question is today's lesson, not the arithmetic."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · naming what each number counts",
+   moves:["Build a 4 by 3 by 2 prism from cubes.","Identify what each dimension counts: cubes along, cubes deep, layers up.","Multiply length by width to get one layer's count, then by height.","Rebuild with the prism on its side and confirm the volume is unchanged."],
+   say:[["Teacher","Four along, three deep. How many in the bottom layer?"],["Expected","Twelve."],["Teacher","That is the base area. Now two layers high."],["Expected","Twenty-four."],["Teacher","Now turn the prism on its side and count again."],["Expected","Still twenty-four."],["Teacher","So it does not matter which dimension you call the height. Multiplication does not care about the order."]],
+   watch:["Students who think the formula only works if the prism sits a particular way up. Rotating it and recounting settles this physically."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · labelled prism",
+   moves:["Draw a prism with l, w and h labelled on the correct edges.","Shade the base and label its area as l × w.","Write V = lwh and V = Bh side by side.","Draw the same prism rotated and confirm the same volume."],
+   say:[["Teacher","Label the three edges. Shade the base. What is the base area?"],["Teacher","Two formulas, same thing. V equals l w h, and V equals base area times height."],["Teacher","Why have both?"],["Expected","The second one works for other shapes too, maybe."],["Teacher","Good instinct. Hold that until day five."]],
+   readaloud:["Say the picture aloud: 'A rectangular prism drawn in three dimensions. Its bottom edge is labelled l, its depth w, and its vertical edge h. The base face is shaded and labelled with the words base area.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · applying the formula",
+   moves:["Calculate volumes from three given dimensions.","Use V = Bh when the base area is given instead.","Handle decimal dimensions.","Include cubic units on every answer."],
+   say:[["Teacher","Multiply all three, in any order you like. Then the unit — cubic centimetres."],["Teacher","This one gives the base area as 18 and the height as 4. Do you need the length and width separately?"],["Expected","No, base area already has them multiplied."]],
+   watch:["Students who add dimensions rather than multiplying. Ask what adding would count — it counts nothing meaningful here, while multiplying counts cubes."]}
+ ],
+ guided:[["4 by 3 by 5. Find the volume.","60 cubic units"],["Base area 20, height 6.","120 cubic units"],["2.5 by 4 by 3.","30 cubic units"],["Why does V = Bh give the same as V = lwh?","Base area is already length times width."]],
+ worksheet:[
+  {t:"A · Three dimensions",d:"Include cubic units.",items:["5 by 4 by 3 cm","6 by 6 by 2 cm","10 by 3 by 4 cm","7 by 2 by 5 cm","8 by 8 by 8 cm","12 by 5 by 2 cm"]},
+  {t:"B · Base area and height",d:"Use V = Bh.",items:["B = 24 cm², h = 5 cm","B = 36 cm², h = 3 cm","B = 15 cm², h = 8 cm","B = 50 cm², h = 2 cm"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A tank is 40 cm by 30 cm by 25 cm. Find its volume in cubic centimetres.","Explain why the order of multiplication does not matter for volume, using the rotating prism idea.","A prism has volume 48 cm³ and a base area of 12 cm². Find its height."]}],
+ exit:["6 by 5 by 4. Find the volume.","Base area 30, height 7. Find the volume.","Explain what the base area counts."],
+ crit:"Mastery: both correct with cubic units, and item 3 identifying cubes in one layer. Reteach with cubes if dimensions are added — the physical layer structure shows why multiplication is the right operation.",
+ support:["Provide the formula card with a labelled prism diagram.","Restrict to whole-number dimensions before decimals.","Keep cubes available for building any prism under 60 cubes."],
+ extend:["A prism has volume 72 cm³. Find three different possible sets of dimensions.","If all three dimensions double, what happens to the volume? Predict, then check."],
+ access:["Touch: rotating a built prism and recounting makes the order-independence concrete.","Vision: the base is shaded on every prism diagram so 'base area' is never ambiguous.","Attention: writing the base area as its own step before multiplying by height gives a checkpoint.","Memory: naming V = Bh now prepares day five without introducing it as new content there."]
+},
+{
+ day:3, short:"Fractional edges", title:"Volume with fractional edge lengths",
+ objective:"Find the volume of a prism with fractional or decimal edge lengths, and explain what a fractional cube means.",
+ standards:["6.G.A.2","6.NS.A.1"],
+ vocab:[["Fractional edge","An edge measuring a fraction of a unit, such as 2½ cm."],["Partial cube","What fits in the leftover space — a fraction of a unit cube."],["Smaller unit cubes","Filling with half-unit cubes, eight of which make one whole unit cube."],["Same formula","V = lwh works unchanged; only the arithmetic gets harder."]],
+ materials:["Unit cubes and half-unit cubes if available","Grid paper","Calculators","Rulers"],
+ warmup:{mins:5,text:"Post a prism 2½ by 2 by 2. Ask whether whole unit cubes can fill it exactly. They cannot — there is a half-thickness slice left over. Ask what would fill that, and hold the question."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · filling with smaller cubes",
+   moves:["Try to fill a 2½ by 2 by 2 space with whole unit cubes and find the leftover slice.","Fill the same space with half-unit cubes and count them.","Establish that 8 half-unit cubes make 1 whole unit cube.","Convert the half-cube count to whole cubic units."],
+   say:[["Teacher","How many half-unit cubes fill one whole unit cube?"],["Expected","Eight — two along each edge."],["Teacher","So if you counted eighty half-cubes, how many whole cubic units is that?"],["Expected","Ten."],["Teacher","The formula would have told you ten directly. But now you know why it is ten."]],
+   watch:["Students who think two half-cubes make a whole cube. Half in every direction means 2 × 2 × 2 = 8. Have them build one whole cube from halves and count."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · the partial layer",
+   moves:["Draw a prism with one fractional dimension and mark the whole and partial parts.","Split the volume into the whole-unit portion and the fractional slice.","Calculate each and add.","Confirm the total matches V = lwh applied directly."],
+   say:[["Teacher","Split it. The whole part is 2 by 2 by 2, which is eight. What is the extra slice?"],["Expected","Half by two by two, so two."],["Teacher","Eight plus two is ten. And two and a half times two times two is also ten. Both routes, same answer."]],
+   readaloud:["Say the picture aloud: 'A prism two units deep and two units tall, with a length of two and a half units. A dashed line divides it into a two-by-two-by-two block and a thinner slice half a unit thick.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · multiplying fractions",
+   moves:["Apply V = lwh with fractional dimensions, using Unit 2's fraction multiplication.","Convert mixed numbers to improper fractions before multiplying.","Handle decimal dimensions and estimate first.","Check the answer against a whole-number estimate."],
+   say:[["Teacher","Two and a half becomes five halves. This is Unit 2 day eight, with a third factor."],["Teacher","Estimate first. Two and a half is about two or three, so expect somewhere between eight and twelve."],["Expected","Ten — right in the middle."]],
+   watch:["Students who multiply only the whole-number parts and ignore the fraction. The estimate catches it, and so does the split-into-two-pieces picture."]}
+ ],
+ guided:[["2½ by 2 by 2. Find the volume.","10 cubic units"],["1½ by 4 by 2.","12 cubic units"],["3 by 2½ by 2.","15 cubic units"],["How many half-unit cubes make one whole unit cube?","Eight."]],
+ worksheet:[
+  {t:"A · Fractional edges",d:"Estimate first.",items:["1½ by 2 by 4","2½ by 3 by 2","3½ by 2 by 2","1½ by 1½ by 4","2¼ by 4 by 2","4½ by 2 by 3"]},
+  {t:"B · Decimal edges",d:"Estimate first.",items:["2.5 by 4 by 3","1.5 by 6 by 2","3.2 by 5 by 2","0.5 by 8 by 4"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why eight half-unit cubes fill one whole unit cube, not two.","A box is 2½ by 3½ by 2. Find its volume two ways: by splitting into whole and partial parts, and by multiplying directly.","A fish tank is 0.5 m by 0.4 m by 0.3 m. Find its volume in cubic metres, then say whether that number is convenient and what unit might be better."]}],
+ exit:["2½ by 4 by 2. Find the volume.","1.5 by 4 by 2. Find the volume.","Explain how many half-unit cubes fill one whole cube."],
+ crit:"Mastery: both correct, and item 3 giving eight with a reason. Reteach if only whole parts are multiplied — the split-into-two-pieces picture makes the missing slice visible.",
+ support:["Provide the split diagram pre-drawn so only calculation remains.","Restrict to one fractional dimension before two.","Permit decimals throughout if fraction arithmetic is the obstacle."],
+ extend:["A prism is ½ by ½ by ½. Find its volume as a fraction. How does it compare with a unit cube?","Why does halving all three dimensions divide the volume by eight rather than by two?"],
+ access:["Touch: building one unit cube from eight half-cubes settles the eight-not-two question physically.","Memory: naming this as Unit 2's fraction multiplication makes it one skill applied, not a new one.","Attention: the estimate-first rule gives a plausibility check before the harder arithmetic.","Vision: the split between whole and partial portions is drawn with a distinct dashed line."]
+},
+{
+ day:4, short:"Volume problems", title:"Volume in real contexts",
+ objective:"Solve volume problems in real contexts, including capacity, and convert between cubic units and litres.",
+ standards:["6.G.A.2","6.RP.A.3"],
+ vocab:[["Capacity","How much a container holds, usually in litres or millilitres."],["1000 cm³ = 1 litre","The conversion linking volume to capacity."],["1 cm³ = 1 millilitre","The smaller version of the same relationship."],["Context decides the unit","Cubic metres for a room, litres for a jug."]],
+ materials:["Measuring jugs","Water","Various containers","Rulers","Calculators"],
+ warmup:{mins:5,text:"Hold up a 1-litre jug and a 10 cm cube if available. Ask whether the cube would hold more or less than the jug. They hold exactly the same. Say: that is not a coincidence, and today's conversion depends on it."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · filling and measuring",
+   moves:["Measure a rectangular container's inside dimensions and calculate its volume in cm³.","Fill it with water and pour into a measuring jug.","Compare the calculated cm³ with the measured millilitres.","Confirm 1 cm³ equals 1 mL."],
+   say:[["Teacher","You calculated 600 cubic centimetres. Now fill it and measure."],["Expected","About 600 millilitres."],["Teacher","So a cubic centimetre and a millilitre are the same amount of space, measured two different ways. That is why the conversion is so clean."]],
+   watch:["Students who measure outside dimensions rather than inside. Container walls have thickness — the volume that holds water is the inside, and on a thin plastic box the difference is small but on a thick one it matters."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · the litre cube",
+   moves:["Draw a 10 by 10 by 10 cube and calculate its volume as 1000 cm³.","Label it as 1 litre.","Draw a conversion strip: cm³ to mL to litres.","Convert three volumes in both directions."],
+   say:[["Teacher","Ten by ten by ten is a thousand cubic centimetres. And that is one litre, exactly."],["Teacher","So converting cubic centimetres to litres is dividing by a thousand — which is a Unit 2 shift of three columns."]],
+   readaloud:["Say the picture aloud: 'A cube drawn with each edge labelled ten centimetres. Inside it is written one thousand cubic centimetres, and beneath it, equals one litre.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · converting and solving",
+   moves:["Calculate a container's volume and convert to litres.","Solve a problem giving capacity and asking for a missing dimension.","Handle a problem in cubic metres and convert to litres.","Choose a sensible unit for the final answer and justify it."],
+   say:[["Teacher","A tank of 45,000 cubic centimetres. Would you report it that way?"],["Expected","Forty-five litres sounds better."],["Teacher","The arithmetic does not care, but the reader does. Pick the unit that makes the number readable."]],
+   watch:["Students who divide by 100 instead of 1000 converting cm³ to litres. Three dimensions means three factors of ten — link it to the cube picture."]}
+ ],
+ guided:[["A box 20 by 15 by 10 cm. Volume in cm³ and litres.","3000 cm³ = 3 L"],["A tank holds 12 L. Volume in cm³?","12,000 cm³"],["A container 30 by 20 by 25 cm. Capacity in litres.","15 L"],["Why is 1 cm³ equal to 1 mL?","They describe the same amount of space in different measuring systems."]],
+ worksheet:[
+  {t:"A · Volume then litres",d:"Give both units.",items:["10 by 10 by 10 cm","20 by 10 by 5 cm","25 by 20 by 10 cm","30 by 30 by 10 cm","15 by 10 by 8 cm","40 by 25 by 20 cm"]},
+  {t:"B · Working backwards",d:"Find the missing dimension.",items:["V = 2 L, base 20 by 10 cm, find height","V = 6 L, base 30 by 20 cm, find height","V = 500 mL, base 10 by 10 cm, find height","V = 24 L, height 30 cm, base is square — find its side"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A fish tank is 60 by 30 by 40 cm. How many litres does it hold? Would you fill it to the brim? Explain.","Explain why converting cm³ to litres means dividing by 1000, linking it to the 10 by 10 by 10 cube.","A watering can holds 5 litres. Design a rectangular container with that capacity, giving sensible dimensions."]}],
+ exit:["A box 20 by 20 by 10 cm. Find the volume in litres.","A tank holds 8 L. What is that in cm³?","Explain why 1000 cm³ makes 1 litre."],
+ crit:"Mastery: both conversions correct, and item 3 referring to the 10 cm cube. Reteach if dividing by 100 — the cube picture with three edges of ten is the argument.",
+ support:["Provide the conversion strip as a permanent reference.","Restrict to cm³ and litres before introducing cubic metres.","Permit calculators throughout."],
+ extend:["How many litres in a cubic metre? Work it out from the definitions rather than looking it up.","A swimming pool is 25 m by 10 m by 2 m. How many litres? Comment on the size of your answer."],
+ access:["Touch: filling a measured container and pouring into a jug verifies the conversion physically rather than accepting it.","Vision: the litre cube is drawn with all three edges labelled, so the thousand is visibly three tens multiplied.","Memory: the divide-by-1000 shift is named as Unit 2 day fifteen's shift machine, three columns.","Language: 'volume' and 'capacity' are near-synonyms here; state that capacity usually means what a container holds, in litres."]
+},
+{
+ day:5, short:"Other prisms", title:"Volume of prisms with other bases",
+ objective:"Find the volume of a prism with a triangular or composite base using V = Bh.",
+ standards:["6.G.A.2","6.G.A.1"],
+ vocab:[["Prism","A solid with the same cross-section all the way through."],["Cross-section","The shape you see if you slice straight across."],["Base","The cross-section face, whatever shape it is."],["V = Bh","Base area times height — works for any prism, not just rectangular ones."]],
+ materials:["Prism models if available","Card to build prisms","Unit cubes","Calculators"],
+ warmup:{mins:5,text:"Hold up a triangular prism, or draw one. Ask whether V = lwh will work. It will not — there is no single width. Ask what stays the same all the way along the solid. The triangle does, and that is the base."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · same slice throughout",
+   moves:["Examine a triangular prism and identify the cross-section that repeats.","Stack identical triangular card pieces to build a prism and count the layers.","Note that each layer has the triangle's area.","Generalise: volume is the repeated area times how many deep."],
+   say:[["Teacher","Slice it anywhere along its length. What shape do you get?"],["Expected","The same triangle every time."],["Teacher","So it is like stacking identical triangles. Area of the triangle, times how far it goes."],["Teacher","That is V equals B h, and you met it on day two."]],
+   watch:["Students who use the triangle's side lengths as if they were width and depth. The base is an area, found with the triangle formula from Unit 6 — it is one number, not two."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · base then length",
+   moves:["Draw a triangular prism with the base triangle labelled.","Calculate the base area with the Unit 6 formula.","Multiply by the prism's length.","Repeat for a prism with an L-shaped base, splitting the base into rectangles."],
+   say:[["Teacher","Base area first, always. Then the length it runs for."],["Teacher","This one has an L-shaped base. What do you do?"],["Expected","Split it into two rectangles and add."],["Teacher","Unit 6's decomposition, applied to the base. Then multiply once."]],
+   readaloud:["Say the picture aloud: 'A prism whose end face is a triangle with base six centimetres and height four centimetres. The prism extends ten centimetres back, with the triangular cross-section repeating along its whole length.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · two-step calculation",
+   moves:["Calculate triangular prism volumes: base area then times length.","Calculate a composite-base prism volume.","Write each step on its own line.","Check the answer against a rough estimate."],
+   say:[["Teacher","Two steps, written separately. If you try to do it in one line you will lose the halving."],["Teacher","Why does a triangular prism hold half what a rectangular one of the same dimensions holds?"],["Expected","Because the triangle is half the rectangle."]],
+   watch:["Students who forget to halve when finding a triangular base area. Writing the base area as its own labelled line makes the omission visible."]}
+ ],
+ guided:[["Triangular base: b = 6, h = 4. Prism length 10.","Base 12, volume 120 cubic units"],["Triangular base: b = 8, h = 5. Length 6.","Base 20, volume 120"],["L-shaped base area 30. Length 7.","210"],["Why does V = Bh work for any prism?","Because the same cross-section repeats all the way through."]],
+ worksheet:[
+  {t:"A · Triangular prisms",d:"Find the base area first.",items:["b=4, h=3, length 10","b=6, h=5, length 8","b=10, h=4, length 6","b=12, h=6, length 5","b=7, h=4, length 9","b=9, h=8, length 3"]},
+  {t:"B · Composite bases",d:"Split the base, then multiply.",wide:true,
+   items:["An L-shaped base made of a 6 by 4 rectangle and a 3 by 2 rectangle, prism length 8.","A base that is a 10 by 6 rectangle with a 4 by 3 rectangle removed, prism length 5."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why V = Bh works for a triangular prism but V = lwh does not.","A triangular prism and a rectangular prism have the same base dimensions and length. Which holds more, and by how much?","A prism has volume 240 cm³ and length 10 cm. Find its base area, and suggest two possible base shapes."]}],
+ exit:["Triangular base b = 8, h = 6, length 5. Find the volume.","Explain what the base of a prism is.","Explain why V = Bh is more general than V = lwh."],
+ crit:"Mastery: correct volume with the base area shown as its own step, and item 3 noting that any cross-section shape works. Reteach if the triangle halving is omitted — requiring the base area on its own line is the fix.",
+ support:["Provide the base area pre-calculated so only the multiplication remains.","Restrict to triangular bases before composite ones.","Keep the Unit 6 area formulas visible."],
+ extend:["A prism has a trapezoid base. Find its volume given the trapezoid's dimensions.","Is a cylinder a prism? Argue both sides using the cross-section idea."],
+ access:["Touch: stacking identical card triangles makes the repeated-cross-section idea physical.","Memory: this reuses Unit 6's triangle area and decomposition — name both connections explicitly.","Attention: the two-step format with the base area labelled separately prevents the halving being lost.","Vision: the repeating cross-section is drawn at both ends of the prism so the 'same all the way through' claim is visible."]
+},
+{
+ day:6, short:"Volume practice", title:"Mixed volume problems",
+ objective:"Solve mixed volume problems, selecting the right approach and checking answers for plausibility.",
+ standards:["6.G.A.2","6.RP.A.3"],
+ vocab:[["Select the method","Decide whether lwh, Bh, or a decomposition applies."],["Plausible","An answer whose size makes sense for the object described."],["Composite solid","A solid built from two or more prisms."],["Working backwards","Given a volume, find a missing dimension."]],
+ materials:["Mixed problem cards","Unit cubes","Calculators","Whiteboards"],
+ warmup:{mins:5,text:"Post four volume problems of different types with no labels — a rectangular box, a triangular prism, a composite solid, and a working-backwards problem. Ask students to sort by method, not to solve. Compare sortings."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · building composites",
+   moves:["Build a composite solid from cubes: two rectangular blocks joined.","Count the total cubes.","Calculate each block separately and add.","Confirm the calculation matches the count."],
+   say:[["Teacher","Two blocks joined. Find the volume of each and add them."],["Teacher","Could you also have found it another way?"],["Expected","Count all the cubes."],["Teacher","Both work. But when the solid is a real building you cannot count the cubes, so the splitting method is the one that scales."]],
+   watch:["Students who double-count the join region when splitting a composite. Split so the pieces do not overlap — draw the dividing line before calculating."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · plan before calculating",
+   moves:["Draw each mixed problem and mark the method to be used.","For composites, draw the splitting line.","For working-backwards problems, mark the unknown.","Then solve all four."],
+   say:[["Teacher","Mark the method on the diagram before any arithmetic. Which formula, and how many steps?"]],
+   readaloud:["Say the page aloud: 'Four solids in a two-by-two grid. The first is a plain box. The second is a triangular prism. The third is an L-shaped composite with a dashed splitting line drawn. The fourth is a box with one dimension marked as unknown.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · solving and checking",
+   moves:["Solve the four problems with one step per line.","Estimate before each calculation.","Check each answer for plausibility against the context.","Justify the method chosen in one sentence each."],
+   say:[["Teacher","A shoebox with a volume of 60,000 cubic centimetres. Is that plausible?"],["Expected","That's sixty litres — way too big for a shoebox."],["Teacher","So the plausibility check caught it. Something went wrong by a factor of ten somewhere."]],
+   watch:["Students who accept an implausible answer because the arithmetic looked right. Require a sentence on whether the size makes sense for the object described."]}
+ ],
+ guided:[["Box 10 by 8 by 5.","400 cubic units"],["Triangular prism, base area 24, length 9.","216"],["Composite: 6 by 4 by 3 plus 4 by 4 by 2.","72 + 32 = 104"],["V = 120, base 6 by 4. Find the height.","5"]],
+ worksheet:[
+  {t:"A · Mixed, unlabelled",d:"State the method, then solve.",wide:true,
+   items:["A box measures 12 cm by 8 cm by 6 cm. Find its volume.","A triangular prism has base 10 cm, base height 6 cm, and length 12 cm. Find its volume.","A solid is made of a 10 by 6 by 4 block with a 4 by 4 by 4 cube on top. Find the total volume.","A tank has volume 18 litres and a base of 30 cm by 20 cm. Find its height."]},
+  {t:"B · Plausibility",d:"State whether each answer is sensible for the object.",items:["a shoebox, 6000 cm³","a swimming pool, 50 cm³","a mug, 350 cm³","a room, 30 m³"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain how you decide whether a problem needs lwh, Bh, or a decomposition.","A composite solid can often be split in more than one way. Show two splits of the same solid and confirm they give the same volume.","A box has volume 240 cm³ and a square base. Its height is 15 cm. Find the base side length."]}],
+ exit:["Box 9 by 5 by 4. Find the volume.","V = 180, base area 30. Find the height.","Explain how a plausibility check helps."],
+ crit:"Mastery: both correct and item 3 describing a size check against the real object. Reteach by method rather than by topic — the sorting activity identifies which method is unclear.",
+ support:["Provide the method reference card with a diagram for each.","Reduce to two problem types before mixing four.","Permit calculators throughout."],
+ extend:["Design a composite solid with a volume of exactly 200 cm³, using two blocks.","A cube has volume 125 cm³. Find its edge length. What operation did you need?"],
+ access:["Attention: sorting before solving splits the task into two shorter phases.","Vision: splitting lines on composites are drawn dashed and distinct from solid edges.","Language: the method reference card carries a diagram per method rather than formula names alone.","Memory: plausibility checking has run since Unit 2; name it as the same habit."]
+},
+{
+ day:7, short:"Nets", title:"Nets: unfolding a solid",
+ objective:"Recognise which flat arrangements fold into a cube, and explain why a given arrangement fails.",
+ standards:["6.G.A.4"],
+ vocab:[["Net","A flat arrangement that folds into a solid without gaps or overlaps."],["Fold line","An edge where two faces meet when folded."],["Overlap","When two faces land on the same place — the net fails."],["Eleven nets","There are exactly eleven distinct nets for a cube."]],
+ materials:["Squared paper","Scissors and tape","Pre-cut square tiles for arranging","Net-folding tool"],
+ warmup:{mins:5,text:"Show a cardboard box and cut along some edges so it opens flat. Ask what has to be true of the flat shape for it to fold back. Six faces, all joined, none overlapping. Those three conditions are today's whole content."},
+ stages:[
+  {k:"c",label:"Concrete",mins:13,sense:"touch · cutting and folding",
+   moves:["Cut a small cardboard box along edges so it lies flat, and record the shape.","Draw a proposed net on squared paper, cut it out, and try to fold it into a cube.","Record whether it worked and, if not, what went wrong.","Try two more arrangements, including one designed to fail."],
+   say:[["Teacher","Cut your net out and fold it. Does it close?"],["Expected","Mine leaves a gap."],["Teacher","Which face is missing, and where did two faces try to go to the same place?"],["Teacher","That is the useful question. 'It didn't work' is not information; 'two faces landed on the top' is."]],
+   watch:["Students who conclude that any six connected squares fold into a cube. The 2 by 3 block and the strip of six are both six connected squares and both fail — have them try these specifically."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · the fold tool",
+   moves:["Use the net-folding tool to test the arrangements tried on paper.","Read the tool's reason for each failure and compare with what happened physically.","Load the preset failures and read why each fails.","Find three valid nets using the tool before cutting any more paper."],
+   say:[["Teacher","The tool tells you which rule you broke. Try the strip of six."],["Expected","It says two faces land in the same place."],["Teacher","Which is exactly what happened when you folded it. The tool is not magic — it is doing what your hands did, faster."]],
+   readaloud:["Say the tool aloud: 'A grid with six shaded squares arranged in a cross shape. After folding, each square is labelled with the cube face it becomes: front, back, top, bottom, left and right.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · the three conditions",
+   moves:["State the three conditions: exactly six squares, all edge-connected, no two landing on the same face.","Test given arrangements against each condition in turn.","Explain a failure by naming which condition it breaks.","Note that there are exactly eleven valid cube nets."],
+   say:[["Teacher","Three conditions. Check them in order — count, connected, no overlap."],["Teacher","Why check the count first?"],["Expected","Because it's quickest and rules things out fast."]],
+   watch:["Students who say a net fails without naming which condition. 'It doesn't work' earns no credit today; the reason is the answer."]}
+ ],
+ guided:[["Is a strip of six squares a valid cube net?","No — faces overlap when folded."],["Is a 2 by 3 block valid?","No — faces overlap."],["Is a cross shape valid?","Yes."],["How many distinct nets fold into a cube?","Eleven."]],
+ worksheet:[
+  {t:"A · Valid or not",d:"State yes or no, and name the condition broken if no.",wide:true,
+   items:["A cross: one square with four around it and one extra below.","A straight strip of six squares.","A 2 by 3 rectangle of squares.","A T-shape: three across the top, three down the middle."]},
+  {t:"B · Find the nets",d:"Using the tool, find and sketch four different valid nets.",wide:true,
+   items:["Net 1: sketch and describe its shape.","Net 2: sketch and describe.","Net 3: sketch and describe.","Net 4: sketch and describe."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain the three conditions a cube net must satisfy, in your own words.","Why is 'six connected squares' not enough on its own? Give an example that fails.","Two squares far apart on a flat net end up next to each other on the cube. Explain how that is possible."]}],
+ exit:["Is a 2 by 3 block a valid cube net? Name the condition it breaks.","Sketch one valid cube net.","State the three conditions for a valid net."],
+ crit:"Mastery: the failure correctly explained by condition, and a valid net sketched. Reteach with physical folding if failures are named vaguely — the tool gives the reason, but folding makes it memorable.",
+ support:["Provide pre-cut square tiles for arranging without drawing.","Give the three conditions as a printed checklist to work through in order.","Use the tool before cutting paper, so failures cost nothing."],
+ extend:["Find all eleven cube nets. Organise them by shape family — how many of each kind?","Design a net for a triangular prism. How many faces does it need, and what shapes?"],
+ access:["Touch: cutting and folding real paper is the definitive test, and the tool is a faster preview of the same thing.","Motor: the tool lets students who find cutting difficult test many nets quickly by clicking.","Vision: folded face labels appear directly on each square, and failing squares are shaded distinctly.","Language: 'net' is a technical term unrelated to its everyday meaning; say explicitly that it means an unfolded solid."]
+},
+{
+ day:8, short:"Surface area", title:"Surface area from a net",
+ objective:"Find the surface area of a rectangular prism by adding the areas of its faces, using the net as the organiser.",
+ standards:["6.G.A.4"],
+ vocab:[["Surface area","The total area of all the faces — how much wrapping paper it takes."],["Face","One flat side of a solid."],["Opposite faces","On a rectangular prism, faces come in three matching pairs."],["Square units","Surface area is an area, so its units are squared, not cubed."]],
+ materials:["Squared paper","Boxes to unfold","Scissors","Calculators","Net-folding tool"],
+ warmup:{mins:5,text:"Hold up a box and ask how much paper it would take to wrap it exactly, with no overlap. Ask whether that is volume or area. It is area — the paper is flat. Say: surface area and volume answer different questions about the same box, and mixing them up is today's risk."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · unfolding and measuring",
+   moves:["Unfold a box into its net.","Measure each face and calculate its area.","Add all six face areas.","Fold it back and confirm the six faces are all accounted for."],
+   say:[["Teacher","Six faces, six areas, added together. Measure each one."],["Teacher","Do any of them match?"],["Expected","They come in pairs — three pairs of two."],["Teacher","So you only need three measurements, then double each. That is a real shortcut and you found it by looking."]],
+   watch:["Students who count only the faces visible in a drawing, missing the hidden three. Unfolding the real box shows all six at once, which is precisely why nets help here."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · net as organiser",
+   moves:["Draw the net of a prism with each face's dimensions labelled.","Calculate and label each face's area on the net.","Add them for the total.","Identify the three matching pairs and write the shortcut form."],
+   say:[["Teacher","Label every face's area on the net. Now you can see all six at once — nothing hidden."],["Teacher","Three pairs. So the total is two lots of each."],["Expected","2lw plus 2lh plus 2wh."]],
+   readaloud:["Say the picture aloud: 'A net of a rectangular prism laid flat in a cross arrangement. Each of the six rectangles is labelled with its dimensions and its area, with matching pairs carrying identical values.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · the formula",
+   moves:["Write surface area as 2lw + 2lh + 2wh.","Calculate for three prisms.","Calculate for a cube as 6s².","State units as squared, not cubed."],
+   say:[["Teacher","Three pairs, each doubled. And for a cube, all six faces are identical, so it is just six times one face."],["Teacher","Units?"],["Expected","Squared — it's an area."],["Teacher","If your surface area answer is in cubic centimetres, you have calculated a volume by mistake."]],
+   watch:["Students who use cubic units for surface area, or who confuse the surface area and volume formulas. The units check catches both — require them written."]}
+ ],
+ guided:[["Prism 4 by 3 by 2. Find the surface area.","2(12) + 2(8) + 2(6) = 52 square units"],["Cube of side 5. Find the surface area.","6 × 25 = 150 square units"],["Prism 6 by 4 by 5.","2(24)+2(30)+2(20) = 148"],["Why does surface area use squared units?","It is a total of flat areas, and area is two lengths multiplied."]],
+ worksheet:[
+  {t:"A · Rectangular prisms",d:"Show the three pairs. Include squared units.",items:["3 by 2 by 4 cm","5 by 5 by 2 cm","6 by 3 by 2 cm","10 by 4 by 5 cm","8 by 2 by 3 cm","7 by 6 by 4 cm"]},
+  {t:"B · Cubes",d:"Use 6s².",items:["side 3 cm","side 6 cm","side 10 cm","side 2.5 cm"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A box is 20 by 15 by 10 cm. Find the surface area, and say how much wrapping paper you would buy allowing for overlap.","Explain why a rectangular prism's faces come in three matching pairs.","Two prisms have the same volume but different surface areas. Find an example and explain how that is possible."]}],
+ exit:["Prism 5 by 3 by 2. Find the surface area.","Cube of side 4. Find the surface area.","Explain why surface area uses squared units."],
+ crit:"Mastery: both correct with squared units, and item 3 explaining it is a total of areas. Reteach if faces are missed — unfolding a real box lays all six out at once and is the fastest correction.",
+ support:["Provide the net pre-drawn with each face labelled for dimensions.","Restrict to cubes before general prisms.","Require all six face areas listed before adding."],
+ extend:["A cube has surface area 96 cm². Find its edge length and its volume.","Which rectangular prism with volume 64 cm³ has the smallest surface area? Try several."],
+ access:["Touch: unfolding a real box makes all six faces simultaneously visible and countable.","Vision: matching pairs are labelled with identical values on the net so the pairing is visible.","Attention: listing all six areas before adding gives a checkable intermediate step.","Language: 'surface area' contains 'area' — point this out as the clue to its units."]
+},
+{
+ day:9, short:"SA of prisms", title:"Surface area of triangular and composite prisms",
+ objective:"Find the surface area of a triangular prism by identifying and adding all its faces.",
+ standards:["6.G.A.4","6.G.A.1"],
+ vocab:[["Triangular prism","Two triangular ends and three rectangular sides — five faces."],["Lateral faces","The rectangular sides, running the length of the prism."],["Count the faces first","Different prisms have different numbers of faces; count before calculating."],["Slant side","On a triangular end, the sloping edge — it becomes a rectangle's width."]],
+ materials:["Triangular prism models","Card and tape to build prisms","Squared paper","Calculators"],
+ warmup:{mins:5,text:"Hold up a triangular prism and ask how many faces it has. Take answers before counting together. Five — two triangles and three rectangles. Ask how that compares with a box's six. Say: counting the faces is the first step every time, because it changes."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · unfolding a triangular prism",
+   moves:["Unfold a card triangular prism into its net.","Identify the two triangles and three rectangles.","Measure each face and calculate its area.","Add all five areas and fold the prism back to check nothing was missed."],
+   say:[["Teacher","Unfold it. What shapes do you see?"],["Expected","Two triangles and three rectangles."],["Teacher","The three rectangles all have the same length — the prism's length. Their widths are the triangle's three sides."],["Teacher","So each side of the triangle becomes the width of one rectangle. That is worth seeing before you calculate."]],
+   watch:["Students who assume the three rectangles are identical. They share a length but have different widths, one per side of the triangle — unless the triangle is equilateral."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · the net laid out",
+   moves:["Draw the net of a triangular prism with all five faces labelled.","Mark each rectangle's width as one side of the triangle.","Calculate the two triangle areas and the three rectangle areas.","Total them."],
+   say:[["Teacher","Label each rectangle with which triangle side it came from. Now you cannot miss one or use the wrong width."],["Teacher","The two triangles — do you calculate both?"],["Expected","They're identical, so calculate one and double it."]],
+   readaloud:["Say the picture aloud: 'A net of a triangular prism laid flat. Three rectangles sit in a row, all the same length. A triangle is attached above the middle rectangle and another below it.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · total surface area",
+   moves:["Calculate a triangular prism's surface area: two triangles plus three rectangles.","Handle a case where the triangle's three sides differ.","Calculate the surface area of a composite solid, excluding hidden faces.","Check by counting that every face has been included."],
+   say:[["Teacher","For the composite solid, be careful — where two blocks join, those faces are inside and are not part of the surface."],["Teacher","Why not?"],["Expected","Because you can't wrap paper over them, they're stuck together."]],
+   watch:["Students who include hidden internal faces on a composite solid. Ask which faces you could actually touch or paint — that is the surface."]}
+ ],
+ guided:[["Triangular prism: triangle b=6, h=4, sides 5,5,6. Length 10.","2(12) + 10(5+5+6) = 24 + 160 = 184"],["How many faces does a triangular prism have?","Five."],["Why are the two triangles identical?","They are the two ends of the same prism, the repeated cross-section."],["On a composite solid, which faces are excluded?","The ones where two pieces join, since they are internal."]],
+ worksheet:[
+  {t:"A · Triangular prisms",d:"Count the faces first.",wide:true,
+   items:["Triangle b=8, h=3, sides 5,5,8. Prism length 12.","Triangle b=6, h=4, sides 5,5,6. Prism length 8.","Triangle b=10, h=12, sides 13,13,10. Prism length 6."]},
+  {t:"B · Composite solids",d:"Exclude internal faces.",wide:true,
+   items:["A 6 by 4 by 3 block with a 2 by 2 by 2 cube on top. Find the surface area.","Two 4 by 4 by 4 cubes joined face to face. Find the surface area, and compare with two separate cubes."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why the three rectangles of a triangular prism are usually not identical.","When two cubes are joined, the total surface area is less than two separate cubes. Explain why and by how much.","Describe how you would find the surface area of a solid you could hold but not unfold."]}],
+ exit:["Triangular prism: triangle area 15, three rectangles of area 40 each. Find the surface area.","How many faces does a triangular prism have?","Explain why internal faces are excluded on a composite solid."],
+ crit:"Mastery: correct total and item 3 explaining that joined faces are not on the surface. Reteach by handling a real composite model — asking which faces could be painted settles it immediately.",
+ support:["Provide the net pre-drawn with all five faces outlined.","Restrict to isosceles triangles where two rectangles match.","Require a face count written before any calculation."],
+ extend:["Find the surface area of a prism with a trapezoid cross-section. How many faces?","Two identical prisms are joined in two different ways. Do both give the same surface area? Investigate."],
+ access:["Touch: unfolding a card prism shows all five faces and their true dimensions at once.","Vision: each rectangle on the net is labelled with which triangle side gave its width.","Attention: counting faces before calculating gives a fixed first action that also catches omissions.","Language: 'lateral faces' is introduced alongside 'the rectangular sides' rather than instead of it."]
+},
+{
+ day:10, short:"SA vs volume", title:"Choosing between surface area and volume",
+ objective:"Decide from a problem's wording whether surface area or volume is required, and justify the choice.",
+ standards:["6.G.A.2","6.G.A.4"],
+ vocab:[["Filling","Signals volume: water, sand, capacity, how much fits inside."],["Covering","Signals surface area: paint, wrapping, tiles, wallpaper."],["Units as a check","Volume is cubed; surface area is squared."],["Same solid, two questions","One box has both a volume and a surface area, and they answer different things."]],
+ materials:["Boxes","Wrapping paper","Measuring jug and water or sand","Mixed problem cards"],
+ warmup:{mins:5,text:"Hold up a box with some sand in it and a sheet of wrapping paper. Ask which one is about volume and which is about surface area. Then post four problems with no labels and ask students to sort them before solving."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · filling versus wrapping",
+   moves:["Fill a box with sand and note this measures what fits inside.","Wrap the same box in paper and note this measures the outside.","Sort problem cards into 'filling' and 'covering' piles.","Identify the signal word in each card."],
+   say:[["Teacher","Filling it — volume. Wrapping it — surface area. Same box, two completely different measurements."],["Teacher","Sort the cards. What word gave this one away?"],["Expected","'Paint' — you cover with paint."],["Teacher","Collect the words. They are the problem telling you which one it wants."]],
+   watch:["Students who sort by whether the problem mentions three dimensions. Both types usually give three dimensions — it is the verb that decides, not the data."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · mark what is measured",
+   moves:["Draw each problem's solid and mark what is being measured.","Shade the interior for volume; outline the faces for surface area.","Write the expected units before calculating.","Solve each and check the units match."],
+   say:[["Teacher","Mark the diagram first. Filled in, or outlined?"],["Teacher","And write the units you expect. If you expect cm² and get cm³, you used the wrong formula."]],
+   readaloud:["Say the page aloud: 'Four boxes in a row. The first and third are shaded solid throughout, labelled cubic centimetres. The second and fourth have their faces outlined in bold, labelled square centimetres.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · solving both types",
+   moves:["Solve two volume and two surface area problems from the sorted cards.","State the formula chosen and the signal word that prompted it.","Handle a problem asking for both about the same solid.","Check every answer's units."],
+   say:[["Teacher","This one asks how much water it holds and how much paint to cover it. Two calculations, same box."],["Teacher","Which gets cubic units?"],["Expected","The water."]],
+   watch:["Students who use the right formula but state the wrong units. Require the expected units written before calculating, so the check is genuine rather than retrofitted."]}
+ ],
+ guided:[["Painting a box 5 by 4 by 3. Which measure?","Surface area: 94 square units"],["Filling the same box with sand.","Volume: 60 cubic units"],["Wrapping a present.","Surface area"],["How much water a tank holds.","Volume"]],
+ worksheet:[
+  {t:"A · Which measure",d:"State volume or surface area, then solve.",wide:true,
+   items:["A tank 50 by 30 by 40 cm — how much water does it hold, in litres?","A box 20 by 15 by 10 cm is to be wrapped. How much paper?","A room 4 m by 3 m by 2.5 m is to be painted on all four walls and the ceiling. What area?","A crate 1 m by 0.8 m by 0.6 m — what volume of grain fits inside?"]},
+  {t:"B · Both measures",d:"Calculate both for each solid.",items:["4 by 3 by 2 cm","6 by 6 by 6 cm","10 by 5 by 4 cm","8 by 3 by 3 cm"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["List four signal words for volume and four for surface area, from the problems you have seen.","Explain how the units of your answer tell you whether you used the right formula.","A cube's side doubles. What happens to its volume, and what happens to its surface area? Are they the same factor?"]}],
+ exit:["A box 6 by 4 by 5 is to be painted. Which measure, and what is it?","The same box is to be filled with sand. Which measure, and what is it?","Explain how units help you check the right formula was used."],
+ crit:"Mastery: both correctly identified and calculated with right units. Reteach by sorting rather than re-explaining formulas — this day diagnoses reading of the context, not formula recall.",
+ support:["Provide the signal-word list as a permanent reference, built with the class.","Reduce to one problem type before mixing.","Require expected units written before any calculation."],
+ extend:["Write two problems about the same box, one needing volume and one surface area.","A problem says 'how much material to make the box'. Which measure, and why might that be ambiguous?"],
+ access:["Touch: filling with sand and wrapping with paper distinguishes the two measures physically.","Language: the signal-word list is the reading support and stays visible during the assessment.","Attention: sorting before solving splits the task into two shorter phases.","Vision: diagrams use solid shading for volume and bold outlines for surface area consistently."]
+},
+{
+ day:11, short:"Working backwards", title:"Finding a missing dimension",
+ objective:"Find a missing dimension given a volume or surface area, using the balance approach from Unit 5.",
+ standards:["6.G.A.2","6.EE.B.7"],
+ vocab:[["Working backwards","Given the result, find an input."],["Inverse operation","Dividing undoes multiplying."],["Set up an equation","Write what you know as an equation, then solve it."],["Reasonable","The missing dimension must make sense for the object."]],
+ materials:["Unit cubes","Calculators","Whiteboards","Balance diagram from Unit 5"],
+ warmup:{mins:5,text:"Post: a box has volume 60 cm³ and a base of 5 by 4 cm. Ask for the height, and ask how they know before they calculate. Someone will divide. Ask what equation they just solved. It is 20h = 60, which is Unit 5 with a geometric costume on."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · building to a target",
+   moves:["Given 24 cubes and a base of 4 by 2, build the prism and find its height.","Repeat with 36 cubes and a base of 3 by 3.","Note that the base area is fixed and only the height varies.","Connect building to dividing."],
+   say:[["Teacher","Twenty-four cubes, base four by two. How many layers?"],["Expected","Three — eight per layer."],["Teacher","So you divided twenty-four by eight without calling it division. The cubes did the arithmetic."]],
+   watch:["Students who divide by one dimension rather than by the base area. The base area is the cubes per layer; dividing by a single edge does not count layers."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · the equation as a balance",
+   moves:["Write V = lwh with the unknown marked.","Draw it as a Unit 5 balance with the unknown on one side.","Divide both sides by the known product.","Repeat for a surface area problem."],
+   say:[["Teacher","Twenty h equals sixty. What do you do to both sides?"],["Expected","Divide by twenty."],["Teacher","Exactly Unit 5. The letters changed but the move did not."]],
+   readaloud:["Say the picture aloud: 'A balance with twenty h on the left pan and sixty on the right. An arrow shows both sides divided by twenty, leaving h alone and equal to three.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · solving for a dimension",
+   moves:["Find a missing dimension from a volume.","Find a cube's edge from its volume or surface area.","Handle a case where the base is square and the side must be found.","Check every answer by working forwards."],
+   say:[["Teacher","Check forwards. You found a height of three; does five times four times three give sixty?"],["Expected","Yes."],["Teacher","Free check, every time. Working backwards always offers it."]],
+   watch:["Students who find a cube's edge from its surface area by dividing by 6 and stopping — that gives one face's area, not the edge. The square root step is still needed."]}
+ ],
+ guided:[["V = 60, base 5 by 4. Find the height.","3"],["V = 48, base area 12. Find the height.","4"],["A cube has volume 27. Find its edge.","3"],["A cube has surface area 54. Find its edge.","One face is 9, so the edge is 3."]],
+ worksheet:[
+  {t:"A · Missing height",d:"Show the division.",items:["V = 72, base 6 by 3","V = 120, base 10 by 4","V = 90, base area 18","V = 200, base 10 by 5","V = 36, base 3 by 3","V = 480, base 20 by 8"]},
+  {t:"B · Cubes",d:"Find the edge length.",items:["V = 8","V = 64","V = 125","SA = 24","SA = 96","SA = 150"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A tank holds 24 litres and has a base of 40 cm by 30 cm. Find its height in centimetres.","Explain why finding a cube's edge from its surface area needs two steps, not one.","A box has volume 100 cm³ and a square base of side 5 cm. Find its height."]}],
+ exit:["V = 84, base 7 by 3. Find the height.","A cube has volume 64. Find its edge.","Explain how you check an answer when working backwards."],
+ crit:"Mastery: both correct with a forward check shown, and item 3 describing multiplying back. Reteach if dividing by one edge rather than the base area — the cube-building activity makes layers concrete.",
+ support:["Provide the equation pre-written with the division set up.","Restrict to finding a height before cube edges.","Keep the Unit 5 balance diagram visible."],
+ extend:["A box has volume 100 cm³ and integer dimensions. List every possibility.","A cube's volume and surface area are numerically equal. Find its edge length."],
+ access:["Touch: building to a target cube count makes the division a counting action.","Memory: naming this as Unit 5's balance reduces it to a known procedure.","Attention: the forward check gives every problem a definite endpoint.","Language: 'working backwards' is contrasted explicitly with the forward calculations of earlier days."]
+},
+{
+ day:12, short:"Composite solids", title:"Volume and surface area of composite solids",
+ objective:"Find the volume and surface area of a solid built from two or more prisms, handling joined faces correctly.",
+ standards:["6.G.A.2","6.G.A.4"],
+ vocab:[["Composite solid","Built from two or more prisms joined together."],["Decompose","Split into prisms you can calculate."],["Hidden face","A face where two pieces join — counts for neither piece's surface."],["Volume adds, surface area does not","Joining does not change total volume, but it does reduce total surface area."]],
+ materials:["Unit cubes","Card models","Calculators","Isometric dot paper"],
+ warmup:{mins:5,text:"Join two cubes face to face with tape. Ask whether the volume is the sum of the two. It is. Ask whether the surface area is. It is not — two faces are now hidden. That asymmetry is today's core idea."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · joining and losing faces",
+   moves:["Build two separate cubes and count their total faces: twelve.","Join them face to face and count the visible faces: ten.","Calculate the surface area before and after joining.","Confirm the volume is unchanged by the join."],
+   say:[["Teacher","Twelve faces separately. Now join them. How many can you still see?"],["Expected","Ten."],["Teacher","Two faces disappeared inside. The volume did not change at all — same cubes, same space."],["Teacher","So joining costs surface area but not volume. Worth remembering which is which."]],
+   watch:["Students who subtract only one face when joining. Two faces are lost — one from each piece — so the reduction is twice a single face's area."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · splitting and marking",
+   moves:["Draw a composite solid on isometric paper.","Mark the splitting line and label each piece's dimensions.","Calculate each piece's volume and add.","Calculate the surface area by listing visible faces, excluding the join."],
+   say:[["Teacher","Mark the join. Those two faces are not on the surface — cross them off before you start adding."],["Teacher","For volume, split and add. For surface area, split, add, then subtract twice the join area."]],
+   readaloud:["Say the picture aloud: 'An L-shaped solid drawn on isometric paper, made from a large block with a smaller block on top. A dashed line marks where the two pieces meet, and the shared face is shaded to show it is internal.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · both measures",
+   moves:["Calculate a composite's volume by adding the pieces.","Calculate its surface area by adding the pieces' surface areas and subtracting twice the join.","Verify surface area by listing every visible face instead.","Compare the two methods."],
+   say:[["Teacher","Two routes for surface area. Add and subtract the join, or just list every visible face. Try both on the same solid."],["Expected","Same answer."],["Teacher","Use whichever you find harder to make a mistake with."]],
+   watch:["Students who apply the subtract-the-join method when the two pieces only partly overlap. The hidden area is the overlap, not a whole face — draw it and measure the actual shared region."]}
+ ],
+ guided:[["Two 3-cubes joined. Find the volume.","54 cubic units"],["Find the surface area.","2(54) − 2(9) = 90"],["A 6×4×3 block with a 2×2×2 cube on top. Volume.","72 + 8 = 80"],["Why does joining reduce surface area but not volume?","Two faces become internal; the space occupied is unchanged."]],
+ worksheet:[
+  {t:"A · Volume of composites",d:"Split and add.",wide:true,
+   items:["A 5 by 4 by 3 block with a 3 by 2 by 2 block on top.","Two 4 by 4 by 4 cubes joined face to face.","An L-shape: 8 by 3 by 2 joined to 3 by 3 by 2."]},
+  {t:"B · Surface area of composites",d:"Exclude the joined faces.",wide:true,
+   items:["Two 3 by 3 by 3 cubes joined face to face.","A 6 by 4 by 2 block with a 2 by 2 by 2 cube on top.","Two 5 by 2 by 2 blocks joined along a 2 by 2 face."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why joining two solids reduces the total surface area but not the total volume.","A small cube sits on a large block. Explain which faces of each are on the surface and which are not.","Two identical cubes can be joined face to face. Is there any other way to join them that gives a different surface area? Explain."]}],
+ exit:["Two 2-cubes joined. Find the volume and surface area.","Explain why two faces are lost, not one.","Which measure is unchanged by joining?"],
+ crit:"Mastery: both measures correct, and item 2 explaining one face lost from each piece. Reteach with physical joining and face-counting — the count from twelve to ten is the argument.",
+ support:["Provide the composite pre-split with each piece's dimensions labelled.","Restrict to volume before surface area.","Use cubes so faces can be counted physically."],
+ extend:["Three cubes are joined in a row, then in an L. Do both have the same surface area? Investigate.","Design a composite solid with volume 100 cm³ and the smallest surface area you can manage."],
+ access:["Touch: counting faces before and after joining is the whole argument and needs no notation.","Vision: the join is shaded on every diagram so the hidden face is visible as a concept.","Attention: doing volume fully before starting surface area avoids interleaving two different rules.","Memory: 'volume adds, surface area does not' is short enough to recall under pressure."]
+},
+{
+ day:13, short:"Design problems", title:"Designing containers to a specification",
+ objective:"Design a container meeting a volume or surface area specification, and justify the design choices.",
+ standards:["6.G.A.2","6.G.A.4","6.EE.B.7"],
+ vocab:[["Specification","The requirement the design must meet."],["Constraint","A limit: maximum height, whole-number dimensions, minimum capacity."],["Trade-off","Two designs both meeting the spec, differing in some other way."],["Efficient","Using less material for the same capacity."]],
+ materials:["Squared paper","Card, scissors, tape","Unit cubes","Calculators"],
+ warmup:{mins:5,text:"Ask for a box holding exactly 24 cubic centimetres. Collect three different answers from the room. Say: all correct, all different. So the spec does not determine the design, and that is what makes today a design problem rather than a calculation."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · building to a spec",
+   moves:["Build three different prisms all holding 24 cubes.","Record each one's dimensions.","Calculate each one's surface area.","Identify which uses the least material."],
+   say:[["Teacher","Three boxes, same volume. Now find each one's surface area."],["Expected","They're different."],["Teacher","Which uses least material?"],["Expected","The one closest to a cube."],["Teacher","That is a real finding, and it is why shipping boxes are shaped the way they are."]],
+   watch:["Students who assume a bigger volume always means a bigger surface area. Within a fixed volume, the shape determines the surface area, and the relationship is not simple."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · comparing designs",
+   moves:["Draw three designs for the same volume with their dimensions labelled.","Calculate and label each surface area.","Rank them by material used.","Draw a design meeting an added constraint, such as a maximum height."],
+   say:[["Teacher","Now add a constraint: the box must be no taller than 3 cm. Which of your designs still work?"],["Teacher","Constraints narrow the options. That is what makes design harder than calculation, and more interesting."]],
+   readaloud:["Say the page aloud: 'Three boxes drawn side by side, all labelled as holding twenty-four cubic centimetres. Their dimensions are two by three by four, one by four by six, and two by two by six, with surface areas of fifty-two, sixty-eight and fifty-six.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · justifying a design",
+   moves:["Design a container to a stated volume with stated constraints.","Calculate its surface area and compare with an alternative.","Write a justification naming the constraint satisfied and the trade-off accepted.","Test whether a design meets every stated requirement."],
+   say:[["Teacher","Your answer is a design plus a justification. The dimensions alone do not tell me why you chose them."],["Teacher","And check every constraint, not just the volume. A design meeting one requirement and failing another is not a solution."]],
+   watch:["Students who meet the volume but ignore a stated constraint. List the constraints as a checklist and tick each before submitting a design."]}
+ ],
+ guided:[["Design a box holding 24 cm³.","Several answers: 2×3×4, 1×4×6, 2×2×6"],["Which of those uses least material?","2×3×4, surface area 52"],["Design a box holding 36 cm³, no taller than 3 cm.","e.g. 3×4×3 or 2×6×3"],["Why do several designs meet the same volume spec?","Volume fixes the product of the dimensions, not the dimensions themselves."]],
+ worksheet:[
+  {t:"A · Design to a volume",d:"Give dimensions and surface area.",items:["V = 12 cm³","V = 30 cm³","V = 48 cm³","V = 64 cm³","V = 100 cm³","V = 27 cm³"]},
+  {t:"B · With constraints",d:"State how each constraint is met.",wide:true,
+   items:["Hold 60 cm³, no dimension larger than 5 cm.","Hold 48 cm³, base must be square.","Hold 100 cm³, height exactly 4 cm."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["For a fixed volume, which shape of box uses the least material? Test three designs and explain your finding.","Design a box for 12 tennis balls each 7 cm across. Give your dimensions and explain your arrangement.","Why might a manufacturer choose a box that is not the most material-efficient? Give a real reason."]}],
+ exit:["Design a box holding 40 cm³ and give its surface area.","State one other design meeting the same volume.","Explain why the volume spec does not fix the design."],
+ crit:"Mastery: a valid design with correct surface area and a second alternative offered. Reteach if constraints are ignored — the checklist habit is the fix, not more calculation practice.",
+ support:["Provide a constraint checklist to tick before submitting.","Restrict to volume-only specs before adding constraints.","Permit cube-building to test designs physically."],
+ extend:["Find the most material-efficient box for a volume of 1000 cm³. Is it always a cube?","Design packaging for six cylindrical cans. What shape wastes least space?"],
+ access:["Touch: building candidate designs from cubes lets a student test a spec without calculating first.","Attention: the constraint checklist externalises the requirements rather than requiring them be held in mind.","Language: 'specification', 'constraint' and 'trade-off' are design vocabulary; introduce each with a worked example.","Vision: competing designs are drawn side by side at the same scale so the comparison is visual."]
+},
+{
+ day:14, short:"Mixed practice", title:"Mixed volume and surface area problems",
+ objective:"Solve mixed problems across the unit, selecting the method and justifying the choice.",
+ standards:["6.G.A.2","6.G.A.4"],
+ vocab:[["Method selection","Deciding which of the unit's approaches applies — today's actual skill."],["Signal words","Fill, hold, paint, wrap, cover, capacity."],["Justify","State why the chosen method fits."],["Check","Plausibility and units, on every answer."]],
+ materials:["Mixed problem cards","Unit cubes","Net-folding tool","Calculators"],
+ warmup:{mins:5,text:"Post five unlabelled problems spanning the unit — volume, surface area, a net, a composite, and a working-backwards problem. Ask students to sort by method, not to solve. Compare sortings and discuss disagreements."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · sorting by method",
+   moves:["Sort problem cards into five method piles.","Compare with another pair and discuss differences.","Identify the signal words that drove each decision.","Build a class signal-word list."],
+   say:[["Teacher","Sort first, solve later. What word put this one in the surface area pile?"],["Expected","'Wrap'."],["Teacher","Collect them. By now you should have signal-word lists from four different units, all working the same way."]],
+   watch:["Students who sort by surface features such as which solid is mentioned. The verb decides — a box appears in both volume and surface area problems."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · model before arithmetic",
+   moves:["Draw the appropriate diagram for four mixed problems without solving.","Mark what is being measured on each.","Swap with a partner and check the diagrams match the problems.","Then solve all four."],
+   say:[["Teacher","Diagram first, all four. If your partner cannot tell what is being asked from your diagram, it is not finished."]],
+   readaloud:["Say the page aloud: 'Four diagrams in a two-by-two grid. A shaded solid box; a box with faces outlined in bold; a flat net of six squares; and a composite solid with a dashed splitting line.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · solving and justifying",
+   moves:["Solve the four problems with one step per line.","Estimate before each calculation.","Check units and plausibility.","Write one sentence per problem justifying the method."],
+   say:[["Teacher","One sentence per problem on why that method. That sentence transfers to next term's numbers."]],
+   watch:["Students who solve correctly but cannot articulate the choice. Ask them to explain to a partner; the explanation is what is being built."]}
+ ],
+ guided:[["Box 6 by 4 by 5, painted. Which measure?","Surface area: 148"],["Same box, filled with water.","Volume: 120 cm³ = 0.12 L"],["Two 3-cubes joined, surface area.","90"],["V = 96, base 8 by 3. Find the height.","4"]],
+ worksheet:[
+  {t:"A · Mixed, unlabelled",d:"Name the method, then solve.",wide:true,
+   items:["A crate 80 by 60 by 50 cm — how many litres does it hold?","A box 15 by 10 by 8 cm is to be wrapped. How much paper?","A cube has volume 216 cm³. Find its edge and its surface area.","A 6 by 4 by 3 block has a 2 by 2 by 2 cube joined on top. Find the total volume."]},
+  {t:"B · Harder",d:"Estimate first, then solve.",wide:true,
+   items:["A tank holds 30 litres with a base of 50 cm by 30 cm. Find its height.","A triangular prism has triangle base 8 cm, height 5 cm, and length 12 cm. Find its volume and surface area given triangle sides 5, 5, 8.","Two 4 by 4 by 4 cubes are joined. Find the volume and surface area."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["List three signal words and say which method each points to.","Write two problems about the same box, one volume and one surface area.","Which method did you find most reliable this unit, and why?"]}],
+ exit:["Box 5 by 4 by 3, painted. Find the surface area.","Same box, filled. Find the volume.","Name one signal word and the method it points to."],
+ crit:"Mastery: both correct with right units and item 3 linking a signal word to a method. Reteach by method rather than by topic — the sorting activity shows which distinction is missing.",
+ support:["Provide the signal-word list as a permanent reference.","Reduce to two problem types before mixing five.","Allow the sorting step with a partner throughout."],
+ extend:["Write five problems, one per method, using the same box throughout.","Find a problem solvable two ways and write both solutions."],
+ access:["Attention: sorting before solving splits a long task into two shorter phases.","Language: the signal-word list is built with the class and stays visible during the assessment.","Vision: models are drawn in a fixed grid position so the layout is predictable.","Memory: this is the fifth unit using signal-word sorting; naming it as the same habit reduces it to recall."]
+},
+{
+ day:15, short:"Review", title:"Review stations and unit assessment",
+ objective:"Consolidate volume, surface area and nets across the unit, and self-identify which topics need more work.",
+ standards:["6.G.A.2","6.G.A.4"],
+ vocab:[["Self-assessment","Judging your own accuracy honestly — a skill, and one being assessed today."],["Station","A short focused task at one topic, then rotate."],["Justify","Say why, not just what — required at every station."],["Next step","A specific action, not a topic name."]],
+ materials:["Unit cubes","Net-folding tool","Boxes and card models","Station cards","Self-assessment grid","Assessment papers"],
+ warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: those are the stations to visit first, and the tally is data, not a confession."},
+ stages:[
+  {k:"c",label:"Concrete",mins:15,sense:"touch · rotation",
+   moves:["Five stations: volume by counting and formula, fractional edges and capacity, nets, surface area, composites and working backwards.","Each station holds its materials and three graded tasks.","Students choose a starting station from the warm-up tally.","Every station requires one written justification."],
+   say:[["Teacher","Start where you are least confident, not where you are quickest."],["Teacher","One sentence per station explaining why your method works."],["Teacher","Twelve minutes per station. Rotate on the signal whether or not you have finished."]],
+   watch:["Students who visit only easy stations. The private warm-up slip is the accountability tool — ask them to show which station addresses what they wrote."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · one diagram per topic",
+   moves:["On a single page, draw one diagram for each of the five station topics.","Annotate each with its formula and units.","Keep the page as the revision sheet.","Identify any diagram that could not be drawn and return to that station."],
+   say:[["Teacher","One page, five diagrams, five formulas. Better than any notes you could copy."],["Teacher","A diagram you cannot draw names the topic to go back to."]],
+   readaloud:["Say the page aloud: 'Five diagrams across two rows. A prism split into layers; a prism with a fractional edge marked; a flat net of six squares; a net with each face's area labelled; and a composite solid with its join shaded.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · assessment",
+   moves:["Complete the written assessment covering all fifteen days.","Self-mark section A against a displayed key.","Record scores by topic on the self-assessment grid.","Identify two weakest topics and write one specific next step for each."],
+   say:[["Teacher","Self-mark honestly. Marking generously only costs you later."],["Teacher","One specific next step per weak topic. 'Practise volume' is not a step. 'Rebuild three prisms from cubes and check the formula' is."]],
+   watch:["Students whose self-assessment does not match their station work. The mismatch signals either low confidence or an unnoticed gap, and those need opposite responses."]}
+ ],
+ guided:[["Prism 5 by 4 by 3. Volume and surface area.","60 cubic units; 94 square units"],["A box 20 by 20 by 10 cm. Capacity in litres.","4 L"],["Is a strip of six squares a valid cube net?","No — faces overlap."],["Two 3-cubes joined. Surface area.","90"]],
+ worksheet:[
+  {t:"A · Volume",d:"Include cubic units.",items:["6 by 5 by 4","base area 24, height 5","2½ by 4 by 2","triangular base area 18, length 7","V from 30 by 20 by 10 cm in litres","3 by 3 by 3"]},
+  {t:"B · Surface area",d:"Include squared units.",items:["4 by 3 by 2","cube of side 5","6 by 4 by 3","cube of side 2","10 by 2 by 5","cube of side 7"]},
+  {t:"C · Nets and composites",d:"Show every step.",wide:true,
+   items:["Sketch two different valid cube nets and explain why a 2 by 3 block is not one.","A 6 by 4 by 2 block has a 2 by 2 by 2 cube on top. Find the volume and surface area.","A box has volume 144 cm³ and a base of 12 cm by 3 cm. Find its height."]},
+  {t:"D · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why volume uses cubic units and surface area uses squared units.","Explain the three conditions a cube net must satisfy.","Choose the topic you found hardest this unit. Explain it with a diagram, as if teaching someone who missed the lesson."]}],
+ exit:["Name the topic you are most confident with and give one reason.","Name the topic you want more practice on and give one specific next step.","Complete: volume is measured in ___ units because ___."],
+ crit:"Mastery: assessment sections A through C at 80 percent or better, with self-assessment matching actual performance within one band. Reteach in small groups by topic rather than reteaching the unit; the self-assessment grid tells you how to form those groups.",
+ support:["Reduce to three stations covering volume, nets and surface area.","Provide worked examples at each station as reference.","Allow the assessment across two sittings if sustained concentration is the barrier rather than the mathematics."],
+ extend:["Design a station task of your own, including the materials and the justification prompt.","Write a problem requiring three of the unit's methods in sequence, then solve it and write the key."],
+ access:["Motor: stations are arranged so each can be completed seated, with materials brought to the student.","Attention: twelve-minute rotations with a clear signal give predictable structure.","Vision: every station card uses the same layout so the format is never re-learned.","Language: the self-assessment grid pairs picture icons with topic names so it can be completed without heavy reading.","Hearing: the rotation signal is both visual and audible."]
+}
+];
+</script>
+<script src="curriculum-core.js"></script>
+</body>
+</html>

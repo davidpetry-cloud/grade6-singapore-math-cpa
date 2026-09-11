@@ -1,6 +1,6 @@
 # MANIFEST — Grade 6 Singapore Math (CPA)
 
-**Bundle version:** through-u07
+**Bundle version:** through-u08
 **Built:** 2026-09-11
 
 The hub's `UNITS` array is the source of truth for what exists. This file is a
@@ -30,7 +30,7 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 
 | file | bytes | sha256 (first 16) |
 |---|---|---|
-| `CLAUDE.md` | 12,645 | `66cba6a39105c60e` |
+| `CLAUDE.md` | 12,693 | `9d4fecf7b5fed034` |
 | `README.md` | 4,714 | `6d2d5ebf47ada6c8` |
 | `angle-chase.js` | 10,540 | `64345ee7b08fb720` |
 | `angle-chase.test.js` | 4,719 | `59cf3f33124df385` |
@@ -40,7 +40,9 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 | `circle-tools.test.js` | 3,842 | `458c1ec1afe4c5d9` |
 | `curriculum-core.js` | 51,921 | `bd010e838ba2a847` |
 | `curriculum.css` | 13,193 | `b67d7d1bf35ce4af` |
-| `singapore-math-6-hub.html` | 20,660 | `ad0b29cdb4ad0727` |
+| `net-fold.js` | 9,248 | `1fb9b6210fdc651c` |
+| `net-fold.test.js` | 4,433 | `8e918d5ca40037fc` |
+| `singapore-math-6-hub.html` | 20,659 | `c06591bbe5c770c3` |
 | `test-unit.js` | 4,235 | `760c86dcdd48f57f` |
 | `unit-01-whole-numbers-and-operations.html` | 62,096 | `fd32edf62e0a2b75` |
 | `unit-02-fractions-and-decimals.html` | 158,134 | `794f8298cbf5223b` |
@@ -49,6 +51,7 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 | `unit-05-algebra.html` | 125,841 | `68ff6a91a38e9c57` |
 | `unit-06-angles-and-figures.html` | 93,992 | `f41d6652553310e8` |
 | `unit-07-circles.html` | 92,162 | `db5724ed77e05cf6` |
+| `unit-08-volume.html` | 92,567 | `f76d2ccdb4cb17f6` |
 | `unit-template.html` | 5,434 | `136b856553bad138` |
 
 ## Unit status
@@ -62,7 +65,7 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 | 05 | Algebraic Expressions & Equations | 20 | ready |
 | 06 | Angles & Geometric Figures | 15 | not built |
 | 07 | Circles | 13 | ready |
-| 08 | Volume of Solids | 15 | not built |
+| 08 | Volume of Solids | 15 | ready |
 | 09 | Data Analysis & Statistics | 15 | not built |
 | 10 | Negative Numbers & Coordinate Plane | 13 | not built (grew from 10 days, absorbed 6.G.A.3) |
 
