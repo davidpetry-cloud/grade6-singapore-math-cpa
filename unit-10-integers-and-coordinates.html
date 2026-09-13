@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit 10 &mdash; Negative Numbers &amp; the Coordinate Plane | Grade 6 CPA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="curriculum.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+    <h1>Unit 10 &mdash; Negative Numbers &amp; the Coordinate Plane</h1>
+    <p class="sub">The final unit of the year, and the one that ties the loose thread from Unit 6 back in: polygons on a grid, now that the grid itself &mdash; negative numbers, absolute value, all four quadrants &mdash; has been properly built first. A submarine's depth, a debt, a temperature below freezing: negative numbers get a reason to exist before they get a rule.</p>
+    <div class="facts">
+      <span><b>13</b> instructional days</span>
+      <span><b>3</b> weeks</span>
+      <span><b>55</b> minutes per lesson</span>
+      <span><b>6.NS &amp; 6.G</b> standards</span>
+    </div>
+  </div>
+  <div class="wrap"><nav class="daynav" id="daynav" aria-label="Lesson days"></nav></div>
+</header>
+
+<main class="wrap">
+  <div class="lesson">
+    <div id="content"></div>
+    <aside class="side" id="side"></aside>
+  </div>
+  <div class="pager">
+    <button id="prev">&larr; Previous lesson</button>
+    <button id="next">Next lesson &rarr;</button>
+  </div>
+</main>
+
+<!-- Unit-specific manipulative. Must load before curriculum-core.js. -->
+<script>
+/* coordPlane — Unit 10 (Integers & the Coordinate Plane).
+   Three modes sharing one grid: plotting points and reading their quadrant,
+   reflecting a point across an axis, and building an axis-aligned polygon
+   from its vertices to find perimeter and area. Declare before
+   curriculum-core.js. */
+window.__EXTRA_TOOLS__=Object.assign(window.__EXTRA_TOOLS__||{},(function(){
+const rm=()=>(!!window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#5B7189", ROSE="#C2536B";
+const LETTERS="ABCDEFGH";
+
+function quadrant(x,y){
+  if(x===0&&y===0)return "the origin";
+  if(x===0)return "on the y-axis";
+  if(y===0)return "on the x-axis";
+  if(x>0&&y>0)return "Quadrant I";
+  if(x<0&&y>0)return "Quadrant II";
+  if(x<0&&y<0)return "Quadrant III";
+  return "Quadrant IV";
+}
+
+function coordPlane(host){
+  const box=el("div","tool");
+  box.innerHTML=`<h3>Coordinate plane<span class="mins">tool</span></h3>
+    <p class="sense">sight · position and distance</p>
+    <p class="how">Click grid intersections to place points. Every mode uses the same plane — plotting, reflecting, and outlining a shape are all the same skill of reading a pair of numbers as a position.</p>
+    <div class="ctl">
+      <label for="cpm">mode</label>
+      <select id="cpm">
+        <option value="plot">plotting points</option>
+        <option value="reflect">reflecting across an axis</option>
+        <option value="polygon">outlining a shape</option>
+      </select>
+      <button class="btn sm" id="cpclear">Clear</button>
+      <span id="cpmsg" style="font-family:var(--mono);font-size:.82rem;color:var(--muted)"></span>
+    </div>
+    <div class="ctl" id="cprefl" hidden>
+      <button class="btn" data-op="x">reflect across the x-axis</button>
+      <button class="btn" data-op="y">reflect across the y-axis</button>
+    </div>
+    <div class="ctl" id="cppoly" hidden>
+      <button class="btn go" data-op="close">Close the shape</button>
+      <span style="font-family:var(--mono);font-size:.8rem;color:var(--muted)">sides must run only horizontal or vertical</span>
+    </div>
+    <div class="stage-area"><svg viewBox="0 0 560 560" role="img" style="width:100%;height:auto;max-width:480px;margin:0 auto;display:block"></svg></div>
+    <div class="out" id="cpout"></div>
+    <p class="note">Every point here is an integer pair — no estimating between gridlines. Read across first, then up or down: that order is the whole convention.</p>`;
+  host.appendChild(box);
+  const svg=box.querySelector("svg"), out=box.querySelector("#cpout"), $=s=>box.querySelector(s), $m=$("#cpm");
+
+  const RANGE=8, CELL=30, CX=280, CY=280;
+  const px=x=>CX+x*CELL, py=y=>CY-y*CELL;
+  const snap=v=>Math.max(-RANGE,Math.min(RANGE,Math.round(v)));
+
+  let points=[];      /* plot mode: {x,y,label} */
+  let reflectPt=null, reflected=null, reflectAxis=null;
+  let poly=[];         /* polygon mode: [{x,y}], closed:boolean */
+  let polyClosed=false;
+
+  function gridSVG(){
+    let s="";
+    for(let i=-RANGE;i<=RANGE;i++){
+      const major=i===0;
+      s+=`<line x1="${px(i)}" y1="${py(-RANGE)}" x2="${px(i)}" y2="${py(RANGE)}" stroke="${major?INK:'#D3DCE4'}" stroke-width="${major?2:1}"/>`;
+      s+=`<line x1="${px(-RANGE)}" y1="${py(i)}" x2="${px(RANGE)}" y2="${py(i)}" stroke="${major?INK:'#D3DCE4'}" stroke-width="${major?2:1}"/>`;
+    }
+    for(let i=-RANGE;i<=RANGE;i+=2){
+      if(i!==0)s+=`<text x="${px(i)}" y="${py(0)+16}" font-family="Inconsolata" font-size="10" fill="${MUT}" text-anchor="middle">${i}</text>`;
+      if(i!==0)s+=`<text x="${px(0)-8}" y="${py(i)+3}" font-family="Inconsolata" font-size="10" fill="${MUT}" text-anchor="end">${i}</text>`;
+    }
+    s+=`<text x="${px(RANGE)+10}" y="${py(0)+4}" font-family="Inconsolata" font-size="12" fill="${INK}">x</text>`;
+    s+=`<text x="${px(0)-6}" y="${py(RANGE)-8}" font-family="Inconsolata" font-size="12" fill="${INK}">y</text>`;
+    /* clickable intersections */
+    for(let x=-RANGE;x<=RANGE;x++)for(let y=-RANGE;y<=RANGE;y++){
+      s+=`<circle class="cpgrid" data-x="${x}" data-y="${y}" cx="${px(x)}" cy="${py(y)}" r="9" fill="transparent" style="cursor:pointer"/>`;
+    }
+    return s;
+  }
+  function dot(x,y,fill,label,dy){
+    return `<circle cx="${px(x)}" cy="${py(y)}" r="6" fill="${fill}" stroke="#fff" stroke-width="1.5"/>` +
+      (label?`<text x="${px(x)}" y="${py(y)+(dy||-12)}" font-family="Inconsolata" font-size="13" fill="${fill}" text-anchor="middle">${label} (${x}, ${y})</text>`:"");
+  }
+
+  function vis(){
+    $("#cprefl").hidden = $m.value!=="reflect";
+    $("#cppoly").hidden = $m.value!=="polygon";
+  }
+
+  function drawPlot(){
+    let s=gridSVG();
+    points.forEach(p=>{ s+=dot(p.x,p.y,T,p.label); });
+    svg.innerHTML=s;
+    svg.setAttribute("aria-label", points.length
+      ? `A coordinate plane with ${points.length} plotted point${points.length===1?"":"s"}: `+points.map(p=>`${p.label} at (${p.x}, ${p.y}), in ${quadrant(p.x,p.y)}`).join("; ")+"."
+      : "An empty coordinate plane with x and y axes marked from negative eight to eight.");
+    if(!points.length){ out.innerHTML=`<span style="color:${MUT}">Click grid points to plot up to 8 points.</span>`; return; }
+    out.innerHTML = points.map(p=>`<b>${p.label}</b> (${p.x}, ${p.y}) — ${quadrant(p.x,p.y)}`).join("<br>");
+  }
+
+  function drawReflect(){
+    let s=gridSVG();
+    if(reflectPt) s+=dot(reflectPt.x,reflectPt.y,T,"P");
+    if(reflected) s+=dot(reflected.x,reflected.y,A,"P'");
+    if(reflectPt&&reflected){
+      if(reflectAxis==="x") s+=`<line x1="${px(reflectPt.x)}" y1="${py(reflectPt.y)}" x2="${px(reflected.x)}" y2="${py(reflected.y)}" stroke="${MUT}" stroke-width="1" stroke-dasharray="3 3"/>`;
+      else s+=`<line x1="${px(reflectPt.x)}" y1="${py(reflectPt.y)}" x2="${px(reflected.x)}" y2="${py(reflected.y)}" stroke="${MUT}" stroke-width="1" stroke-dasharray="3 3"/>`;
+    }
+    svg.innerHTML=s;
+    svg.setAttribute("aria-label", reflectPt
+      ? `Point P at (${reflectPt.x}, ${reflectPt.y})`+(reflected?`, reflected across the ${reflectAxis==="x"?"x":"y"}-axis to P prime at (${reflected.x}, ${reflected.y})`:"")+"."
+      : "An empty coordinate plane, ready for a point to be placed and reflected.");
+    if(!reflectPt){ out.innerHTML=`<span style="color:${MUT}">Click one point, then choose which axis to reflect it across.</span>`; return; }
+    if(!reflected){ out.innerHTML=`P is at (${reflectPt.x}, ${reflectPt.y}). Choose an axis to reflect across.`; return; }
+    const rule = reflectAxis==="x" ? "the x-coordinate stays the same and the y-coordinate flips sign" : "the y-coordinate stays the same and the x-coordinate flips sign";
+    out.innerHTML=`P (${reflectPt.x}, ${reflectPt.y}) reflected across the ${reflectAxis==="x"?"x":"y"}-axis is <b>P' (${reflected.x}, ${reflected.y})</b>.<br>
+      <span style="color:${MUT}">Reflecting across the ${reflectAxis==="x"?"x":"y"}-axis means ${rule}. Both points sit the same distance from the axis, on opposite sides.</span>`;
+  }
+
+  function polyValid(next){
+    if(!poly.length)return true;
+    const last=poly[poly.length-1];
+    return next.x===last.x || next.y===last.y;
+  }
+  function polyMetrics(){
+    let perim=0;
+    for(let i=0;i<poly.length;i++){
+      const a=poly[i], b=poly[(i+1)%poly.length];
+      perim+=Math.abs(a.x-b.x)+Math.abs(a.y-b.y);
+    }
+    /* shoelace, valid for any simple polygon including rectilinear ones */
+    let area2=0;
+    for(let i=0;i<poly.length;i++){
+      const a=poly[i], b=poly[(i+1)%poly.length];
+      area2+=a.x*b.y-b.x*a.y;
+    }
+    return {perim, area:Math.abs(area2)/2};
+  }
+  function drawPolygon(){
+    let s=gridSVG();
+    poly.forEach((v,i)=>{ s+=dot(v.x,v.y,T,LETTERS[i]); });
+    for(let i=0;i<poly.length-1;i++){
+      s+=`<line x1="${px(poly[i].x)}" y1="${py(poly[i].y)}" x2="${px(poly[i+1].x)}" y2="${py(poly[i+1].y)}" stroke="${P}" stroke-width="2.5"/>`;
+    }
+    if(polyClosed && poly.length>=3){
+      s+=`<line x1="${px(poly[poly.length-1].x)}" y1="${py(poly[poly.length-1].y)}" x2="${px(poly[0].x)}" y2="${py(poly[0].y)}" stroke="${P}" stroke-width="2.5"/>`;
+      s+=`<polygon points="${poly.map(v=>px(v.x)+","+py(v.y)).join(" ")}" fill="${T}" opacity=".15"/>`;
+    }
+    svg.innerHTML=s;
+    svg.setAttribute("aria-label", poly.length
+      ? `A ${polyClosed?"closed":"partly drawn"} shape with vertices at `+poly.map((v,i)=>`${LETTERS[i]} (${v.x}, ${v.y})`).join(", ")+"."
+      : "An empty coordinate plane, ready for polygon vertices to be placed in order.");
+    if(!poly.length){ out.innerHTML=`<span style="color:${MUT}">Click vertices in order. Each new side must run straight across or straight up-down from the last point.</span>`; return; }
+    if(!polyClosed){
+      out.innerHTML=`${poly.length} vertex${poly.length===1?"":"es"} placed: `+poly.map((v,i)=>`${LETTERS[i]} (${v.x}, ${v.y})`).join(", ")+
+        `.<br><span style="color:${MUT}">Add more vertices, or press "Close the shape" once you have at least 3 and the last one aligns with the first.</span>`;
+      return;
+    }
+    const m=polyMetrics();
+    out.innerHTML=`Vertices: `+poly.map((v,i)=>`${LETTERS[i]} (${v.x}, ${v.y})`).join(", ")+`.<br>
+      Each side length is found by subtracting coordinates — no measuring needed.<br>
+      <b>Perimeter: ${m.perim} units</b> &nbsp;·&nbsp; <b>Area: ${m.area} square units</b>`;
+  }
+
+  function draw(){
+    if($m.value==="plot")drawPlot();
+    else if($m.value==="reflect")drawReflect();
+    else drawPolygon();
+  }
+
+  svg.addEventListener("click",e=>{
+    const g=e.target.closest("circle.cpgrid"); if(!g)return;
+    const x=+g.dataset.x, y=+g.dataset.y;
+    if($m.value==="plot"){
+      const i=points.findIndex(p=>p.x===x&&p.y===y);
+      if(i>-1) points.splice(i,1);
+      else if(points.length<8) points.push({x,y,label:LETTERS[points.length]});
+    } else if($m.value==="reflect"){
+      reflectPt={x,y}; reflected=null; reflectAxis=null;
+    } else {
+      if(polyClosed)return;
+      const exists=poly.some(v=>v.x===x&&v.y===y);
+      if(exists)return;
+      if(!polyValid({x,y})){
+        $("#cpmsg").textContent="that side isn't straight — pick a point sharing an x or a y with the last vertex";
+        return;
+      }
+      $("#cpmsg").textContent="";
+      poly.push({x,y});
+    }
+    draw();
+  });
+  $("#cprefl").addEventListener("click",e=>{
+    const b=e.target.closest("button[data-op]"); if(!b||!reflectPt)return;
+    reflectAxis=b.dataset.op;
+    reflected = reflectAxis==="x" ? {x:reflectPt.x,y:-reflectPt.y} : {x:-reflectPt.x,y:reflectPt.y};
+    draw();
+  });
+  $("#cppoly").addEventListener("click",e=>{
+    const b=e.target.closest("button[data-op]"); if(!b)return;
+    if(poly.length<3){$("#cpmsg").textContent="need at least 3 vertices to close a shape";return;}
+    const first=poly[0], last=poly[poly.length-1];
+    if(first.x!==last.x && first.y!==last.y){
+      $("#cpmsg").textContent="the last vertex doesn't align with the first — add one more point first";
+      return;
+    }
+    polyClosed=true; $("#cpmsg").textContent=""; draw();
+  });
+  $("#cpclear").addEventListener("click",()=>{
+    points=[]; reflectPt=null; reflected=null; reflectAxis=null;
+    poly=[]; polyClosed=false; $("#cpmsg").textContent=""; draw();
+  });
+  $m.addEventListener("change",()=>{vis();draw();});
+  vis(); draw();
+}
+return {coordPlane};
+})());
+window.__EXTRA_NAMES__=Object.assign(window.__EXTRA_NAMES__||{},{coordPlane:"Coordinate plane"});
+</script>
+
+<script>
+/* Core tools: placeValue, rounding, shift, stepper, power, barModel, factors,
+   decimalGrid, rateLine. This unit adds coordPlane. */
+window.UNIT={
+  number:10,
+  minutes:55,
+  tools:{
+     1:["rounding"],    2:["rounding"],    3:["rounding"],    4:["rounding"],
+     5:["rounding"],    6:["rounding"],    7:["coordPlane"],  8:["coordPlane"],
+     9:["coordPlane"], 10:["coordPlane"], 11:["coordPlane"], 12:["coordPlane"],
+    13:"all"
+  }
+};
+
+window.LESSONS=
+[
+{
+ day:1, short:"Negative numbers", title:"Integers in context: below zero, below sea level, in debt",
+ objective:"Interpret negative numbers in real contexts, and explain what the negative sign means in each case.",
+ standards:["6.NS.C.5"],
+ vocab:[["Integer","A whole number, positive, negative, or zero."],["Negative","Less than zero — opposite in direction from positive."],["Context","What the number is actually measuring, which gives the negative sign its meaning."],["Opposite","Same distance from zero, other direction: 5 and −5."]],
+ materials:["Thermometer, real or a large diagram","A floor-taped number line","Cards showing real contexts (temperature, elevation, bank balance)"],
+ warmup:{mins:5,text:"Show a thermometer reading −5°C. Ask what that means in a sentence, not just a number. Someone will say 5 degrees below freezing. Say: the negative sign is not subtraction here — it's a direction. Below is what it means, and today is full of belows."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · walking the line",
+   moves:["Tape a number line on the floor with zero marked at the centre.","Call out contexts — 'temperature is 3 below zero', 'a submarine is 20 metres below sea level' — and have a student walk to the matching position.","Walk to a positive value and its negative opposite, noting both are the same number of steps from zero.","Discuss what 'zero' means in each context: freezing point, sea level, no money owed."],
+   say:[["Teacher","3 below zero. Walk there."],["Teacher","Now walk to positive 3. Same number of steps from zero, opposite direction."],["Teacher","What is zero in the submarine context?"],["Expected","Sea level — not 'nothing', a specific reference point."]],
+   watch:["Students who think zero always means 'nothing'. In each context, zero is a chosen reference point — freezing, sea level, breaking even — not an absence of the quantity."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · a labelled vertical line",
+   moves:["Draw a vertical number line representing elevation, with sea level at zero.","Mark a mountain peak above zero and a valley below.","Draw a second vertical line for temperature, with freezing at zero.","Compare the two lines and discuss what zero represents on each."],
+   say:[["Teacher","This mountain is 2000 metres above sea level. This valley is 50 metres below. Mark both."],["Teacher","Same line, same zero point, opposite directions. That is what makes negative numbers useful here."]],
+   readaloud:["Say the picture aloud: 'A vertical number line with sea level marked at zero. A mountain peak is marked at positive two thousand metres, well above the line. A valley floor is marked at negative fifty metres, just below sea level.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · writing integers from context",
+   moves:["Write an integer for each of six described contexts.","State what zero represents in each case.","Identify the opposite of a given integer.","Practise reading negative numbers aloud correctly: 'negative five', not 'minus five', when naming a value rather than an operation."],
+   say:[["Teacher","A debt of $40. Write it as an integer."],["Expected","−40."],["Teacher","And what does zero mean here?"],["Expected","Owing nothing — breaking even."]],
+   watch:["Students who write a negative sign but cannot state what zero means in that context. The number is meaningless without knowing what zero represents; require the reference point stated alongside every integer written."]}
+ ],
+ guided:[["A submarine is 30 m below sea level. Write this as an integer.","−30"],["Temperature is 8 degrees above freezing. Write this as an integer.","8"],["What is the opposite of −12?","12"],["What does zero represent for a bank balance?","Owing nothing and having nothing — breaking even"]],
+ worksheet:[
+  {t:"A · Context to integer",d:"Write an integer for each.",items:["15 m above sea level","20 m below sea level","a debt of $50","a profit of $30","10 degrees below freezing","5 degrees above freezing"]},
+  {t:"B · Find the opposite",d:"State the opposite integer.",items:["7","−9","−1","100","−45","0"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain what zero represents for elevation, and why it is a chosen reference point rather than 'nothing'.","A submarine at −40 m rises to the surface, then continues to an antenna at +15 m. Describe this journey using integers.","Why is 0 its own opposite? Use the definition of 'opposite' to explain."]}],
+ exit:["Write an integer for '25 m below sea level'.","Find the opposite of −18.","Explain what zero means in the context of a bank balance."],
+ crit:"Mastery: correct integers written with the reference point stated, and item 3 explaining zero as a chosen point rather than an absence. Reteach if the reference point cannot be named — the number is only meaningful once you know what zero measures.",
+ support:["Provide a context card matched to a written integer as a checking pair.","Restrict to one context (temperature) before introducing others.","Keep the floor number line available for walking through every new context."],
+ extend:["Find a context where negative numbers would not make sense, and explain why.","Elevation and temperature both use zero as a reference point, but the actual zero means something different in each. List three other quantities that use negative numbers and state what zero means for each."],
+ access:["Touch: physically walking a floor-taped line makes distance-from-zero a bodily experience rather than an abstraction.","Vision: vertical number lines are used for elevation and temperature since they match the physical up-down of the real quantity.","Language: 'negative five' is modelled consistently rather than 'minus five', reserving 'minus' for the operation of subtraction.","Memory: contexts are introduced one at a time and connected explicitly, rather than presented as an unconnected list."]
+},
+{
+ day:2, short:"Adding context", title:"Combining and comparing integers in context",
+ objective:"Combine changes described by integers in a real context, and compare which of two integers represents a larger or smaller quantity.",
+ standards:["6.NS.C.5","6.NS.C.7"],
+ vocab:[["Change","An increase or decrease, written as a positive or negative integer."],["Combine","Add changes together to find a net result."],["Larger and smaller","For integers, larger means further right on the number line, not larger in size."],["Net result","The overall outcome after combining several changes."]],
+ materials:["Floor number line","Cards describing sequential changes","Whiteboards"],
+ warmup:{mins:5,text:"Post: a submarine starts at −20 m, rises 8 m, then descends 15 m. Ask for its final position. Let students attempt it with any method before formal addition is taught — a number line walk is entirely valid here."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · walking sequential changes",
+   moves:["Start at a marked position on the floor number line.","Walk forward for a positive change, backward for a negative one.","Record the position after each step.","Repeat for a different starting point and sequence of changes."],
+   say:[["Teacher","Start at negative 20. Rise 8 means walk which way?"],["Expected","Forward, toward positive."],["Teacher","Now descend 15. Which way?"],["Expected","Backward."],["Teacher","Where did you end up?"],["Expected","Negative 27."]],
+   watch:["Students who walk in the wrong direction for a negative change. Rising is always toward positive and descending toward negative, regardless of where you currently stand — the current position doesn't change which way 'rise' points."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · arrows on a number line",
+   moves:["Draw a number line and mark the starting position.","Draw an arrow for each change, pointing right for positive and left for negative.","Chain the arrows head to tail and mark the final position.","Repeat for a comparison: which of two given integers is larger, using their positions."],
+   say:[["Teacher","Head to tail, in order. Where does the last arrow's tip land?"],["Teacher","Now compare negative 3 and negative 8. Which is larger?"],["Expected","Negative 3 — it's further right, closer to zero."],["Teacher","Even though 8 is the 'bigger' number without the sign. On the line, further right always means larger."]],
+   readaloud:["Say the picture aloud: 'A number line from negative thirty to positive ten. Starting at negative twenty, an arrow points right eight units, landing at negative twelve. A second arrow from there points left fifteen units, landing at negative twenty-seven.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · adding and comparing",
+   moves:["Write the combination as an addition of integers: −20 + 8 − 15.","Calculate the net result numerically.","Compare pairs of integers using < and > correctly.","Solve a multi-step context problem combining three or more changes."],
+   say:[["Teacher","Negative 20 plus 8 minus 15. Work it through step by step."],["Teacher","Is negative 3 less than or greater than negative 8?"],["Expected","Greater than — write negative 3 is greater than negative 8."]],
+   watch:["Students who compare negative integers as if the sign didn't matter, saying −8 is bigger than −3 because 8 is bigger than 3. The number line settles this immediately: −3 sits to the right of −8."]}
+ ],
+ guided:[["Start at −20, rise 8, descend 15. Find the final position.","−27"],["Compare −4 and −9. Which is larger?","−4"],["A temperature starts at −6°C and rises 10°C. Find the new temperature.","4°C"],["Why is −3 greater than −8?","−3 sits further right on the number line, closer to zero."]],
+ worksheet:[
+  {t:"A · Combine changes",d:"Find the final position.",items:["Start 5, change −8","Start −10, change 15","Start −3, change −7","Start 0, change −12, then change 20","Start −25, change 10, then change −8","Start 18, change −30"]},
+  {t:"B · Compare",d:"Write < or >.",items:["−5 __ −2","3 __ −10","−15 __ −20","0 __ −1","−7 __ 7","−100 __ −99"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A hiker starts at 500 m elevation, descends 200 m, then rises 350 m. Find the final elevation, showing each step.","Explain why −50 is less than −10, using the number line in your explanation.","A bank balance starts at −$30 (an overdraft). Two deposits of $15 each are made. Is the account out of overdraft? Show your working."]}],
+ exit:["Start at −8, rise 15, descend 3. Find the final position.","Compare −6 and −2. Which is larger?","Explain why the sign of an integer, not just its size, decides which is larger."],
+ crit:"Mastery: correct combination and comparison, with item 3 correctly stating that further right means larger. Reteach with the floor number line if comparisons of negative integers are reversed — walking to both positions makes 'further right' undeniable.",
+ support:["Provide the number line with the starting position pre-marked.","Restrict to two-step combinations before three or more.","Use < and > with a worked example showing the direction each symbol points."],
+ extend:["Find two different integers whose sum is −10. How many such pairs exist?","A sequence of five changes returns a value to its starting point. What must be true of the changes?"],
+ access:["Touch: physically walking each change in sequence makes the direction of positive and negative unambiguous.","Vision: arrows on the number line point explicitly right or left, reinforcing direction over sign alone.","Language: 'larger' is redefined explicitly for integers — further right, not bigger without the sign — since the everyday sense of 'larger' can mislead here.","Attention: the head-to-tail arrow chaining method gives a consistent visual procedure for every multi-step problem."]
+},
+{
+ day:3, short:"The number line", title:"Ordering and comparing integers",
+ objective:"Order a set of integers from least to greatest, and place integers accurately on a number line.",
+ standards:["6.NS.C.6c","6.NS.C.7a"],
+ vocab:[["Order","Arrange from least to greatest, or the reverse."],["Least to greatest","Left to right on a standard number line."],["Between","An integer whose position lies between two others on the line."],["Consistent scale","Equal spacing between consecutive marks on a number line."]],
+ materials:["Blank number lines","Integer cards for sorting","Whiteboards"],
+ warmup:{mins:5,text:"Post six integers in random order: 3, −7, 0, −2, 5, −10. Ask students to guess the correct order without a number line first. Then check with one. The line is the tool that makes ordering integers reliable rather than a matter of guessing."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · sorting cards on a line",
+   moves:["Give pairs a set of integer cards including negatives.","Arrange the cards on a blank number line in the correct positions.","Read the ordered sequence from least to greatest.","Insert an additional integer card into the correct position among those already placed."],
+   say:[["Teacher","Place every card on the line first. Then read them off left to right — that is your order."],["Teacher","Now insert negative 4. Where does it go?"],["Expected","Between negative 7 and negative 2, if those are already placed."]],
+   watch:["Students who order by treating the number after the negative sign as the priority, putting −2 before −7 because 2 is smaller than 7. The physical line corrects this immediately — walk to both and see which is further left."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · marking with even spacing",
+   moves:["Draw a number line with consistent, evenly spaced marks.","Plot a set of given integers accurately.","Draw a second number line with uneven spacing and discuss why it misrepresents the data.","Practise reading an integer's position from an already-marked line."],
+   say:[["Teacher","Every gap on this line must be the same size. Why does that matter?"],["Expected","Otherwise the distances don't mean anything."],["Teacher","A number line with uneven spacing can make two numbers look closer or further apart than they really are."]],
+   readaloud:["Say the picture aloud: 'A number line from negative ten to positive six, with evenly spaced marks at every integer. Six points are plotted: negative ten, negative seven, negative two, zero, three and five, read from left to right in that order.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · ordering and notation",
+   moves:["Order sets of integers from least to greatest and greatest to least.","Write comparisons using < and > for pairs within a larger set.","Identify an integer between two given integers.","Solve a real-context ordering problem, such as ranking golf scores where lower is better."],
+   say:[["Teacher","In golf, the lowest score wins. Order these five scores from best to worst."],["Expected","Order from least to greatest, since least is best here."],["Teacher","Context decides whether 'least to greatest' means 'best to worst' or the reverse. Read the situation."]],
+   watch:["Students who order correctly in the abstract but misapply it to a context where a smaller number is the better outcome, or vice versa. Confirm what 'best' means in the specific context before ordering."]}
+ ],
+ guided:[["Order −5, 3, −1, 0, 2 from least to greatest.","−5, −1, 0, 2, 3"],["Order 4, −6, −2, 7, −9 from greatest to least.","7, 4, −2, −6, −9"],["Find an integer between −8 and −3.","Any of −7, −6, −5, −4"],["In golf, lower scores are better. Order −3, 2, −5, 0 from best to worst.","−5, −3, 0, 2"]],
+ worksheet:[
+  {t:"A · Order the integers",d:"Least to greatest.",items:["4, −2, 0, −6, 3","−10, 5, −1, 8, −5","2, −2, 0, 1, −1","−15, −20, −5, −25","6, −6, 3, −3, 0","−100, 50, 0, −50, 100"]},
+  {t:"B · Compare and find between",d:"State a comparison or a between value.",items:["Is −12 greater or less than −20?","Find an integer between −4 and 2","Is 0 greater or less than −1?","Find an integer between −15 and −10"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Five golfers score −4, 2, −1, 0, −6. Order them from best to worst, explaining what 'best' means here.","Explain why a number line must have evenly spaced marks to be trustworthy for ordering.","A city's daily low temperatures are −5, 3, −8, 0, −2. Order them from coldest to warmest, and explain your ordering rule."]}],
+ exit:["Order −6, 2, −1, 0, 5 from least to greatest.","Find an integer between −10 and −5.","Explain why even spacing matters on a number line."],
+ crit:"Mastery: correct ordering with even spacing understood, and item 3 explaining the spacing requirement. Reteach with card-sorting on a physical line if negative integers are ordered by their digit alone rather than their position.",
+ support:["Provide a pre-drawn number line with marks already spaced evenly.","Restrict to smaller integer ranges before larger ones.","Use the golf-score context repeatedly, since 'lower is better' gives concrete stakes to ordering."],
+ extend:["Order a set of integers that includes very large positive and negative values. Does the ordering process change at all?","Design a real context where 'greatest' does not mean 'best'. Order a set of values for it and explain your reasoning."],
+ access:["Touch: physically inserting a new card among already-placed ones makes ordering a spatial, checkable action.","Vision: the uneven-spacing counterexample makes the even-spacing rule visible as a real risk, not just an instruction.","Language: 'least to greatest' and 'greatest to least' are both practised, since context determines which is asked for.","Attention: the golf-score context is reused across guided and worksheet items so the context itself does not need re-learning each time."]
+},
+{
+ day:4, short:"More ordering", title:"Ordering integers in real-world data",
+ objective:"Apply integer ordering to solve multi-step real-world problems, including finding a difference between ordered values.",
+ standards:["6.NS.C.7","6.NS.C.5"],
+ vocab:[["Difference","How far apart two values are, found by subtraction."],["Temperature change","The difference between two recorded temperatures."],["Highest and lowest","The extremes of an ordered set — first and last once ordered."],["Real-world integers","Contexts where negative numbers appear naturally: weather, finance, elevation, sports."]],
+ materials:["Weather report data (real or provided)","Number lines","Calculators","Whiteboards"],
+ warmup:{mins:5,text:"Show a week of daily low temperatures including negatives: −3, 5, −8, 2, 0, −1, 4. Ask for the coldest and warmest day without ordering the whole list first — just scanning for the extremes. Then check by ordering fully."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · finding extremes on the line",
+   moves:["Plot a week of temperatures on a number line.","Identify the leftmost (coldest) and rightmost (warmest) points.","Find the temperature difference between the coldest and warmest days by counting spaces on the line.","Repeat for a different dataset, such as elevation changes on a hike."],
+   say:[["Teacher","Coldest is furthest left. Warmest is furthest right. Count the spaces between them."],["Expected","Twelve, from negative eight to positive four."],["Teacher","That count is the difference — how far apart the two extremes actually are."]],
+   watch:["Students who subtract the digits without the signs, getting 8 − 4 = 4 for the gap between −8 and 4. Counting the actual number line spaces between the two points gives the correct 12, and doing it physically prevents the sign error."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · marking the gap",
+   moves:["Draw a number line with the coldest and warmest temperatures marked.","Draw a bracket spanning between them, labelled with the difference.","Repeat for an elevation change from a valley to a peak.","Compare with a case where both values are positive, to see the method is unchanged."],
+   say:[["Teacher","The bracket spans from negative eight to positive four. Count every space inside it."],["Teacher","Does the same method work for two positive numbers, like 3 to 9?"],["Expected","Yes — the gap is still six spaces, counted the same way."]],
+   readaloud:["Say the picture aloud: 'A number line from negative ten to positive six. Points are marked at negative eight and positive four, with a bracket spanning between them labelled twelve, the total number of unit spaces crossed.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · calculating differences",
+   moves:["Calculate the difference between two integers by counting the total distance crossed on the line.","Solve for the highest, lowest, and range of a dataset containing negative values.","Handle a multi-step problem: temperature change over several days.","Verify each answer using the number-line bracket method."],
+   say:[["Teacher","From negative 8 to positive 4 is a rise of how much?"],["Expected","Twelve."],["Teacher","Whenever you cross zero, count both sides and add them, or count every space straight through. Either way works if you count carefully."]],
+   watch:["Students who find the difference by subtracting the smaller-looking number from the larger-looking one without accounting for which side of zero each sits on. The number-line bracket count is the reliable check."]}
+ ],
+ guided:[["Coldest −8°C, warmest 4°C. Find the difference.","12°C"],["A valley at −50 m, a peak at 800 m. Find the elevation change.","850 m"],["Temperature drops from 3°C to −6°C. Find the change.","A drop of 9°C"],["Why count spaces on the number line rather than just subtracting digits?","Because the sign of each value affects which side of zero it's on, and simple digit subtraction ignores that."]],
+ worksheet:[
+  {t:"A · Find the difference",d:"Show the number line count.",items:["−5 to 3","−12 to −2","0 to −8","10 to −4","−20 to 15","−7 to −1"]},
+  {t:"B · Real contexts",d:"Show your working.",wide:true,
+   items:["A week's temperatures: −4, 2, −7, 0, 3, −1, 5. Find the coldest, warmest, and the difference between them.","A submarine dives from the surface to −120 m, then rises to −45 m. Find the total change in depth.","A stock price starts at −$5 (a loss) and rises to $12. Find the total gain."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain how to find the difference between two integers when one is negative and one is positive, using a number line.","A mountain summit is at 1200 m; a nearby mine shaft reaches −300 m. Find the total vertical distance between them.","Why might 'the temperature changed by 10 degrees' be ambiguous without knowing the direction? Give an example."]}],
+ exit:["Find the difference between −6 and 9.","A hiker starts at 200 m and descends to −50 m. Find the change.","Explain why crossing zero needs careful counting."],
+ crit:"Mastery: correct difference calculated and verified by counting, with item 3 explaining the crossing-zero care needed. Reteach with the physical number line — counting the actual spaces is the reliable method when digit subtraction misleads.",
+ support:["Provide the number line with both values pre-marked so only the bracket and count remain.","Restrict to one value negative and one positive before both negative.","Keep a real weather dataset as the running context throughout."],
+ extend:["A dataset has a range of 30 with a minimum of −18. Find the maximum.","Find a real dataset (temperatures, tide levels, golf scores) with both positive and negative values, and calculate its range."],
+ access:["Touch: physically counting spaces on a floor or drawn number line is more reliable than mental subtraction when signs are involved.","Vision: the bracket marking the difference is drawn directly on the line, making the counted span visually explicit.","Language: 'difference' and 'change' are used carefully; 'a rise of 12' is distinguished from 'a difference of 12' where direction matters.","Attention: the crossing-zero case is explicitly contrasted with a same-side case so the method's generality is demonstrated, not assumed."]
+},
+{
+ day:5, short:"Absolute value", title:"Absolute value as distance from zero",
+ objective:"Find the absolute value of an integer as its distance from zero, and distinguish absolute value from the sign of a number.",
+ standards:["6.NS.C.7c"],
+ vocab:[["Absolute value","The distance a number sits from zero, always given as a positive number or zero."],["Distance","Always positive or zero — you cannot walk a negative distance."],["|n|","The notation for absolute value: two vertical bars around the number."],["Magnitude","Another word for size or distance, ignoring direction."]],
+ materials:["Floor number line","Rulers","Whiteboards"],
+ warmup:{mins:5,text:"Ask two students to stand at +5 and −5 on a floor number line. Ask how far each one walked from zero to get there. Both walked five steps. Say: the direction was different, but the distance was identical — that distance is called the absolute value."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · measuring distance from zero",
+   moves:["Have students walk from zero to various positive and negative positions on the floor line.","Count the number of steps taken each time, regardless of direction.","Note that +7 and −7 both take seven steps.","Repeat for zero itself, noting the distance is zero steps."],
+   say:[["Teacher","Walk from zero to negative six. How many steps?"],["Expected","Six."],["Teacher","Walk from zero to positive six. How many steps?"],["Expected","Six, also."],["Teacher","Same number of steps, opposite directions. The step count is the absolute value; it never cares which way you walked."]],
+   watch:["Students who think absolute value depends on the sign, expecting |−6| to give a different number than |6|. The step count is identical either way — walking is walking, regardless of direction."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · matching distances on the line",
+   moves:["Draw a number line with 5 and −5 both marked.","Draw a bracket from zero to each, both the same length.","Label both brackets with the same distance value.","Repeat for a pair including zero and note its distance is zero."],
+   say:[["Teacher","Both brackets are exactly the same length. That is the entire idea — direction differs, distance does not."]],
+   readaloud:["Say the picture aloud: 'A number line with negative five and positive five both marked. Two brackets span from zero to each point, both exactly five units long and both labelled with the value five.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · the notation",
+   moves:["Write absolute value using the |n| notation.","Calculate |n| for several positive and negative integers.","Compare two absolute values to determine which represents a greater distance.","Solve a context problem: which of two account overdrafts is the larger debt, regardless of the negative sign."],
+   say:[["Teacher","Two vertical bars mean 'distance from zero, ignore the sign'. |−9| equals what?"],["Expected","9."],["Teacher","An overdraft of −$40 versus −$65. Which debt is bigger?"],["Expected","65 — even though as integers −65 is 'less than' −40, as a debt it's the larger amount owed."]],
+   watch:["Students who confuse 'greater than' for integers with 'greater absolute value'. −65 is less than −40 as an integer (further left), but its absolute value, 65, is greater. Both statements are true and refer to different things."]}
+ ],
+ guided:[["Find |−8|.","8"],["Find |12|.","12"],["Find |0|.","0"],["Which represents the bigger debt: −40 or −65?","−65, since its absolute value 65 is larger"]],
+ worksheet:[
+  {t:"A · Find the absolute value",d:"Give a number.",items:["|−5|","|9|","|−20|","|0|","|−100|","|17|"]},
+  {t:"B · Compare absolute values",d:"State which has the greater absolute value.",items:["−7 or 4","−15 or 12","−3 or −9","20 or −18"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why |−6| and |6| are equal, using the idea of distance from zero.","Two submarines are at −80 m and −45 m. Which is further from the surface? Use absolute value to justify your answer.","Explain the difference between saying '−20 is less than −10' and 'the absolute value of −20 is greater than the absolute value of −10'. Are both true?"]}],
+ exit:["Find |−14|.","Which has the greater absolute value: −9 or 6?","Explain what absolute value measures."],
+ crit:"Mastery: correct calculations and comparisons, with item 3 correctly describing distance from zero. Reteach with the physical walking activity if the sign is thought to affect the absolute value — the step count settles it decisively.",
+ support:["Provide the |n| notation alongside a plain-English translation on every problem: 'distance from zero'.","Restrict to straightforward positive and negative pairs before debt or elevation contexts requiring interpretation.","Keep the floor number line available for verifying any absolute value by walking it."],
+ extend:["Find all integers with an absolute value of 12. How many are there?","Is there any integer whose absolute value is negative? Explain why or why not, using the definition."],
+ access:["Touch: physically walking and counting steps makes 'distance, not direction' a bodily fact rather than an abstract rule.","Vision: matching brackets of equal length for a number and its opposite make the equality visually undeniable.","Language: 'magnitude' is introduced as a synonym for absolute value, useful since some students will meet this term in other contexts.","Memory: the overdraft comparison connects today's idea directly back to day one's real-world contexts."]
+},
+{
+ day:6, short:"Absolute value problems", title:"Using absolute value to solve problems",
+ objective:"Apply absolute value to solve context problems involving distance, deviation, and comparing magnitudes.",
+ standards:["6.NS.C.7c","6.NS.C.7"],
+ vocab:[["Deviation","How far a value sits from a reference point, using absolute value."],["Tolerance","An allowed range of deviation from a target value."],["Within tolerance","A value whose absolute deviation from the target does not exceed the allowed limit."],["Real distance","Absolute value applied to a genuine physical or numerical gap."]],
+ materials:["Calculators","Sample manufacturing/quality-control data","Whiteboards"],
+ warmup:{mins:5,text:"Post: a factory machine should fill bottles with 500 mL, with a tolerance of ±5 mL. One bottle has 496 mL. Ask whether it passes inspection. Students need to find the deviation and compare it to the tolerance — today's whole skill in one example."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · measuring against a target",
+   moves:["Mark a target value on a number line, with a tolerance range shaded on both sides.","Plot several actual measured values.","Identify which fall inside the shaded tolerance and which fall outside.","Calculate the absolute deviation for each and compare to the tolerance limit."],
+   say:[["Teacher","Target 500, tolerance 5. Shade from 495 to 505."],["Teacher","This bottle measured 496. Inside or outside the shaded zone?"],["Expected","Inside."],["Teacher","Find its deviation using absolute value."],["Expected","|496 − 500| = 4, which is within the tolerance of 5."]],
+   watch:["Students who compute the deviation without the absolute value, getting a negative number and comparing that directly to the tolerance. The tolerance is a distance, so the deviation must also be treated as a distance — always non-negative."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · the tolerance band",
+   moves:["Draw a number line with the target and shaded tolerance band.","Mark several values, some inside and some outside the band.","Label each with its absolute deviation from the target.","Discuss what happens right at the edge of the tolerance."],
+   say:[["Teacher","This one sits right on the edge. Is it inside or outside?"],["Expected","Depends on whether the tolerance includes the boundary — usually inside if it says 'at most'."]],
+   readaloud:["Say the picture aloud: 'A number line with a shaded band from four hundred ninety-five to five hundred five, centred on the target of five hundred. Four points are marked: four hundred ninety-six and five hundred two fall inside the shaded band; four hundred eighty-nine and five hundred eight fall outside it.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · calculating and deciding",
+   moves:["Calculate |actual − target| for several values.","Compare each deviation to a stated tolerance to decide pass or fail.","Solve a real quality-control style problem with multiple items to check.","Write the decision rule in general form: passes if |actual − target| ≤ tolerance."],
+   say:[["Teacher","Write the rule once, in general form. Then apply it to every case without re-deriving it each time."]],
+   watch:["Students who apply the rule inconsistently, checking some values against the target correctly and others by comparing raw numbers without absolute value. Requiring the |actual − target| notation written out for every check enforces consistency."]}
+ ],
+ guided:[["Target 500, tolerance 5, actual 496. Pass or fail?","|496−500|=4 ≤ 5, passes"],["Target 500, tolerance 5, actual 508.","|508−500|=8 > 5, fails"],["Target 20, tolerance 2, actual 17.5.","|17.5−20|=2.5 > 2, fails"],["Write the general pass rule using absolute value.","Passes if |actual − target| ≤ tolerance"]],
+ worksheet:[
+  {t:"A · Pass or fail",d:"Target 250, tolerance 8. Show the deviation.",items:["actual 245","actual 259","actual 250","actual 241","actual 258","actual 261"]},
+  {t:"B · Real quality control",d:"Show your working for each.",wide:true,
+   items:["A rope should be 2 m long, tolerance 3 cm. Check lengths of 1.97 m, 2.04 m, and 2.035 m.","A recipe needs 500 g of flour, tolerance 10 g. Check amounts of 492 g, 511 g, and 489 g."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why absolute value, rather than plain subtraction, is the right tool for checking tolerance.","A machine's tolerance is tightened from ±5 to ±2. What effect does this have on how many items pass inspection? Explain using an example.","Design a tolerance-checking problem of your own, including a target, a tolerance, and three test values."]}],
+ exit:["Target 100, tolerance 3, actual 96. Pass or fail? Show the deviation.","Write the general pass rule.","Explain why the deviation must be an absolute value, not a signed number."],
+ crit:"Mastery: correct pass/fail decisions with the deviation shown as an absolute value, and item 3 explaining why sign is irrelevant here. Reteach if the sign of the deviation is used directly in the comparison — the tolerance band diagram makes clear that both directions from target count equally.",
+ support:["Provide the general rule pre-written, with only the specific numbers to substitute.","Restrict to values clearly inside or outside tolerance before edge cases.","Keep the tolerance band diagram visible for every problem."],
+ extend:["A tolerance is asymmetric — allowed to be up to 10 over target but only 2 under. Can absolute value still be used directly? Explain the complication.","Research (or reason from context) why real manufacturing uses tolerances rather than requiring an exact target value every time."],
+ access:["Touch: physically marking a shaded tolerance zone on a real number line makes 'inside vs outside' a visual, checkable judgement.","Vision: the tolerance band is shaded consistently across every diagram, distinguishing 'in range' from 'out of range' at a glance.","Language: 'deviation' and 'tolerance' are technical terms introduced together with a concrete, relatable example (bottle filling).","Attention: writing the general rule once and reusing it for every subsequent problem reduces the cognitive load of each individual check."]
+},
+{
+ day:7, short:"The coordinate plane", title:"Introducing the coordinate plane and all four quadrants",
+ objective:"Plot and read points in all four quadrants of the coordinate plane, and identify a point's quadrant from its coordinates.",
+ standards:["6.NS.C.6b","6.NS.C.6c"],
+ vocab:[["Coordinate plane","A grid formed by a horizontal and vertical number line crossing at the origin."],["Ordered pair","A point's address: (x, y), x first."],["Origin","The point (0, 0), where both axes cross."],["Quadrant","One of the four regions the axes divide the plane into."]],
+ materials:["The coordinate plane tool","Graph paper","Rulers"],
+ warmup:{mins:5,text:"Draw a horizontal number line and a vertical number line crossing at zero on the board. Ask what this creates. Some will recognise it from earlier grades. Say: today extends it to include negative values in every direction, not just the positive corner."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · plotting with a physical grid",
+   moves:["Set up a floor grid with both positive and negative axes marked.","Call out ordered pairs and have students walk to and stand at each point.","Discuss which quadrant each landed in.","Reverse the activity: a student stands at a point and the class calls out its coordinates."],
+   say:[["Teacher","Walk to (−3, 4). Which way first?"],["Expected","Left three, then up four."],["Teacher","Always x first, then y. That order is the whole convention, and it never changes."]],
+   watch:["Students who move up/down before left/right. The convention is always horizontal first, then vertical — 'along the corridor, then up the stairs' is a common way to remember the order."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · the tool",
+   moves:["Open the coordinate plane tool in plotting mode.","Plot several points across all four quadrants.","Read each point's quadrant directly from the tool's report.","Discuss the pattern of signs in each quadrant: (+,+), (−,+), (−,−), (+,−)."],
+   say:[["Teacher","Quadrant II. What do you notice about the signs of every point there?"],["Expected","X is negative, y is positive."],["Teacher","That pattern holds for the whole quadrant, not just one point in it."]],
+   readaloud:["Say the picture aloud: 'A coordinate plane with four points plotted, one in each quadrant. Point A at three, four sits in Quadrant one. Point B at negative two, five sits in Quadrant two. Point C at negative four, negative three sits in Quadrant three. Point D at five, negative two sits in Quadrant four.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · reading and identifying",
+   moves:["Write the sign pattern for each quadrant.","Given a point, identify its quadrant without plotting.","Given a quadrant, generate three points that would lie within it.","Handle points on an axis, which belong to no quadrant."],
+   say:[["Teacher","(−7, −2). Which quadrant, without drawing anything?"],["Expected","Both negative, so Quadrant III."],["Teacher","(0, 6). Which quadrant?"],["Expected","None — it's on the y-axis."]],
+   watch:["Students who assign an axis point to a quadrant. A point with a zero coordinate sits on an axis, not inside any of the four regions — this is worth stating as its own rule, not an edge case to guess at."]}
+ ],
+ guided:[["Plot (2, 5). Which quadrant?","Quadrant I"],["Plot (−4, 3). Which quadrant?","Quadrant II"],["Plot (−1, −6). Which quadrant?","Quadrant III"],["Plot (0, −5). Which quadrant?","None — it's on the y-axis"]],
+ worksheet:[
+  {t:"A · Identify the quadrant",d:"State the quadrant or axis.",items:["(3, 7)","(−2, 8)","(−5, −5)","(6, −3)","(0, 4)","(−7, 0)"]},
+  {t:"B · Generate points",d:"Give three points in each quadrant.",items:["Quadrant I","Quadrant II","Quadrant III","Quadrant IV"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain the sign pattern for each of the four quadrants, and why a point on an axis belongs to none of them.","A point is described as 'left of the y-axis and below the x-axis'. Which quadrant, and what are the signs of its coordinates?","Why does the order in an ordered pair matter? Give an example of two different points that use the same two numbers in a different order."]}],
+ exit:["Plot (−3, −7). Which quadrant?","Give the sign pattern for Quadrant IV.","Explain why (5, 0) is not in any quadrant."],
+ crit:"Mastery: correct quadrant identification and sign pattern, with item 3 explaining the axis exception. Reteach with the floor grid if the x-first convention is reversed — walking it out physically makes the order concrete.",
+ support:["Provide the sign-pattern chart for all four quadrants as a permanent reference.","Restrict to points clearly inside a quadrant before axis cases.","Use 'along the corridor, then up the stairs' as a consistent verbal cue for the plotting order."],
+ extend:["Is there a pattern to which quadrant a point falls in based on whether x and y are each even or odd? Investigate and report what you find (there shouldn't be one — a good chance to practise ruling something out).","Plot a set of points that form a recognisable shape when connected. What shape, and which quadrants does it cross?"],
+ access:["Touch: walking to a called-out coordinate on a floor grid makes the along-then-up order a physical habit rather than a rule to remember.","Vision: the tool's automatic quadrant labelling reinforces the sign pattern visually alongside the numeric coordinates.","Language: 'ordered pair' emphasises that order matters, distinct from just 'a pair of numbers'.","Attention: generating three points per quadrant, rather than just identifying given ones, checks understanding in the harder, generative direction."]
+},
+{
+ day:8, short:"Plotting practice", title:"Plotting and reading points fluently",
+ objective:"Plot and read coordinates fluently across all four quadrants, including solving simple context problems on a grid.",
+ standards:["6.NS.C.6b","6.NS.C.8"],
+ vocab:[["Fluent","Accurate and quick, without needing to re-derive the method each time."],["Map context","Coordinates used to represent real locations, such as on a city grid or a game board."],["Same x-coordinate","Points that lie on the same vertical line."],["Same y-coordinate","Points that lie on the same horizontal line."]],
+ materials:["The coordinate plane tool","Graph paper","A simple map-style grid context","Whiteboards"],
+ warmup:{mins:5,text:"Post a simple 'treasure map' grid with a few labelled locations and ask for the coordinates of the treasure, described only in words: 'three east and two south of the old oak tree at the origin'. This connects the abstract skill to something with genuine stakes and a story."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · a map context",
+   moves:["Set up a floor grid representing a simple map with landmarks at labelled coordinates.","Give directions in words and have students find the described location.","Reverse it: a student stands somewhere and the class states the coordinates and a worded direction from a landmark.","Discuss real map applications of this same coordinate idea."],
+   say:[["Teacher","Three east, two south of the origin. Where's that?"],["Expected","(3, −2)."],["Teacher","Real maps, ships, and even your phone's GPS use exactly this idea, just with different units."]],
+   watch:["Students who treat 'east/west' and 'north/south' inconsistently with x and y. Establish explicitly: east-west maps to the x-axis, north-south to the y-axis, matching the along-then-up convention already learned."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · the tool for fluency",
+   moves:["Use the coordinate plane tool to plot a rapid sequence of points called out loud.","Identify pairs of points sharing the same x-coordinate and note they form a vertical line.","Identify pairs sharing the same y-coordinate and note a horizontal line.","Discuss why this matters for the polygon work in the next few days."],
+   say:[["Teacher","These two points share an x-coordinate of 4. What does that mean about their position relative to each other?"],["Expected","They're directly above or below one another."]],
+   readaloud:["Say the picture aloud: 'Four points plotted on the coordinate plane. Points at (4, 2) and (4, 7) share the same x-coordinate, lying on a shared vertical line. Points at (−3, 5) and (6, 5) share the same y-coordinate, lying on a shared horizontal line.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · reading fluently",
+   moves:["Plot and identify coordinates rapidly across a worksheet of mixed problems.","Determine whether two given points share an x- or y-coordinate without plotting.","Solve a context problem: find a third point completing a simple pattern.","Time a short fluency drill and discuss strategies for speed without sacrificing accuracy."],
+   say:[["Teacher","(2, 5) and (2, −3) — do they share a coordinate?"],["Expected","Yes, the x-coordinate, 2 — same vertical line."]],
+   watch:["Students who confuse which shared coordinate produces a vertical versus a horizontal line. Same x means same left-right position, which means a vertical line; same y means a horizontal line. State the rule and check it against a plotted example whenever it's forgotten."]}
+ ],
+ guided:[["Plot 4 east, 3 north of the origin.","(4, 3)"],["Do (5, 2) and (5, −4) share a coordinate? Which line does that make?","Same x-coordinate, 5 — a vertical line"],["Do (−3, 6) and (8, 6) share a coordinate? Which line?","Same y-coordinate, 6 — a horizontal line"],["Why does 'same x-coordinate' produce a vertical line, not horizontal?","Because the points differ only in height, staying at the same left-right position."]],
+ worksheet:[
+  {t:"A · Plot from directions",d:"Give the ordered pair.",items:["5 east, 2 north","3 west, 4 south","6 east, 0 north/south","0 east/west, 7 south","4 west, 5 north","8 east, 8 south"]},
+  {t:"B · Same line or not",d:"State same x, same y, or neither.",items:["(3, 4) and (3, 9)","(2, 5) and (8, 5)","(−4, 1) and (4, −1)","(6, 6) and (6, −2)"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A rectangle's corners are at (2, 3), (2, 8), (7, 8) and (7, 3). Explain which sides are horizontal and which are vertical, using shared coordinates.","Design a short 'treasure map' with three landmarks and directions to a fourth point, using coordinate language.","Why is fluency with plotting important before building shapes on the coordinate plane, as the next lessons will require?"]}],
+ exit:["Plot the point 6 west, 3 south of the origin.","Do (5, 7) and (5, −2) share a coordinate? Which kind of line does this make?","Explain the difference between points sharing an x-coordinate and points sharing a y-coordinate."],
+ crit:"Mastery: accurate plotting and correctly identifying shared-coordinate lines. Reteach with the floor grid and explicit east-west/north-south mapping if confusion persists — the physical direction-following is the most reliable correction.",
+ support:["Provide a compass-direction key alongside the axes on every diagram.","Restrict to one quadrant before requiring all four in a single fluency drill.","Keep the shared-coordinate rule (same x → vertical, same y → horizontal) posted throughout."],
+ extend:["Plot four points that form a square with sides not parallel to the axes. Do any pairs still share a coordinate? Why or why not?","Design a fluency drill of your own with ten points, mixing all four quadrants and several shared-coordinate pairs."],
+ access:["Touch: the floor grid with real compass directions connects the abstract skill to spatial navigation students already understand.","Vision: shared-coordinate pairs are highlighted with a connecting line in the tool, making the vertical/horizontal relationship visible rather than only stated.","Language: 'east/west' and 'north/south' are mapped explicitly and consistently onto x and y respectively, never left ambiguous.","Attention: the timed fluency drill is kept short and bounded, avoiding fatigue from an open-ended plotting task."]
+},
+{
+ day:9, short:"Distance & reflections", title:"Distance between points and reflecting across an axis",
+ objective:"Find the distance between two points sharing a coordinate, and reflect a point across the x-axis or y-axis.",
+ standards:["6.NS.C.6b","6.NS.C.8"],
+ vocab:[["Distance between points","For points sharing a coordinate, found using absolute value of the difference in the other coordinate."],["Reflect","Flip a point across an axis to its mirror image on the other side."],["Reflect across the x-axis","Keep x the same, flip the sign of y."],["Reflect across the y-axis","Keep y the same, flip the sign of x."]],
+ materials:["The coordinate plane tool","Mirrors if available","Graph paper"],
+ warmup:{mins:5,text:"Plot (3, 5) and ask what point you'd get by 'flipping' it across the x-axis, using a real mirror held along the x-axis if one is available. Students can often guess (3, −5) intuitively before any rule is stated."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · mirrors and distance counting",
+   moves:["Hold a real mirror along the x-axis on a printed grid and observe where a point's reflection appears.","Confirm the reflected point using the coordinate plane tool.","Find the distance between two points sharing an x-coordinate by counting grid squares.","Repeat for two points sharing a y-coordinate."],
+   say:[["Teacher","Hold the mirror along the x-axis. Where does the reflection of (3, 5) appear?"],["Expected","(3, −5)."],["Teacher","Count the squares between (2, 7) and (2, −3). How far apart?"],["Expected","Ten."]],
+   watch:["Students who count only from zero to one point rather than the full span between both points. The distance is the full gap between the two given points, not each one's individual distance from the origin."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · the tool's reflect mode",
+   moves:["Use the coordinate plane tool's reflect mode to reflect several points across each axis.","Observe the dashed line connecting a point to its reflection.","Note that both the original and reflected point sit the same distance from the axis.","Draw the distance calculation for two points sharing a coordinate on the same diagram."],
+   say:[["Teacher","The dashed line always crosses the axis at a right angle, and both points are the same distance from it. That is what makes it a reflection, not just any old point."]],
+   readaloud:["Say the picture aloud: 'A point P at four, three, connected by a dashed line straight down to its reflection P prime at four, negative three, crossing the x-axis exactly halfway between them.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · the rules and calculations",
+   moves:["Write the reflection rules: (x,y) → (x,−y) for the x-axis, (x,y) → (−x,y) for the y-axis.","Reflect a set of given points across each axis.","Calculate distances between points sharing a coordinate using |difference|.","Solve a combined problem requiring both a reflection and a distance calculation."],
+   say:[["Teacher","Reflect (−4, 6) across the y-axis."],["Expected","(4, 6) — x flips, y stays."],["Teacher","Find the distance from (2, 8) to (2, −5)."],["Expected","|8 − (−5)| = 13."]],
+   watch:["Students who flip both coordinates when reflecting across a single axis. Only one coordinate changes sign per reflection — reflecting across the x-axis leaves x untouched."]}
+ ],
+ guided:[["Reflect (5, 2) across the x-axis.","(5, −2)"],["Reflect (−3, 7) across the y-axis.","(3, 7)"],["Find the distance from (4, 9) to (4, −2).","11"],["Find the distance from (−6, 3) to (5, 3).","11"]],
+ worksheet:[
+  {t:"A · Reflect across the x-axis",d:"Give the reflected point.",items:["(2, 6)","(−4, 3)","(5, −8)","(0, 7)","(−2, −5)","(9, 1)"]},
+  {t:"B · Reflect across the y-axis",d:"Give the reflected point.",items:["(3, 4)","(−6, 2)","(7, −1)","(0, 5)","(−3, −8)","(4, 0)"]},
+  {t:"C · Distance and reflection combined",d:"Show your working.",wide:true,
+   items:["Find the distance between (−3, 6) and (8, 6). Then reflect both points across the x-axis and find the new distance. What do you notice?","A point at (5, −4) is reflected across the y-axis, then that image is reflected across the x-axis. Find the final point.","Two points share an x-coordinate of 7. One is at y = 12, the other at y = −9. Find the distance between them."]}],
+ exit:["Reflect (−5, 8) across the x-axis.","Find the distance from (3, −6) to (3, 9).","Explain which coordinate stays the same when reflecting across the y-axis."],
+ crit:"Mastery: correct reflections and distances, with item 3 correctly stating the invariant coordinate. Reteach with a real mirror on a grid if both coordinates are flipped — seeing the mirror image directly clarifies that only one axis is crossed at a time.",
+ support:["Provide the two reflection rules side by side with a worked example each.","Restrict to reflecting points already in one quadrant before points on an axis.","Keep the |difference| method for distance written out fully on every problem."],
+ extend:["Reflecting a point across the x-axis and then the y-axis gives the same result as reflecting across both — is this the same as rotating the point 180° about the origin? Test with an example.","Find a point that is its own reflection across the x-axis. What must be true of it?"],
+ support2:[],
+ access:["Touch: a real mirror held along an axis on a printed grid gives immediate, undeniable visual confirmation of a reflection.","Vision: the dashed connecting line in the tool makes the perpendicular, equal-distance relationship visible rather than only algebraic.","Language: 'reflect across the x-axis' and 'reflect across the y-axis' are kept as separate, explicit phrases rather than a single blended 'reflect' instruction.","Attention: distance and reflection are practised separately before being combined, so the combination in part C builds on two already-secure skills."]
+},
+{
+ day:10, short:"Polygons I", title:"Plotting polygons on the coordinate plane",
+ objective:"Plot a polygon from its vertices on the coordinate plane, and find its side lengths using coordinate differences.",
+ standards:["6.G.A.3"],
+ vocab:[["Vertex","A corner point of a polygon, given as an ordered pair."],["Side length","For a horizontal or vertical side, found using coordinate differences."],["Axis-aligned","A side that runs exactly horizontal or exactly vertical, with no slant."],["Perimeter","The total distance around, found by summing every side length."]],
+ materials:["The coordinate plane tool","Graph paper","Rulers"],
+ warmup:{mins:5,text:"Give four ordered pairs describing a rectangle's corners: (1,1), (1,5), (6,5), (6,1). Ask students to predict the shape before plotting. Then plot and confirm."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · building on the floor grid",
+   moves:["Mark four vertices on a floor grid with tape or cones.","Connect them in order with string to form the polygon's outline.","Measure each side by counting floor-grid squares.","Sum the side lengths for the perimeter."],
+   say:[["Teacher","Connect the vertices in order. What shape have you made?"],["Expected","A rectangle."],["Teacher","Count the squares along one side. How does that match the coordinates?"],["Expected","The difference between the two y-values, since it's a vertical side."]],
+   watch:["Students who connect vertices out of order, producing a self-intersecting shape rather than the intended polygon. Vertices must be connected in the sequence given, and the connection returns from the last vertex back to the first to close the shape."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · the tool's polygon mode",
+   moves:["Use the coordinate plane tool's polygon mode to plot the same four vertices.","Close the shape and read the reported perimeter.","Verify the perimeter matches the hand-counted floor-grid measurement.","Build a second polygon, an L-shape, and find its perimeter."],
+   say:[["Teacher","The tool found the perimeter automatically. Does it match what you counted by hand?"],["Teacher","Now an L-shape. More vertices, but the same idea — every side is still horizontal or vertical."]],
+   readaloud:["Say the picture aloud: 'A rectangle with vertices at one comma one, one comma five, six comma five, and six comma one, plotted and connected in order. Each side length is labelled: four units up the left side, five units across the top, four units down the right side, and five units back along the bottom.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · calculating side lengths",
+   moves:["Find each side length as the absolute difference of the changing coordinate.","Sum all side lengths for the perimeter.","Handle a polygon with more than four vertices.","Verify by checking that the shape actually closes back to its starting vertex."],
+   say:[["Teacher","From (1,1) to (1,5): which coordinate changed?"],["Expected","Y, from 1 to 5."],["Teacher","So the side length is |5 − 1| = 4. Same method every time, whichever coordinate is changing."]],
+   watch:["Students who use the coordinates from vertices that are not actually connected in the polygon, mismatching which pairs form a real side. Only consecutive vertices in the given order (and the closing pair back to the first) form the polygon's actual sides."]}
+ ],
+ guided:[["Vertices (2,2), (2,7), (9,7), (9,2). Find the perimeter.","5+7+5+7 = 24"],["Side from (3,4) to (3,10). Find its length.","6"],["Side from (2,5) to (8,5). Find its length.","6"],["Why must consecutive vertices be used to find a side length?","Because a side only exists between vertices that are actually connected in the polygon's outline."]],
+ worksheet:[
+  {t:"A · Side lengths",d:"Find the length of each side.",items:["(1,1) to (1,6)","(3,2) to (9,2)","(−4,3) to (−4,−2)","(0,5) to (7,5)","(2,−3) to (2,4)","(−6,1) to (2,1)"]},
+  {t:"B · Perimeter",d:"Plot and find the perimeter.",wide:true,
+   items:["Rectangle: (0,0), (0,4), (6,4), (6,0)","L-shape: (0,0), (0,5), (3,5), (3,3), (6,3), (6,0)"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A square has one vertex at (2,2) and a side length of 5. Give three possible sets of coordinates for the remaining vertices, considering different orientations.","Explain why finding a side length only needs one coordinate difference for an axis-aligned polygon, unlike a slanted side.","Design an L-shaped polygon of your own, list its vertices, and calculate its perimeter."]}],
+ exit:["Find the length of the side from (4,2) to (4,9).","Vertices (0,0), (0,3), (5,3), (5,0). Find the perimeter.","Explain why consecutive vertices, not just any two, must be used to find a side length."],
+ crit:"Mastery: correct side lengths and perimeter, with vertices connected in the given order. Reteach with the floor-grid string outline if vertices are connected out of sequence — physically tracing the connection order prevents this.",
+ support:["Provide vertices pre-plotted with only the side-length calculations remaining.","Restrict to rectangles before L-shapes and other composite polygons.","Keep the |difference| method for side length written out fully on every problem."],
+ extend:["A polygon has 6 vertices and a perimeter of 30, with all sides equal length. What shape must it be, and what is each side length?","Is it possible for an axis-aligned polygon to have an odd number of sides? Investigate with an example or explain why not."],
+ access:["Touch: building the polygon physically on a floor grid with string makes 'connecting vertices in order' a concrete, traceable action.","Vision: the tool labels each side with its length directly on the diagram, connecting the calculation to the visual side it describes.","Language: 'consecutive vertices' is a precise phrase; pair it with 'vertices that are actually joined by a side' for clarity.","Attention: building a rectangle before an L-shape lets the method for finding side length become secure before it is applied to a less familiar outline."]
+},
+{
+ day:11, short:"Polygons II", title:"Finding the area of polygons on the coordinate plane",
+ objective:"Find the area of a polygon plotted on the coordinate plane by decomposing it into rectangles.",
+ standards:["6.G.A.3","6.G.A.1"],
+ vocab:[["Decompose","Split a complex polygon into simple rectangles for area calculation."],["Grid squares","Counting unit squares as a check on a calculated area."],["Coordinate-based area","Area found from the vertices' coordinates, without needing to measure with a ruler."],["Composite polygon","A shape built from more than one basic rectangle."]],
+ materials:["The coordinate plane tool","Graph paper","Rulers"],
+ warmup:{mins:5,text:"Plot a simple rectangle with vertices (2,2), (2,6), (7,6), (7,2). Ask for its area. Students should get this directly from Unit 6/8 knowledge: length times width, found from the coordinates rather than a ruler."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · counting squares to verify",
+   moves:["Plot a rectangle on graph paper using given vertices.","Count the grid squares inside to find its area directly.","Calculate the area using length times width from the coordinates.","Confirm both methods agree."],
+   say:[["Teacher","Count every square inside. How many?"],["Expected","Twenty."],["Teacher","Now calculate using the side lengths from the coordinates. Do they match?"],["Expected","Yes — both give twenty."]],
+   watch:["Students who count squares along the boundary as if they were fully inside. Only fully enclosed squares count for area on an axis-aligned shape; the grid-counting method is a check here, not the primary method for larger shapes."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · decomposing an L-shape",
+   moves:["Plot an L-shaped polygon and draw a line splitting it into two rectangles.","Label each rectangle's dimensions from the coordinates.","Calculate each rectangle's area and add them.","Verify using the tool's reported area for the same shape."],
+   say:[["Teacher","Split it into two rectangles you can handle. Label each one's dimensions."],["Teacher","Add the two areas. Does it match the tool's reported total?"]],
+   readaloud:["Say the picture aloud: 'An L-shaped polygon plotted on the grid, split by a dashed line into two rectangles: a larger one measuring three by five, and a smaller one measuring two by three, positioned to complete the L outline.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · calculating from coordinates",
+   moves:["Calculate a rectangle's area directly from its four vertices.","Decompose and calculate an L-shaped or composite polygon's area.","Handle a case requiring subtraction — a rectangle with a smaller rectangle removed.","Verify every answer against a rough grid-square estimate."],
+   say:[["Teacher","This composite shape — would you add regions or subtract one from another?"],["Expected","Depends on the shape — check whether a piece is missing or extra."]],
+   watch:["Students who decompose a shape into overlapping rectangles, double-counting some area. The split must divide the shape into non-overlapping regions, covering the whole area exactly once."]}
+ ],
+ guided:[["Rectangle (1,1),(1,5),(6,5),(6,1). Find the area.","20"],["L-shape splits into a 3×5 and a 2×3 rectangle. Find the total area.","15+6=21"],["A 6×8 rectangle has a 2×2 square removed from one corner. Find the remaining area.","48−4=44"],["Why must decomposed regions not overlap?","Overlapping regions would be counted twice, inflating the total area."]],
+ worksheet:[
+  {t:"A · Rectangle areas",d:"Find the area from the vertices.",items:["(0,0),(0,4),(7,4),(7,0)","(2,3),(2,9),(5,9),(5,3)","(−3,1),(−3,6),(4,6),(4,1)","(0,0),(0,10),(3,10),(3,0)"]},
+  {t:"B · Composite areas",d:"Decompose and calculate.",wide:true,
+   items:["L-shape: (0,0),(0,6),(3,6),(3,3),(7,3),(7,0)","T-shape: (0,4),(0,6),(6,6),(6,4),(4,4),(4,0),(2,0),(2,4)"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain two different ways to split the L-shape from part B into rectangles, and confirm both give the same total area.","A composite shape can be found by adding regions or by subtracting a missing piece from a larger rectangle. Choose one shape and solve it both ways.","Design a composite polygon of your own with an area of exactly 30 square units, and show your decomposition."]}],
+ exit:["Find the area of the rectangle with vertices (1,2),(1,8),(5,8),(5,2).","Describe how you would find the area of an L-shaped polygon.","Explain why decomposed regions must not overlap."],
+ crit:"Mastery: correct area with a valid, non-overlapping decomposition shown. Reteach with grid-square counting as a check if the decomposition method produces an implausible answer — the count catches an overlap or omission immediately.",
+ support:["Provide the composite shape with a suggested splitting line already drawn.","Restrict to simple rectangles before L-shapes and more complex composites.","Keep grid-square counting available as a verification method throughout."],
+ extend:["Find the area of a polygon requiring three separate rectangles to decompose. Confirm with a grid-square count.","A composite shape's area can be found by decomposition or by subtraction from an enclosing rectangle. When is subtraction faster? Give an example."],
+ access:["Touch: counting individual grid squares is a concrete verification method available to every student regardless of confidence with the coordinate method.","Vision: the splitting line for decomposition is drawn distinctly (dashed) from the polygon's actual boundary (solid).","Attention: verifying every calculated area against a rough grid-square estimate builds in a habitual plausibility check.","Memory: this reuses Unit 6 and Unit 8's decomposition-into-known-shapes method; naming that connection reduces it to an application, not a new skill."]
+},
+{
+ day:12, short:"Composite problems", title:"Multi-step problems combining integers, distance, and polygon area",
+ objective:"Solve multi-step problems combining integer operations, coordinate distance, and polygon area on the coordinate plane.",
+ standards:["6.G.A.3","6.NS.C.8","6.G.A.1"],
+ vocab:[["Multi-step","Combining several of the unit's skills in one problem."],["Real-world grid","A coordinate plane representing an actual space: a park, a floor plan, a city block."],["Missing vertex","A vertex that must be found before a shape's perimeter or area can be calculated."],["Justify the method","State which skill was used at each step."]],
+ materials:["The coordinate plane tool","Graph paper","Calculators","Mixed problem cards"],
+ warmup:{mins:5,text:"Post a problem: a rectangular park has three known corners, (−4,2), (−4,8), (10,8), and the fourth corner is missing. Ask what the fourth corner must be, before calculating anything about the park's area."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · finding the missing piece",
+   moves:["Plot the three known corners of a rectangle.","Determine the fourth corner using the pattern of shared coordinates.","Confirm by checking all four sides are horizontal or vertical once connected.","Calculate the rectangle's perimeter and area."],
+   say:[["Teacher","Three corners of a rectangle. What must the fourth share with each neighbour?"],["Expected","An x-coordinate with one, a y-coordinate with the other."],["Teacher","So the fourth corner is (10, 2). Check by connecting all four."]],
+   watch:["Students who guess the fourth corner without checking it against both neighbouring vertices. The fourth corner of a rectangle must share its x-coordinate with one adjacent corner and its y-coordinate with the other — verify both."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · a full real-world diagram",
+   moves:["Draw a floor-plan-style grid with a composite shape representing rooms.","Mark distances between key points using absolute value differences.","Decompose the shape for area.","Combine all the steps into one annotated diagram."],
+   say:[["Teacher","One diagram, several questions. Distance here, area there, all from the same coordinates."]],
+   readaloud:["Say the picture aloud: 'A floor plan drawn on a coordinate grid, showing an L-shaped room with vertices labelled, a marked distance between two doorways found by coordinate subtraction, and a dashed decomposition line splitting the room into two rectangles for area calculation.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · full multi-step solutions",
+   moves:["Solve a problem requiring a missing vertex, then a perimeter.","Solve a problem requiring a distance calculation combined with a reflection.","Solve a composite-area problem set in a real context.","Justify each step, naming which skill from the unit was used."],
+   say:[["Teacher","Write which skill you used at each step: finding a missing vertex, absolute value distance, decomposition. Naming it is part of the answer."]],
+   watch:["Students who arrive at a correct final number without being able to explain the sequence of skills used. Requiring the named justification at each step ensures the method transfers to a differently structured problem next time."]}
+ ],
+ guided:[["Rectangle corners (−4,2),(−4,8),(10,8) and ?. Find the fourth.","(10,2)"],["Find its perimeter.","6+14+6+14=40"],["Find its area.","6×14=84"],["A point at (5,−3) reflects across the x-axis, then finds its distance from (5,9). Find both.","Reflects to (5,3); distance is 6"]],
+ worksheet:[
+  {t:"A · Missing vertex problems",d:"Find the fourth vertex, then the perimeter and area.",wide:true,
+   items:["Rectangle: (−2,−3),(−2,5),(6,5), and the missing fourth corner.","Rectangle: (0,0),(0,7),(−9,7), and the missing fourth corner."]},
+  {t:"B · Distance and reflection combined",d:"Show every step.",wide:true,
+   items:["A point at (−6,4) is reflected across the y-axis. Find the distance between the original point and its reflection.","Two points share a y-coordinate of −2: one at x=−8, one at x=5. Find the distance, then reflect both points across the x-axis and find the new positions."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A garden is rectangular with three known corners at (1,1), (1,9), (12,9). A gate sits at the midpoint of the bottom edge. Find the fourth corner, then the gate's coordinates.","Explain the full sequence of skills needed to find the area of an L-shaped park given only some of its vertices.","Design your own multi-step problem combining at least two skills from this unit, and solve it completely."]}],
+ exit:["Rectangle corners (0,0),(0,6),(9,6) and a missing fourth. Find it, then the area.","A point at (4,−7) reflects across the x-axis. Find the distance between the point and its reflection.","Name the two or more skills you combined in the exit problems."],
+ crit:"Mastery: correct multi-step solutions with each skill named explicitly. Reteach the specific weak skill identified — this day diagnoses which of the unit's components needs review, not the combination itself.",
+ support:["Provide a step-by-step frame naming each skill to be used before the numbers are filled in.","Reduce to two-skill combinations before three.","Permit calculators for all arithmetic so the focus stays on sequencing and method."],
+ extend:["Design a real-world scenario (a park, a building floor, a game map) requiring all of missing-vertex, distance, and area skills to fully solve.","A problem gives a perimeter and asks you to find possible vertex sets. How many valid rectangles could produce a perimeter of 40?"],
+ access:["Attention: naming the skill used at each step externalises the method, making the multi-step structure explicit rather than implicit.","Language: real-world contexts (floor plans, parks, maps) anchor abstract coordinate work to familiar physical spaces.","Vision: the composite diagram keeps every calculation's supporting marks (distance brackets, decomposition lines) on the same figure rather than scattered across separate small diagrams.","Memory: each skill is explicitly traced back to the day it was introduced, reducing this lesson to integration of known parts rather than new content."]
+},
+{
+ day:13, short:"Review", title:"Review stations and unit assessment",
+ objective:"Consolidate integers, the coordinate plane, and polygon problems across the unit, and self-identify which topics need more work.",
+ standards:["6.NS.C.5","6.NS.C.6","6.NS.C.7","6.NS.C.8","6.G.A.3"],
+ vocab:[["Self-assessment","Judging your own accuracy honestly — a skill, and one being assessed today."],["Station","A short focused task at one topic, then rotate."],["Justify","Say why, not just what — required at every station."],["Next step","A specific action, not a topic name."]],
+ materials:["The coordinate plane tool","Station cards","Self-assessment grid","Assessment papers"],
+ warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: those are the stations to visit first, and the tally is data, not a confession."},
+ stages:[
+  {k:"c",label:"Concrete",mins:15,sense:"touch · rotation",
+   moves:["Five stations: integers in context and ordering, absolute value, plotting and quadrants, reflections and distance, polygon perimeter and area.","Each station holds its manipulative and three graded tasks.","Students choose a starting station from the warm-up tally.","Every station requires one written justification, not just answers."],
+   say:[["Teacher","Start where you are least confident, not where you are quickest."],["Teacher","One sentence per station explaining why your method works."],["Teacher","Twelve minutes per station. Rotate on the signal whether or not you have finished."]],
+   watch:["Students who visit only easy stations. The private warm-up slip is the accountability tool — ask them to show which station addresses what they wrote."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · one example per topic",
+   moves:["On a single page, create one example for each of the five station topics.","Annotate each with its key rule or formula.","Keep the page as the revision sheet.","Identify any example that could not be created and return to that station."],
+   say:[["Teacher","One page, five examples, five key ideas. Better than any notes you could copy."],["Teacher","An example you cannot create names the topic to go back to."]],
+   readaloud:["Say the page aloud: 'Five examples across two rows. A number line with negative and positive integers in a real context; a distance bracket showing absolute value; a coordinate plane with all four quadrants labelled; a point and its reflection; and a polygon with its perimeter and area marked.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · assessment",
+   moves:["Complete the written assessment covering all thirteen days.","Self-mark section A against a displayed key.","Record scores by topic on the self-assessment grid.","Identify two weakest topics and write one specific next step for each."],
+   say:[["Teacher","Self-mark honestly. Marking generously only costs you later."],["Teacher","One specific next step per weak topic. 'Practise integers' is not a step. 'Redo three ordering problems on a physical number line' is."]],
+   watch:["Students whose self-assessment does not match their station work. The mismatch signals either low confidence or an unnoticed gap, and those need opposite responses."]}
+ ],
+ guided:[["Order −5, 3, −8, 0 from least to greatest.","−8, −5, 0, 3"],["Find |−17|.","17"],["Plot (−3, 6). Which quadrant?","Quadrant II"],["Rectangle (1,1),(1,6),(8,6),(8,1). Find perimeter and area.","Perimeter 24, area 35"]],
+ worksheet:[
+  {t:"A · Integers",d:"Show your working.",items:["Order −4,7,−9,0,2 least to greatest","Find |−23|","Compare −15 and −6, which is larger?","A submarine at −60m rises 25m. Find its new depth."]},
+  {t:"B · Coordinate plane",d:"Plot, reflect, or identify as needed.",items:["Quadrant of (−5,−2)","Reflect (4,−3) across the x-axis","Reflect (−6,2) across the y-axis","Distance from (3,8) to (3,−5)"]},
+  {t:"C · Polygons",d:"Find the perimeter and area.",wide:true,
+   items:["Rectangle: (0,0),(0,5),(9,5),(9,0)","L-shape: (0,0),(0,6),(4,6),(4,3),(7,3),(7,0)"]},
+  {t:"D · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why −20 is less than −5, even though 20 is a bigger number than 5.","Explain the reflection rule for the x-axis and the y-axis, and why only one coordinate changes each time.","Choose the topic you found hardest this unit. Explain it with an example, as if teaching someone who missed the lesson."]}],
+ exit:["Name the topic you are most confident with and give one reason.","Name the topic you want more practice on and give one specific next step.","Complete: a point's absolute value distance from zero is always ___."],
+ crit:"Mastery: assessment sections A through C at 80 percent or better, with self-assessment matching actual performance within one band. Reteach in small groups by topic rather than reteaching the unit; the self-assessment grid tells you how to form those groups.",
+ support:["Reduce to three stations covering integers/ordering, plotting/reflecting, and polygon area.","Provide worked examples at each station as reference.","Allow the assessment across two sittings if sustained concentration is the barrier rather than the mathematics."],
+ extend:["Design a station task of your own, including the diagram and the justification prompt.","Design a real-world scenario (a map, a building, a game) that requires every skill from this unit to fully solve, then solve it."],
+ access:["Motor: stations are arranged so each can be completed seated, with materials brought to the student.","Attention: twelve-minute rotations with a clear signal give predictable structure.","Vision: every station card uses the same layout so the format is never re-learned.","Language: the self-assessment grid pairs picture icons with topic names so it can be completed without heavy reading.","Hearing: the rotation signal is both visual and audible."]
+}
+];
+</script>
+<script src="curriculum-core.js"></script>
+</body>
+</html>

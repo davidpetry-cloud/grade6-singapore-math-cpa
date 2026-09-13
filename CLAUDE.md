@@ -44,7 +44,7 @@ Everything stays in one folder. Links and shared assets break otherwise.
 In `curriculum-core.js` (promoted when a second unit reused them):
 `decimalGrid` · `rateLine`
 
-Still unit-local: `balanceScale` in unit-05 (also shipped as `balance-scale.js`); `angleChase` in unit-06 (also shipped as `angle-chase.js`); `circleUnroll` and `circleWedges` in unit-07 (also shipped as `circle-tools.js`); `netFold` in unit-08 (also shipped as `net-fold.js`)
+Still unit-local: `balanceScale` in unit-05 (also shipped as `balance-scale.js`); `angleChase` in unit-06 (also shipped as `angle-chase.js`); `circleUnroll` and `circleWedges` in unit-07 (also shipped as `circle-tools.js`); `netFold` in unit-08 (also shipped as `net-fold.js`); `distBuilder` in unit-09 (also shipped as `dist-builder.js`); `coordPlane` in unit-10 (also shipped as `coord-plane.js`)
 
 Still unit-local, in unit-02: `fractionModel` · `fractionDivide`
 
@@ -266,8 +266,8 @@ existing tools are template work; Sonnet handles them well.
 | 06 | done | built in chat |
 | 07 | done | built in chat |
 | 08 | done | built in chat on Opus; nets did need a fold tool |
-| 09 | **Opus** | distribution builder |
-| 10 | Sonnet | coordinate plane is conventional |
+| 09 | done | tool built on Opus, lessons written on Sonnet |
+| 10 | done | built in chat |
 
 Design a new tool in chat on Opus, test it, then let Sonnet write the lessons
 against the finished tool. That split has worked twice now.
@@ -279,3 +279,8 @@ before the second is finished.
 
 One commit per unit, message `unit NN: <topic>`. Tool fixes and content edits
 get their own commits so `git log --oneline` stays readable as a build history.
+
+
+## Status: complete
+
+All ten units built and tested — 148 instructional days, 259 test assertions, zero failures. `fractionModel` and `fractionDivide` (unit-02) remain the only tools never reused by a second unit, so they were never promoted into core; that's fine and matches the promotion rule as written.

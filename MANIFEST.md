@@ -1,7 +1,7 @@
 # MANIFEST — Grade 6 Singapore Math (CPA)
 
-**Bundle version:** through-u08
-**Built:** 2026-09-11
+**Bundle version:** complete (through-u10)
+**Built:** 2026-09-13
 
 The hub's `UNITS` array is the source of truth for what exists. This file is a
 convenience snapshot — if the two ever disagree, believe the hub.
@@ -30,7 +30,7 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 
 | file | bytes | sha256 (first 16) |
 |---|---|---|
-| `CLAUDE.md` | 12,693 | `9d4fecf7b5fed034` |
+| `CLAUDE.md` | 12,737 | `0e943ed1b8b34a4d` |
 | `README.md` | 4,714 | `6d2d5ebf47ada6c8` |
 | `angle-chase.js` | 10,540 | `64345ee7b08fb720` |
 | `angle-chase.test.js` | 4,719 | `59cf3f33124df385` |
@@ -38,11 +38,15 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 | `balance-scale.test.js` | 3,260 | `18d60ecff41e5566` |
 | `circle-tools.js` | 12,165 | `463bdc8224da371b` |
 | `circle-tools.test.js` | 3,842 | `458c1ec1afe4c5d9` |
+| `coord-plane.js` | 11,556 | `e75b1e65f83ee155` |
+| `coord-plane.test.js` | 4,516 | `62238f169083fde3` |
 | `curriculum-core.js` | 51,921 | `bd010e838ba2a847` |
 | `curriculum.css` | 13,193 | `b67d7d1bf35ce4af` |
+| `dist-builder.js` | 9,161 | `4f8f09c5a6594861` |
+| `dist-builder.test.js` | 3,911 | `0910cafcf6db26fc` |
 | `net-fold.js` | 9,248 | `1fb9b6210fdc651c` |
 | `net-fold.test.js` | 4,433 | `8e918d5ca40037fc` |
-| `singapore-math-6-hub.html` | 20,659 | `c06591bbe5c770c3` |
+| `singapore-math-6-hub.html` | 20,657 | `ebef8fbe62506191` |
 | `test-unit.js` | 4,235 | `760c86dcdd48f57f` |
 | `unit-01-whole-numbers-and-operations.html` | 62,096 | `fd32edf62e0a2b75` |
 | `unit-02-fractions-and-decimals.html` | 158,134 | `794f8298cbf5223b` |
@@ -52,9 +56,14 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 | `unit-06-angles-and-figures.html` | 93,992 | `f41d6652553310e8` |
 | `unit-07-circles.html` | 92,162 | `db5724ed77e05cf6` |
 | `unit-08-volume.html` | 92,567 | `f76d2ccdb4cb17f6` |
+| `unit-09-data-and-statistics.html` | 102,789 | `7ee0c62833b83ce8` |
+| `unit-10-integers-and-coordinates.html` | 93,165 | `9fedcff34a950102` |
 | `unit-template.html` | 5,434 | `136b856553bad138` |
 
 ## Unit status
+
+**All ten units complete. 148 instructional days across the full Grade 6 year.**
+
 
 | unit | topic | days | status |
 |---|---|---|---|
@@ -66,8 +75,8 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 | 06 | Angles & Geometric Figures | 15 | not built |
 | 07 | Circles | 13 | ready |
 | 08 | Volume of Solids | 15 | ready |
-| 09 | Data Analysis & Statistics | 15 | not built |
-| 10 | Negative Numbers & Coordinate Plane | 13 | not built (grew from 10 days, absorbed 6.G.A.3) |
+| 09 | Data Analysis & Statistics | 15 | ready |
+| 10 | Negative Numbers & Coordinate Plane | 13 | ready |
 
 ## Test before shipping a new unit
 

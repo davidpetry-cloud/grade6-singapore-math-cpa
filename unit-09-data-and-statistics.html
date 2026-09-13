@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Unit 9 &mdash; Data Analysis &amp; Statistics | Grade 6 CPA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="curriculum.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+    <h1>Unit 9 &mdash; Data Analysis &amp; Statistics</h1>
+    <p class="sub">A dot plot, a histogram, and the mean and median of a dataset are three views of one thing, and this unit keeps them moving together rather than teaching them as separate topics. Drag the bin-width slider on a real outlier and watch it vanish into a bar; drag the outlier itself and watch the mean chase it while the median holds still. Both are arguments a printed chart cannot make.</p>
+    <div class="facts">
+      <span><b>15</b> instructional days</span>
+      <span><b>3</b> weeks</span>
+      <span><b>55</b> minutes per lesson</span>
+      <span><b>6.SP</b> standards</span>
+    </div>
+  </div>
+  <div class="wrap"><nav class="daynav" id="daynav" aria-label="Lesson days"></nav></div>
+</header>
+
+<main class="wrap">
+  <div class="lesson">
+    <div id="content"></div>
+    <aside class="side" id="side"></aside>
+  </div>
+  <div class="pager">
+    <button id="prev">&larr; Previous lesson</button>
+    <button id="next">Next lesson &rarr;</button>
+  </div>
+</main>
+
+<!-- Unit-specific manipulative. Must load before curriculum-core.js. -->
+<script>
+/* distBuilder — Unit 9 (Data & Statistics).
+   One dataset, three views that move together: dot plot, histogram, and the
+   summary measures. Two things here cannot be done with a printed chart —
+   changing the bin width and watching the histogram's story change, and
+   dragging one outlier and watching the mean follow while the median sits
+   still. Declare before curriculum-core.js. */
+window.__EXTRA_TOOLS__=Object.assign(window.__EXTRA_TOOLS__||{},(function(){
+const rm=()=>(!!window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
+const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#5B7189", ROSE="#C2536B";
+const r2=x=>Math.round(x*100)/100;
+
+const PRESETS=[
+ {k:"even spread",   d:[2,3,3,4,4,4,5,5,5,5,6,6,6,7,7,8]},
+ {k:"one outlier",   d:[3,3,4,4,4,5,5,5,5,6,6,6,7,7,20]},
+ {k:"two clumps",    d:[2,2,3,3,3,4,   8,9,9,10,10,10,11]},
+ {k:"skewed right",  d:[1,1,1,2,2,2,2,3,3,3,4,4,5,6,8,11]},
+ {k:"all the same",  d:[6,6,6,6,6,6,6,6,6,6]},
+ {k:"class heights", d:[142,145,145,148,150,150,150,152,153,155,155,158,160,162,165]}
+];
+
+function stats(d){
+  if(!d.length)return null;
+  const s=[...d].sort((a,b)=>a-b), n=s.length;
+  const mean=s.reduce((a,b)=>a+b,0)/n;
+  const median = n%2 ? s[(n-1)/2] : (s[n/2-1]+s[n/2])/2;
+  const counts=new Map();
+  s.forEach(v=>counts.set(v,(counts.get(v)||0)+1));
+  let best=0; counts.forEach(c=>{if(c>best)best=c;});
+  const modes=best>1 ? [...counts.entries()].filter(([,c])=>c===best).map(([v])=>v) : [];
+  const mad = s.reduce((a,b)=>a+Math.abs(b-mean),0)/n;
+  return {s,n,mean,median,modes,min:s[0],max:s[n-1],range:s[n-1]-s[0],mad};
+}
+
+function distBuilder(host){
+  const box=el("div","tool");
+  box.innerHTML=`<h3>Building a distribution<span class="mins">tool</span></h3>
+    <p class="sense">sight · spread and shape</p>
+    <p class="how">Click the line to add a value; click a dot to take it away. The dot plot, the histogram and the summary measures all describe the same data — change it once and watch all three move.</p>
+    <div class="ctl picker" id="dbp"></div>
+    <div class="ctl">
+      <label for="dbbin">bin width</label>
+      <input id="dbbin" type="range" min="1" max="10" value="2" aria-label="histogram bin width" style="width:150px">
+      <span id="dbbv" style="font-family:var(--mono);font-size:.9rem;color:var(--ink-2)">2</span>
+      <button class="btn sm" id="dbclear">Clear</button>
+      <span id="dbn" style="font-family:var(--mono);font-size:.85rem;color:var(--muted)">0 values</span>
+    </div>
+    <div class="stage-area"><svg viewBox="0 0 700 380" role="img" style="width:100%;height:auto"></svg></div>
+    <div class="out" id="dbout"></div>
+    <p class="note">Load "one outlier", then drag the bin width slider. The same fifteen numbers can look like one clump or like two, depending only on how you chose to group them — which is why the bin width is a decision, not a setting.</p>`;
+  host.appendChild(box);
+  const svg=box.querySelector("svg"), out=box.querySelector("#dbout"), $=s=>box.querySelector(s);
+  $("#dbp").innerHTML=PRESETS.map((p,i)=>`<button class="btn sm" data-i="${i}">${p.k}</button>`).join("");
+
+  let data=[], lo=0, hi=20;
+
+  function rescale(){
+    if(!data.length){lo=0;hi=20;return;}
+    const mn=Math.min(...data), mx=Math.max(...data);
+    const pad=Math.max(1,Math.round((mx-mn)*0.15));
+    lo=Math.max(0,Math.floor(mn-pad)); hi=Math.ceil(mx+pad);
+    if(hi-lo<5)hi=lo+5;
+  }
+  const X0=56, W=600;
+  const px=v=>X0+((v-lo)/(hi-lo))*W;
+  const nearestVal=x=>Math.round(lo+((x-X0)/W)*(hi-lo));
+
+  function draw(){
+    const st=stats(data), bin=+$("#dbbin").value;
+    $("#dbbv").textContent=bin;
+    $("#dbn").textContent=`${data.length} value${data.length===1?"":"s"}`;
+    rescale();
+    let s="";
+
+    /* ---- dot plot ---- */
+    const DY=150;
+    s+=`<text x="${X0}" y="26" font-family="Inconsolata" font-size="12" fill="${MUT}">dot plot — one dot per value</text>`;
+    s+=`<line x1="${X0}" y1="${DY}" x2="${X0+W}" y2="${DY}" stroke="${INK}" stroke-width="1.5"/>`;
+    const step=Math.max(1,Math.ceil((hi-lo)/12));
+    for(let v=lo;v<=hi;v+=step){
+      s+=`<line x1="${px(v)}" y1="${DY-5}" x2="${px(v)}" y2="${DY+5}" stroke="${MUT}" stroke-width="1"/>`;
+      s+=`<text x="${px(v)}" y="${DY+20}" font-family="Inconsolata" font-size="11" fill="${MUT}" text-anchor="middle">${v}</text>`;
+    }
+    const stack=new Map();
+    [...data].sort((a,b)=>a-b).forEach(v=>{
+      const k=stack.get(v)||0; stack.set(v,k+1);
+      s+=`<circle class="dbdot" data-v="${v}" cx="${px(v)}" cy="${DY-10-k*13}" r="5.5" fill="${T}" stroke="#fff" stroke-width="1" style="cursor:pointer"/>`;
+    });
+    /* mean as a balance point, median as a line */
+    if(st){
+      s+=`<polygon points="${px(st.mean)},${DY+8} ${px(st.mean)-7},${DY+22} ${px(st.mean)+7},${DY+22}" fill="${A}"/>`;
+      s+=`<text x="${px(st.mean)}" y="${DY+36}" font-family="Inconsolata" font-size="11" fill="#B87C1C" text-anchor="middle">mean</text>`;
+      s+=`<line x1="${px(st.median)}" y1="${DY-95}" x2="${px(st.median)}" y2="${DY-6}" stroke="${P}" stroke-width="2" stroke-dasharray="4 3"/>`;
+      s+=`<text x="${px(st.median)}" y="${DY-100}" font-family="Inconsolata" font-size="11" fill="${P}" text-anchor="middle">median</text>`;
+    }
+
+    /* ---- histogram ---- */
+    const HY=340, HH=110;
+    s+=`<text x="${X0}" y="${HY-HH-16}" font-family="Inconsolata" font-size="12" fill="${MUT}">histogram — values grouped into bins of ${bin}</text>`;
+    if(st){
+      const start=Math.floor(lo/bin)*bin;
+      const bins=[];
+      for(let b=start;b<=hi;b+=bin){
+        bins.push({from:b,to:b+bin,c:data.filter(v=>v>=b&&v<b+bin).length});
+      }
+      const maxC=Math.max(1,...bins.map(b=>b.c));
+      const bw=W/bins.length;
+      bins.forEach((b,i)=>{
+        const h=(b.c/maxC)*HH;
+        s+=`<rect class="bmseg" x="${X0+i*bw+1}" y="${HY-h}" width="${bw-2}" height="${h}" fill="${P}" opacity=".85"/>`;
+        if(b.c)s+=`<text x="${X0+i*bw+bw/2}" y="${HY-h-5}" font-family="Inconsolata" font-size="10" fill="${INK}" text-anchor="middle">${b.c}</text>`;
+        if(bins.length<=14)s+=`<text x="${X0+i*bw+bw/2}" y="${HY+15}" font-family="Inconsolata" font-size="9" fill="${MUT}" text-anchor="middle">${b.from}</text>`;
+      });
+      s+=`<line x1="${X0}" y1="${HY}" x2="${X0+W}" y2="${HY}" stroke="${INK}" stroke-width="1.5"/>`;
+    }
+    svg.innerHTML=s;
+
+    if(!st){
+      svg.setAttribute("aria-label","An empty number line, ready for data values to be added by clicking.");
+      out.innerHTML=`<span style="color:${MUT}">Click the line to add values, or load one of the sets above.</span>`;
+      return;
+    }
+    /* Scale the skew test against average distance from the mean, not the
+       range: an outlier inflates the range, which would raise the threshold
+       and hide the very thing we are trying to detect. */
+    const scale = st.mad*0.25;
+    const shape = (st.mean-st.median>scale) ? "a tail stretching to the right"
+      : (st.median-st.mean>scale) ? "a tail stretching to the left"
+      : st.modes.length>1 ? "more than one peak"
+      : "roughly balanced";
+    svg.setAttribute("aria-label",
+      `A dot plot of ${st.n} values ranging from ${st.min} to ${st.max}, with the mean marked at ${r2(st.mean)} and the median at ${r2(st.median)}. Below it, a histogram of the same data grouped into bins of width ${bin}. The distribution is ${shape}.`);
+
+    const gap=Math.abs(st.mean-st.median);
+    out.innerHTML=`<b>${st.n} values</b>, from ${st.min} to ${st.max} &nbsp; range <b>${st.range}</b><br>
+      mean <b>${r2(st.mean)}</b> &nbsp;·&nbsp; median <b>${r2(st.median)}</b> &nbsp;·&nbsp; ${st.modes.length?`mode <b>${st.modes.join(", ")}</b>`:`<span style="color:${MUT}">no mode — no value repeats</span>`}<br>
+      <span style="color:${MUT}">average distance from the mean: ${r2(st.mad)}</span><br>
+      <span style="color:${gap>scale?ROSE:T}">${gap>scale
+        ? `The mean sits ${r2(gap)} away from the median. Something is pulling it — look for values far out on one side. The median barely notices them; the mean cannot ignore them.`
+        : `Mean and median are close, so no single value is dragging the average around.`}</span>`;
+  }
+
+  svg.addEventListener("click",e=>{
+    const dot=e.target.closest("circle[data-v]");
+    if(dot){const v=+dot.dataset.v; const i=data.indexOf(v); if(i>-1)data.splice(i,1); draw(); return;}
+    const r=svg.getBoundingClientRect();
+    const x=((e.clientX-r.left)/r.width)*700;
+    const y=((e.clientY-r.top)/r.height)*380;
+    if(y>60&&y<200){const v=nearestVal(x); if(v>=lo&&v<=hi&&data.length<60){data.push(v);draw();}}
+  });
+  $("#dbclear").addEventListener("click",()=>{data=[];draw();});
+  $("#dbbin").addEventListener("input",draw);
+  $("#dbp").addEventListener("click",e=>{
+    const b=e.target.closest("button[data-i]");if(!b)return;
+    data=[...PRESETS[+b.dataset.i].d];draw();
+  });
+  draw();
+}
+return {distBuilder};
+})());
+window.__EXTRA_NAMES__=Object.assign(window.__EXTRA_NAMES__||{},{distBuilder:"Building a distribution"});
+</script>
+
+<script>
+/* Core tools: placeValue, rounding, shift, stepper, power, barModel, factors,
+   decimalGrid, rateLine. This unit adds distBuilder. */
+window.UNIT={
+  number:9,
+  minutes:55,
+  tools:{
+     1:["barModel"],      2:["barModel"],      3:["barModel"],      4:["distBuilder"],
+     5:["distBuilder"],   6:["distBuilder"],   7:["distBuilder"],   8:["distBuilder"],
+     9:["distBuilder"],  10:["distBuilder"],  11:["distBuilder"],  12:["distBuilder"],
+    13:["distBuilder"],  14:["distBuilder"],
+    15:"all"
+  }
+};
+
+window.LESSONS=
+[
+{
+ day:1, short:"Statistical questions", title:"What makes a question statistical",
+ objective:"Distinguish a statistical question from one with a single fixed answer, and explain why variability is what makes data worth collecting.",
+ standards:["6.SP.A.1"],
+ vocab:[["Statistical question","A question anticipating variability in the answer — asked of a group, not one fixed fact."],["Variability","The way answers differ from one another."],["Data","The collected answers to a statistical question."],["Fixed answer","A question with one correct answer, however you ask it — not statistical."]],
+ materials:["Index cards","Chart paper","Whiteboards"],
+ warmup:{mins:5,text:"Post two questions: 'How old is our teacher?' and 'How old are the students in this class?' Ask what is different about them. The first has one fixed answer; the second will vary from person to person before anyone answers. That difference is today's whole topic."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · sorting real questions",
+   moves:["Write ten questions on cards, mixing statistical and fixed-answer ones.","Sort the cards into two piles by whether the answer would vary across the class.","For the statistical pile, actually ask the class and record the spread of answers.","For the fixed pile, confirm everyone gives the same answer."],
+   say:[["Teacher","Sort these. Which ones would give different answers from different people?"],["Teacher","'How many pets does each student have?' Ask the class."],["Expected","The answers are different — 0, 1, 2, 3..."],["Teacher","That is a statistical question, and the spread of answers is what we are going to learn to describe this unit."]],
+   watch:["Students who classify by topic rather than by structure — assuming anything about people is statistical. 'What is the capital of the state we live in?' is about people's location but has one fixed answer. Check whether the answer varies, not what the question is about."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · a question becoming data",
+   moves:["Take one statistical question and record the whole class's answers on the board.","Circle the range of different values that appeared.","Contrast with a fixed-answer question, where the board would show one repeated value.","Discuss what the circled spread actually tells you."],
+   say:[["Teacher","Look at the board. What does the spread tell you that a single number couldn't?"],["Expected","That people are different, not everyone is the same."],["Teacher","That is the entire reason statistics exists — to describe a group honestly, rather than pretending everyone is average."]],
+   readaloud:["Say the board aloud: 'A tally of answers to how many pets each student has: five students have zero, eight have one, four have two, and two have three or more. The values differ across nearly every student.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · writing statistical questions",
+   moves:["Write the test: does the question anticipate different answers from different individuals?","Classify ten new questions using the test.","Rewrite three fixed-answer questions as statistical ones.","Write two original statistical questions about the class."],
+   say:[["Teacher","'How tall is the tallest student?' Statistical or not?"],["Expected","Not — that has one answer, even though it's about people."],["Teacher","'How tall is each student?' Now?"],["Expected","Statistical — heights vary."],["Teacher","One word changed the whole question. Read carefully."]],
+   watch:["Students who confuse 'how many total' with a statistical question. A total is one fixed number even if it was built from varying data; the statistical question is about the individual values, not their sum."]}
+ ],
+ guided:[["Is 'how many days in a week' statistical?","No — one fixed answer."],["Is 'how many hours did each student sleep last night' statistical?","Yes — varies by student."],["Rewrite 'how many students are in this class' to be statistical.","'How many siblings does each student have?'"],["Why does a statistical question need to anticipate variability?","Because it is asked to learn about a spread of answers, not to confirm one fact."]],
+ worksheet:[
+  {t:"A · Statistical or not",d:"State yes or no with a reason.",items:["How many pets does each student own?","How many minutes are in an hour?","What is each student's favourite colour?","How old is the school principal?","How long did each student spend on homework last night?","How many continents are there?"]},
+  {t:"B · Rewrite it",d:"Turn each into a statistical question.",items:["How many people live in our town?","How far is the moon from Earth?","How many students are in this school?","What is the capital of our country?"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain the difference between 'how many pets are there in total' and 'how many pets does each student have'.","Write two statistical questions you could ask your class, and explain why each anticipates variation.","A survey asks 'do you like pizza?' with only yes or no answers. Is this statistical? Explain your reasoning."]}],
+ exit:["Is 'how many minutes are in a class period' statistical?","Write a statistical question about the students in this room.","Explain what makes a question statistical."],
+ crit:"Mastery: correct classification and a genuine statistical question written, with item 3 referencing variability. Reteach if a question is classified by topic rather than structure — the substitution test (does the answer vary person to person?) should be applied explicitly.",
+ support:["Provide the yes/no test as a printed checklist.","Start with clearly contrasting pairs before ambiguous cases.","Work through the sorting activity as a whole class before independent work."],
+ extend:["Is 'what is the most common eye colour in this class' a statistical question itself, or a possible answer to one? Explain the distinction.","Write a statistical question whose answers would all be the same, purely by coincidence. Does that make it not statistical?"],
+ access:["Language: 'anticipates variability' is dense; the plain test — 'would different people give different answers?' — should be the one used aloud.","Attention: sorting real cards before writing new questions breaks the lesson into a shorter, concrete first half.","Vision: the board's tally uses both numbers and a visual bar so the spread is readable two ways.","Memory: contrasting pairs (total vs individual) are kept side by side rather than presented separately."]
+},
+{
+ day:2, short:"Collecting data", title:"Collecting data to answer a statistical question",
+ objective:"Design and carry out a simple data collection to answer a statistical question, and organise the results in a table.",
+ standards:["6.SP.A.1","6.SP.B.5"],
+ vocab:[["Survey","Asking the same question of every member of a group."],["Tally","A running count as data comes in, marked in groups of five."],["Frequency","How many times a particular value occurred."],["Frequency table","A table listing each value and its frequency."]],
+ materials:["Tally sheets","Chart paper","Rulers","Whiteboards"],
+ warmup:{mins:5,text:"Pick a statistical question from yesterday's list — favourite season, say. Ask how you would actually go about answering it for the whole class. Someone will suggest asking everyone and counting. Say: that is a survey, and today is about doing it properly."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · running a real survey",
+   moves:["As a class, choose a statistical question everyone will answer.","Collect the data by having each student state their answer aloud or on a card.","Tally the answers on the board as they come in, in groups of five.","Total the tally and check it matches the number of students."],
+   say:[["Teacher","Mark every fifth tally across the previous four, like a gate. It makes counting the total much faster."],["Teacher","Total the tallies. Does it match the number of students in the room?"],["Expected","Yes."],["Teacher","That check matters — a mismatch means someone's answer was missed or counted twice."]],
+   watch:["Students who tally without checking the total against a known count. Verifying against the class size is the same discipline as checking a bar model's parts sum to its total."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · building the frequency table",
+   moves:["Convert the tally marks into a frequency table with two columns.","Order the values sensibly — alphabetically, or by size if numeric.","Add a total row and confirm it matches the tally.","Discuss what the table shows that the raw tally didn't."],
+   say:[["Teacher","The table is the same information as the tally, organised. What is easier to see now?"],["Expected","Which answer was most common."],["Teacher","Organising data does not create new information. It makes existing information visible."]],
+   readaloud:["Say the table aloud: 'A two-column frequency table. The left column lists spring, summer, autumn and winter. The right column lists their frequencies: six, eleven, four and five, with a total row reading twenty-six.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · designing a collection",
+   moves:["Design a data collection plan for a new statistical question: what to ask, of whom, and how to record it.","Predict the likely shape of the results before collecting.","Carry out a smaller version in pairs.","Build the frequency table and compare with the prediction."],
+   say:[["Teacher","Predict before you collect. What do you expect the most common answer to be, and why?"],["Teacher","Now check. Was your prediction right? If not, that is worth noticing, not hiding."]],
+   watch:["Students who abandon or adjust an inconvenient prediction rather than reporting it honestly. A wrong prediction checked against real data is more useful than a vague one nobody tested."]}
+ ],
+ guided:[["Tally for a survey of 23 students should total what?","23"],["Convert 4 tally marks plus a gate of 5 into a number.","9"],["Why order values alphabetically or by size in a frequency table?","So the table is easy to scan and compare, rather than listed in the order collected."],["Why predict before collecting data?","To find out whether your expectation matches reality, which is itself informative."]],
+ worksheet:[
+  {t:"A · Read a frequency table",d:"Answer from the table: shoe sizes 5(2), 6(5), 7(8), 8(6), 9(3).",items:["Total students surveyed","Most common shoe size","How many wear size 7 or 8","How many wear size 9","Least common size","How many more wear size 7 than size 5"]},
+  {t:"B · Build a table",d:"Convert tallies to a frequency table.",wide:true,
+   items:["Favourite subject tallies: Math |||| |, Science |||, English ||||, Art ||. Build the table with a total row.","Pets owned tallies: 0 pets |||| ||, 1 pet |||| |||, 2 pets ||||, 3+ pets ||. Build the table with a total row."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Design a data collection plan for 'how many books did each student read last month'. What would you ask, and how would you record it?","Explain why checking the tally total against the known group size is a useful habit.","Predict the shape of the results for a survey of favourite ice cream flavours in your class, then explain what you expect and why."]}],
+ exit:["Convert |||| || into a number.","Why order a frequency table by value rather than by collection order?","Design one statistical question you could survey the class with tomorrow."],
+ crit:"Mastery: correct tally conversion and a genuine, well-designed collection plan. Reteach if the tally total is not checked against the group size — this habit prevents undetected errors before any analysis begins.",
+ support:["Provide a tally template with the gate-of-five grouping already marked.","Work the first frequency table as a whole class before independent design.","Restrict initial surveys to questions with four or fewer possible answers."],
+ extend:["Design a data collection plan that would be difficult to carry out fairly. What could go wrong, and how would you fix the design?","Two students survey the same question but get different results. List three possible reasons why, beyond random chance."],
+ access:["Touch: physically making tally marks on a shared board is a collaborative, low-stakes way to build the dataset together.","Attention: the gate-of-five tally method reduces the counting load at the total stage.","Language: 'frequency' is a specific technical use of an everyday word; contrast it explicitly with its general meaning.","Vision: frequency tables use consistent column headers and a visually separated total row on every example."]
+},
+{
+ day:3, short:"Data displays", title:"Choosing how to display data",
+ objective:"Compare different ways of displaying the same dataset, and justify which display suits a given purpose.",
+ standards:["6.SP.B.4"],
+ vocab:[["Display","A visual way of presenting data: table, dot plot, bar chart."],["Categorical data","Data sorted into named categories, like favourite colour."],["Numerical data","Data that is itself a number, like height or age."],["Fit the display to the data","Different data types suit different displays."]],
+ materials:["Chart paper","Rulers","Coloured pencils","Sample datasets"],
+ warmup:{mins:5,text:"Show the same small dataset as both a frequency table and a bar chart. Ask which one answers 'what was the most common answer' faster. The chart usually wins for a quick glance. Ask when the table might be better instead — when exact numbers matter."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · building multiple displays",
+   moves:["Take yesterday's class survey data and build a bar chart from the frequency table.","Build a dot plot of the same data if it is numerical.","Compare all three displays: table, bar chart, dot plot.","Discuss what each one makes easy to see and what it hides."],
+   say:[["Teacher","Same data, three pictures. What does the bar chart show fastest?"],["Expected","Which category is biggest."],["Teacher","And the table?"],["Expected","The exact numbers."],["Teacher","Neither is better in general — they answer different questions well."]],
+   watch:["Students who think one display is simply superior. Ask what each display would be bad at answering; every display has a weakness as well as a strength."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · matching data to display",
+   moves:["Sort five sample datasets by whether they are categorical or numerical.","Match each to an appropriate display type.","Identify a case where a bar chart is used for numerical data and discuss whether that is appropriate.","Draw one categorical and one numerical dataset using their best-fit displays."],
+   say:[["Teacher","This dataset is ages, so it's numerical. Bar chart or dot plot?"],["Expected","Dot plot, probably — it shows every individual value."],["Teacher","And favourite pet is categorical. A dot plot doesn't really make sense there — there's no natural order to the categories."]],
+   readaloud:["Say the pair aloud: 'A bar chart with four labelled bars for favourite pet — dog, cat, fish, other — of varying heights. Beside it, a dot plot with a number line from ten to fifteen, showing individual ages as stacked dots above each value.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · justifying the choice",
+   moves:["State the rule: categorical data suits bar charts; numerical data suits dot plots (and later, histograms).","Justify a display choice for four new datasets.","Identify a poorly chosen display and explain the mismatch.","Redesign the poor display appropriately."],
+   say:[["Teacher","Categorical or numerical — that single distinction decides your first move."],["Teacher","This data set is class test scores. What display, and why?"],["Expected","Dot plot — scores are numbers, and you want to see the individual spread."]],
+   watch:["Students who choose a display based on which one looks most impressive rather than which one fits the data. Ask what the display needs to show, then which type does that job."]}
+ ],
+ guided:[["Favourite fruit — categorical or numerical?","Categorical"],["Number of pets owned — categorical or numerical?","Numerical"],["Best display for favourite fruit data?","Bar chart"],["Best display for a class's heights?","Dot plot"]],
+ worksheet:[
+  {t:"A · Categorical or numerical",d:"Classify each dataset.",items:["favourite school subject","number of siblings","hair colour","test scores out of 20","mode of transport to school","hours of sleep per night"]},
+  {t:"B · Choose the display",d:"State bar chart or dot plot, and why.",items:["favourite sport across the class","ages of everyone in a family","number of pets per household","favourite ice cream flavour"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A student displays favourite colours on a dot plot with colours listed left to right on a number line. Explain why this display doesn't quite work.","Choose a statistical question, decide whether its data would be categorical or numerical, and justify your choice of display.","Can the same dataset ever be displayed both ways usefully? Give an example."]}],
+ exit:["Is 'favourite season' categorical or numerical?","What display would you use for it?","Explain why a dot plot doesn't suit categorical data well."],
+ crit:"Mastery: correct classification and display choice, with item 3 giving a genuine reason. Reteach with the direct comparison of table, bar chart and dot plot on the same dataset — seeing all three side by side clarifies more than a rule stated alone.",
+ support:["Provide a decision flowchart: categorical or numerical, then which display follows.","Work through several clear-cut examples before ambiguous ones.","Keep yesterday's real class data as the running example throughout."],
+ extend:["Number of siblings is numerical but often has few distinct values. Would a bar chart or dot plot suit it better? Argue both sides.","Design a dataset that could reasonably use either display type, and explain the trade-off."],
+ access:["Vision: sample datasets are shown in both display types side by side, so the comparison is visual rather than purely described.","Language: 'categorical' and 'numerical' are the two words carrying this entire lesson; post both with clear examples of each.","Attention: the decision flowchart externalises the choice into two short questions rather than one open judgement.","Memory: the running class dataset from day two is reused here, reducing the cognitive load of a new example."]
+},
+{
+ day:4, short:"Dot plots", title:"Building and reading a dot plot",
+ objective:"Build a dot plot from a dataset and read its shape, identifying clusters, gaps and outliers.",
+ standards:["6.SP.B.4","6.SP.A.2"],
+ vocab:[["Dot plot","A display where each value gets one dot above its position on a number line."],["Cluster","A group of values sitting close together."],["Gap","A stretch of the number line with no data in it."],["Outlier","A value sitting far from the rest of the data."]],
+ materials:["The distribution builder tool","Sticky dots or counters","Rulers","Sample datasets"],
+ warmup:{mins:5,text:"Post a small dataset — ages of pets in a class survey, say 1,2,2,2,3,3,9. Ask what stands out. Someone will notice the 9. Say: dot plots make that kind of thing visible in a way a list of numbers does not."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · placing dots by hand",
+   moves:["Draw a number line spanning a dataset's range on the board.","Place one sticky dot per value, stacking repeats directly above each other.","Circle any cluster and label any gap.","Identify any value sitting apart from the rest."],
+   say:[["Teacher","One dot per value, stacked if they repeat. Where do most of the dots sit?"],["Expected","Bunched together in the middle."],["Teacher","And is there anything unusual?"],["Expected","One dot way out on its own."],["Teacher","That is called an outlier, and today is just about seeing it. What it means comes later."]],
+   watch:["Students who merge repeated values into one dot rather than stacking. Every value gets its own dot; stacking is how a dot plot shows frequency."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · the tool",
+   moves:["Open the distribution builder tool and load a preset dataset.","Identify the cluster, any gaps, and any outlier from the dot plot view.","Add and remove a few values and watch the plot update.","Load a second, differently shaped dataset and compare."],
+   say:[["Teacher","Where is the data bunched up? Where is it thin or empty?"],["Teacher","Add a value far from the rest. What happens to the shape?"],["Expected","A new dot appears out on its own."],["Teacher","You just created an outlier. Notice how one value changed the whole picture's story."]],
+   readaloud:["Say the picture aloud: 'A dot plot with a cluster of dots between four and seven, several dots stacked at five and six, and a single dot sitting alone at fourteen, separated from the rest by a wide gap.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · describing the shape",
+   moves:["Write a description of a dot plot's shape using cluster, gap and outlier.","Build a dot plot from a raw list of numbers by hand.","Read specific values off a dot plot: how many, which value is most frequent.","Compare two dot plots and describe what is different about their shapes."],
+   say:[["Teacher","Describe this shape in a sentence, using at least one of today's three words."],["Teacher","How many students scored above 7 on this plot?"],["Expected","Count the dots above 7."]],
+   watch:["Students who describe a dot plot only by its highest point, missing the overall shape. Ask them to describe the whole picture — cluster, gap, and outlier if any — not just the tallest stack."]}
+ ],
+ guided:[["Data: 2,3,3,4,4,4,5,9. Describe the shape.","Cluster from 2-5, gap, outlier at 9"],["How many dots would 4,4,4 need?","Three, stacked above 4"],["What is a gap in a dot plot?","A stretch of the number line with no data"],["What is an outlier?","A value sitting far from the rest of the data"]],
+ worksheet:[
+  {t:"A · Build the dot plot",d:"Draw a number line and plot each dataset.",wide:true,
+   items:["Pets owned: 0,1,1,2,2,2,3,1,0,2","Test scores: 12,15,15,16,17,17,17,18,20","Ages: 11,12,12,12,13,13,25"]},
+  {t:"B · Describe the shape",d:"Use cluster, gap and outlier where they apply.",items:["1,2,2,3,3,3,4,4,10","5,5,6,6,7,7,8,8","2,2,2,2,15","3,4,5,6,7,8,9"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Build a dot plot for the ages 12,13,13,13,14,14,20 and describe its shape fully.","Explain why stacking repeated values, rather than merging them into one dot, matters for reading the plot.","Two dot plots have the same range but different shapes. Describe what 'same range, different shape' could look like."]}],
+ exit:["Plot 3,4,4,5,5,5,6,11 on a number line.","Describe its shape using at least one of today's vocabulary words.","Explain what a gap tells you about a dataset."],
+ crit:"Mastery: a correctly built plot and an accurate shape description. Reteach with the tool's live updating if students describe only the tallest stack — adding and removing a value shows the whole shape mattering, not just the peak.",
+ support:["Provide a pre-drawn number line with the range already marked.","Restrict to small datasets (under 10 values) before larger ones.","Use physical sticky dots before requiring hand-drawn plots."],
+ extend:["Design a dataset with two separate clusters and a gap between them. What real situation might produce that shape?","Is an outlier always a mistake in the data? Give an example where it is a real, correct value."],
+ access:["Touch: sticky dots let a plot be built and rearranged physically before committing to a drawn version.","Vision: clusters are circled and gaps labelled directly on the diagram, not just described in text.","Attention: the tool's live update when adding a value connects cause and effect immediately rather than across two separate static pictures.","Language: 'cluster', 'gap' and 'outlier' are the three words carrying this lesson; post all three with a labelled example plot."]
+},
+{
+ day:5, short:"Reading dot plots", title:"Answering questions from a dot plot",
+ objective:"Extract specific quantitative information from a dot plot, including counts, comparisons and simple sums.",
+ standards:["6.SP.B.4","6.SP.A.2"],
+ vocab:[["Read off","Extract a specific value or count from a display."],["At least / at most","Phrases requiring counting dots above or below a threshold."],["Between","Counting dots within a range on the number line."],["Total values","The count of all dots on the plot, found by adding every stack."]],
+ materials:["The distribution builder tool","Sample dot plots on paper","Whiteboards"],
+ warmup:{mins:5,text:"Show a dot plot of class quiz scores. Ask how many students scored at least 15. Let students count directly from the picture rather than needing the raw list. Say: that is the whole point of a dot plot — the answer is sitting right there."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · counting from the picture",
+   moves:["Load a dataset in the distribution builder tool.","Count dots above a stated threshold by pointing at each one.","Count dots within a stated range.","Total all the dots and compare with the tool's reported count."],
+   say:[["Teacher","Point at every dot above 15 as you count it. How many?"],["Teacher","Now between 10 and 15, inclusive."],["Teacher","Total every dot on the plot. Does it match what the tool says?"]],
+   watch:["Students who miscount stacked dots, especially tall stacks. Count each stack from the bottom up, out loud, rather than estimating the height."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · marking the region",
+   moves:["Draw a vertical line at a threshold value on a dot plot.","Shade the region satisfying 'at least' or 'at most'.","Draw two lines to mark a 'between' range and shade it.","Count the shaded dots."],
+   say:[["Teacher","Draw the boundary line first. Then shade the side the question wants."],["Teacher","'At least 15' — does the line at 15 get shaded in, or not?"],["Expected","Yes, 'at least' includes the boundary."]],
+   readaloud:["Say the picture aloud: 'A dot plot from ten to twenty. A vertical dashed line is drawn at fifteen, with the region from fifteen to twenty shaded, containing seven dots.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · answering precisely",
+   moves:["Answer at-least, at-most and between questions from given dot plots.","State whether a boundary value is included based on the wording.","Calculate a total from a plot and use it in a further step, such as a fraction of the whole.","Compare two dot plots by answering the same question of each."],
+   say:[["Teacher","'More than 15' — is 15 itself included?"],["Expected","No — 'more than' is strict."],["Teacher","Different from 'at least'. Read the wording as carefully as you read the plot."]],
+   watch:["Students who treat 'at least' and 'more than' as interchangeable. Write both phrases side by side with worked examples showing the boundary handled differently in each."]}
+ ],
+ guided:[["Plot: 2,3,3,4,5,5,5,9. How many are at least 5?","3 (5,5,5) plus the 9, so 4"],["How many are between 3 and 5 inclusive?","5"],["How many are more than 5?","1 (just the 9)"],["Total values on this plot?","8"]],
+ worksheet:[
+  {t:"A · Counting from a plot",d:"Use the dataset 4,5,5,6,6,6,7,7,8,12.",items:["Total values","At least 6","At most 5","Between 5 and 7 inclusive","More than 8","Exactly 6"]},
+  {t:"B · Comparing two plots",d:"Plot A: 3,4,4,5,5,5,6. Plot B: 2,3,3,4,7,8,9.",items:["Total in Plot A","Total in Plot B","At least 5 in Plot A","At least 5 in Plot B"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain the difference between 'at least 6' and 'more than 6' when reading a dot plot.","A dot plot has 20 total values, with 5 scoring at least 18. What fraction scored below 18?","Compare Plot A and Plot B from part B: which has more high scores? Justify from the data."]}],
+ exit:["Plot: 5,6,6,7,8,8,8,10. How many are at least 7?","How many are between 6 and 8 inclusive?","Explain the difference between 'at most' and 'less than'."],
+ crit:"Mastery: correct counts with boundaries handled per the exact wording. Reteach with the shaded-region drawing method if boundaries are consistently mishandled — physically marking the line clarifies what counts as included.",
+ support:["Provide a phrase reference: at least (≥), at most (≤), more than (>), fewer than (<).","Practise shading the region before counting on every problem.","Restrict to small, hand-countable datasets before larger ones."],
+ extend:["A dot plot has 30 values. Half are at least 15. What can you say about the shape of the distribution around 15?","Write your own at-least, at-most and between questions for a dataset, then answer all three."],
+ access:["Touch: the tool's live count lets a student verify their own counting before committing to an answer.","Language: the four boundary phrases (at least, at most, more than, fewer than) are posted together with which symbol and inclusion rule each uses.","Attention: drawing the boundary line before shading gives a fixed first action for every question.","Vision: shaded regions use a distinct fill so the counted area is unambiguous."]
+},
+{
+ day:6, short:"Dot plot problems", title:"Multi-step problems with dot plots",
+ objective:"Solve problems combining dot-plot reading with earlier units, including percent and ratio of the data shown.",
+ standards:["6.SP.B.4","6.RP.A.3"],
+ vocab:[["Multi-step","Reading the plot feeds a further calculation."],["Fraction of the data","A count from the plot expressed as a fraction of the total."],["Percent of the data","The same count expressed as a percent."],["Context matters","Read what the dots represent before answering."]],
+ materials:["The distribution builder tool","Calculators","Mixed problem cards","Whiteboards"],
+ warmup:{mins:5,text:"Show a dot plot of 20 quiz scores. Ask what fraction scored at least 18. Students read the count from the plot, then need Unit 3's fraction-of-a-total move to finish. Say: the plot gets you partway; the rest is what you already know."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · reading then calculating",
+   moves:["Read a count from a dot plot for a stated condition.","Express that count as a fraction of the total shown on the plot.","Convert the fraction to a percent.","Repeat for a second, different condition on the same plot."],
+   say:[["Teacher","Six out of twenty scored at least 18. Write that as a fraction."],["Expected","6/20."],["Teacher","Simplify it, then convert to a percent."],["Expected","3/10, so 30%."],["Teacher","The plot gave you the six and the twenty. Everything after that is Unit 3 and Unit 4."]],
+   watch:["Students who use the wrong total — the count within a range rather than the plot's grand total — as the denominator. The denominator is always every value on the plot, not a subset."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · combining displays and models",
+   moves:["Draw the dot plot with the relevant region shaded.","Draw a bar model showing the counted part against the total.","Write the fraction and percent from the bar model.","Repeat with a ratio question: comparing two counts from the same plot."],
+   say:[["Teacher","The bar model is doing exactly what it did in Unit 3 — the plot just supplied the numbers this time."]],
+   readaloud:["Say the picture aloud: 'A dot plot with the region above eighteen shaded, containing six of twenty total dots. Beside it, a bar model divided into twenty units with six shaded, labelled six twentieths, or thirty percent.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · full solutions",
+   moves:["Solve four combined problems: fraction of data, percent of data, ratio between two counts, and a comparison across two plots.","Write every step, including the plot-reading step explicitly.","Estimate before calculating on the numeric steps.","Check each answer's plausibility against the plot."],
+   say:[["Teacher","Write the reading step as its own line: 'From the plot, 6 out of 20 scored at least 18.' Then the calculation."]],
+   watch:["Students who skip straight to a fraction without recording what was actually read from the plot. Requiring the reading step in writing catches misreads before they propagate into the calculation."]}
+ ],
+ guided:[["Plot has 20 values, 6 at least 18. Find the fraction and percent.","3/10, 30%"],["Plot has 15 values, 9 below 10. Find the percent.","60%"],["Two plots: A has 4 outliers out of 20, B has 2 out of 10. Compare the ratios.","1/5 vs 1/5 — equal proportions"],["Why must the denominator be the plot's total, not a subset?","Because the fraction describes that subset's share of everything, not of another part."]],
+ worksheet:[
+  {t:"A · Fraction and percent",d:"Read from the plot, then calculate. Dataset: 3,4,4,5,5,5,5,6,6,7,7,8,8,9,10 (15 values).",items:["Fraction at least 7","Percent at least 7","Fraction at most 5","Percent at most 5"]},
+  {t:"B · Two plots compared",d:"Plot A (10 values): 5 scored at least 8. Plot B (25 values): 10 scored at least 8.",items:["Percent in A scoring at least 8","Percent in B scoring at least 8","Which plot has the higher percent?","Ratio of A's count to B's count"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A dot plot of 30 values shows 9 outliers. Find the percent, and explain what this tells you about how unusual the outliers really are.","Explain why comparing raw counts between two differently sized plots can be misleading, and how percent fixes this.","Design a dot plot problem of your own that needs both a plot-reading step and a percent calculation."]}],
+ exit:["A plot has 25 values, 5 at least 20. Find the percent.","Explain why you read the plot before calculating.","Why compare percents rather than raw counts between two plots of different sizes?"],
+ crit:"Mastery: correct fraction and percent with the reading step shown explicitly. Reteach if the wrong total is used — emphasise that the denominator is always the plot's full count.",
+ support:["Provide a two-line frame: 'From the plot: ___ out of ___' then the calculation.","Restrict to single-plot problems before two-plot comparisons.","Permit calculators for all percent conversions."],
+ extend:["A plot shows 40 values. What percent would 1 outlier represent? What about 4? Use this to judge how many outliers would be unusual.","Two plots have the same percent above a threshold but very different totals. Does that mean the two situations are equally significant? Discuss."],
+ access:["Attention: the explicit reading-step line prevents a misread from being lost inside a longer calculation.","Language: 'fraction of the data' and 'percent of the data' are used consistently rather than shortened, so the connection to earlier units stays visible.","Memory: naming this as Unit 3 and Unit 4 material applied to a new source reduces it to one familiar skill, not a new one.","Vision: the shaded plot and its matching bar model are drawn side by side so the translation between them is visible."]
+},
+{
+ day:7, short:"Histograms", title:"Building a histogram from grouped data",
+ objective:"Build a histogram by grouping data into equal-width bins, and explain how a histogram differs from a dot plot.",
+ standards:["6.SP.B.4"],
+ vocab:[["Histogram","A bar chart for numerical data, grouped into equal-width bins."],["Bin","A range of values grouped together, such as 0-4, 5-9."],["Bin width","How wide each bin is — a choice, not a fixed fact about the data."],["No individual dots","A histogram shows how many fall in a bin, not each value separately."]],
+ materials:["The distribution builder tool","Grid paper","Rulers","Sample datasets"],
+ warmup:{mins:5,text:"Show a dot plot with 40 values, tightly packed. Ask how easy it is to read at a glance. It is cluttered. Ask what might help. Grouping the values into ranges is the answer, and that is a histogram."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · grouping by hand",
+   moves:["Take a list of 20 numbers and sort them into bins of width 5 by hand.","Count how many fall in each bin.","Draw bars for each bin's count.","Compare with a dot plot of the same data."],
+   say:[["Teacher","Sort these into groups: 0-4, 5-9, 10-14, and so on. Count each group."],["Teacher","Now draw a bar for each count. What have you lost compared to the dot plot?"],["Expected","You can't see the exact individual values anymore."],["Teacher","Right — and what have you gained?"],["Expected","It's easier to see the overall shape."]],
+   watch:["Students who create overlapping bins, such as 0-5 and 5-10, double-counting the boundary value. Bins must not overlap — 0-4 and 5-9 is the correct pattern, with a clear rule for which bin a boundary value belongs to."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · the histogram tool",
+   moves:["Open the distribution builder tool and switch to the histogram view.","Load a dataset and observe the default bin width.","Compare the histogram with the dot plot of the same data directly above it.","Identify what the histogram shows and what it hides."],
+   say:[["Teacher","Same data, two views. What can you read from the dot plot that you can't from the histogram?"],["Expected","The exact repeated values."],["Teacher","And what does the histogram make easier?"],["Expected","Seeing the overall shape at a glance."]],
+   readaloud:["Say the picture aloud: 'Above, a dot plot with individual values scattered from two to eighteen. Below, a histogram of the same data grouped into bins of width four, showing four bars of heights three, seven, five and two.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · reading and building",
+   moves:["Read bin frequencies directly from a histogram.","Build a frequency table from a histogram's bars.","State a rule for boundary values: each bin includes its lower bound, up to but not including the next bin's lower bound.","Calculate a total from a histogram and use it in a fraction or percent."],
+   say:[["Teacher","This bar covers 10 to 14. Does a value of exactly 15 belong here?"],["Expected","No, it goes in the next bin."],["Teacher","One consistent rule, applied every time: a bin includes its start, not its end."]],
+   watch:["Students who cannot state where a boundary value belongs. Require the rule stated explicitly — lower bound included, upper bound excluded — rather than deciding case by case."]}
+ ],
+ guided:[["Values 3,7,7,11,14,14,14,19 in bins of 5 (0-4,5-9,10-14,15-19). Find each bin's count.","0-4: 1, 5-9: 2, 10-14: 4, 15-19: 1"],["Does 10 belong in the 5-9 bin or the 10-14 bin?","10-14, since bins include their lower bound"],["What is lost by grouping into a histogram?","The exact individual values within each bin"],["What is gained?","An easier view of the overall shape with less clutter"]],
+ worksheet:[
+  {t:"A · Build the histogram",d:"Group into bins of the width given, then find each bin's count.",wide:true,
+   items:["Data: 2,4,5,7,8,9,9,11,13,15. Bins of width 5.","Data: 21,23,25,28,29,30,32,35,38,40. Bins of width 10."]},
+  {t:"B · Read a histogram",d:"A histogram shows bins 0-9(3), 10-19(8), 20-29(6), 30-39(3).",items:["Total values","Most frequent bin","How many are at least 20","How many are below 10"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain the rule for which bin a boundary value belongs to, and why a consistent rule matters.","A dot plot and a histogram show the same data. Describe one question each display answers better than the other.","Group the data 5,5,6,8,10,10,11,14,15,18 into bins of width 5, then into bins of width 3. Are the shapes similar?"]}],
+ exit:["Group 4,6,9,11,14,16,19 into bins of width 5 starting at 0.","State the rule for boundary values.","Explain one thing a histogram shows that a dot plot doesn't, and vice versa."],
+ crit:"Mastery: correctly grouped bins with the boundary rule applied consistently, and item 3 stating a genuine trade-off. Reteach with the tool's direct dot-plot-to-histogram comparison if the boundary rule is inconsistent.",
+ support:["Provide a pre-drawn bin table with boundaries marked so only sorting and counting remain.","Restrict to bin widths that divide the data range evenly before requiring students to choose their own.","Keep the matching dot plot visible alongside every histogram built."],
+ extend:["Group the same data using bins of width 2, 5 and 10. How does the shape change? Which feels most informative?","Why must every bin in a histogram be the same width? What would go wrong if they weren't?"],
+ access:["Touch: physically sorting number cards into labelled bin piles before drawing bars makes grouping a hands-on sorting task.","Vision: the dot plot and histogram are shown vertically stacked, sharing the same horizontal scale, so the relationship between them is spatial as well as conceptual.","Language: 'bin' is used consistently rather than switching to 'group' or 'interval', since the unit builds toward day eight and nine using this exact term.","Attention: the boundary rule is stated once, explicitly, and referred back to rather than re-derived each time."]
+},
+{
+ day:8, short:"Bin width", title:"How bin width changes the story",
+ objective:"Explore how changing bin width changes a histogram's shape, and explain that bin width is a choice with consequences.",
+ standards:["6.SP.B.4"],
+ vocab:[["Bin width","How wide each group is — chosen by the person building the histogram."],["Too fine","Bins so narrow the histogram looks like a cluttered dot plot."],["Too coarse","Bins so wide that real structure in the data gets flattened away."],["A decision, not a fact","There is no single correct bin width; different widths tell different parts of the story."]],
+ materials:["The distribution builder tool","Calculators","Whiteboards"],
+ warmup:{mins:5,text:"Load the 'one outlier' preset in the distribution builder tool. Set the bin width very narrow, then very wide. Ask what happened to the outlier in each case. At narrow width it stands alone; at wide width it disappears into a bar with other values. Say: same data, two very different stories, and the only thing that changed was a choice."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · the slider in action",
+   moves:["Load a dataset with two natural clusters in the distribution builder tool.","Set the bin width to 1 and observe the histogram.","Gradually increase the bin width and watch the two clusters merge into one bar.","Identify the bin width at which the two-cluster shape disappears."],
+   say:[["Teacher","At width 1, how many separate humps do you see?"],["Expected","Two."],["Teacher","Now increase the width slowly. At what point do they merge into one?"],["Teacher","So the 'two clusters' story and the 'one cluster' story are both true of the same data — they just come from different choices."]],
+   watch:["Students who conclude one bin width is objectively correct. Push back gently: ask what real question the histogram is meant to answer, since that, not a formula, should guide the choice."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · three widths side by side",
+   moves:["Draw the same dataset as three histograms with narrow, medium and wide bins.","Label what each width reveals or obscures.","Identify which width would suit a question about fine detail, and which suits a question about overall shape.","Discuss a real situation where the choice of bin width could mislead."],
+   say:[["Teacher","Three pictures, one dataset. Which would you use to argue there are two distinct groups in this data?"],["Expected","The narrow-bin one."],["Teacher","And if you wanted to hide that there are two groups?"],["Expected","Use wide bins."],["Teacher","That is worth knowing, because it means histograms can be built honestly or built to mislead, and the difference is not always obvious."]],
+   readaloud:["Say the three pictures aloud: 'Three histograms of the same twenty values. The first, with narrow bins, shows two distinct peaks with a gap between them. The second, with medium bins, shows two peaks merging into a wide, low valley. The third, with wide bins, shows a single smooth hump.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · describing the effect",
+   moves:["State in writing how bin width changed the number of visible peaks in a dataset.","Choose an appropriate bin width for a stated purpose and justify it.","Identify a histogram that looks suspiciously smoothed and explain what a narrower bin width might reveal.","Compare two histograms of the same data at different widths and describe the difference precisely."],
+   say:[["Teacher","Justify your bin width choice in a sentence. Not 'it looked good' — what question does this width actually answer?"]],
+   watch:["Students who pick a bin width arbitrarily without being able to justify it. The point of today is that the choice should be deliberate and stated, not simply whatever the software defaults to."]}
+ ],
+ guided:[["A histogram with narrow bins shows two peaks. Wide bins show one. Which is 'correct'?","Neither alone — both are true descriptions at different resolutions."],["Why might someone choose wide bins deliberately?","To present an overall trend without highlighting individual variation, sometimes to obscure real structure."],["What does a very narrow bin width risk?","Looking cluttered, similar to an unsorted dot plot, hiding the overall shape."],["What should guide a bin width choice?","The question the histogram is meant to answer."]],
+ worksheet:[
+  {t:"A · Compare widths",d:"Using the tool, load 'two clumps' and record what you see at each width.",items:["Bin width 1","Bin width 2","Bin width 4","Bin width 8"]},
+  {t:"B · Justify a choice",d:"State a bin width and justify it for the purpose given.",wide:true,
+   items:["You want to show whether there are two distinct groups of exam scores. What bin width, and why?","You want a smooth, simple summary of city temperatures over a year for a general audience. What bin width, and why?"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why bin width is described as a choice rather than a fact about the data.","A company presents sales data with very wide bins that hide a recent decline. Explain what a narrower bin width might reveal, and why the company might prefer the wide one.","Load 'skewed right' in the tool and describe how its shape changes across three different bin widths."]}],
+ exit:["Load a dataset and record its histogram shape at bin width 1 and at bin width 8.","Which width shows more detail?","Explain why there is no single correct bin width."],
+ crit:"Mastery: an accurate description of the shape change across widths, and item 3 stating that the choice depends on the purpose. Reteach with the live slider — the transition point where clusters merge is more convincing seen happening than described.",
+ support:["Provide two or three fixed bin widths to compare rather than requiring free exploration of the whole slider range.","Work through one dataset as a whole class before independent exploration of others.","Give sentence starters for the justification task: 'I chose bin width ___ because I wanted to show ___.'"],
+ extend:["Find a bin width for the 'one outlier' dataset where the outlier is completely invisible. How wide does the bin need to be?","Research (or discuss from prior knowledge) a real example where a chosen bin width in a published chart affected how a story was told."],
+ access:["Touch: dragging the slider and watching the shape respond in real time makes the concept experiential rather than merely explained.","Vision: three histograms at different widths are shown side by side rather than sequentially, so the comparison does not rely on memory.","Language: 'a decision, not a fact' is the key reframing of this lesson; state it explicitly rather than leaving it implicit in the activity.","Attention: the worksheet's four-width comparison is bounded to a specific dataset, avoiding open-ended, unfocused exploration."]
+},
+{
+ day:9, short:"Histogram problems", title:"Multi-step problems with histograms",
+ objective:"Solve problems combining histogram reading with percent and ratio, and justify a bin-width choice for a given purpose.",
+ standards:["6.SP.B.4","6.RP.A.3"],
+ vocab:[["Multi-step","Reading the histogram feeds a further calculation."],["Bin frequency","How many values fall in one bin."],["Cumulative","Adding frequencies across several bins to answer 'at least' or 'at most'."],["Justify the width","State the purpose the chosen bin width serves."]],
+ materials:["The distribution builder tool","Calculators","Mixed problem cards"],
+ warmup:{mins:5,text:"Show a histogram with bins 0-9, 10-19, 20-29, 30-39 and ask what fraction of the data is at least 20. Students need to add two bins together first. Say: reading a histogram sometimes means combining bars, not just reading one."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · combining bins",
+   moves:["Read the frequency of each bin from a histogram.","Add adjacent bins to answer an 'at least' or 'at most' question.","Convert the combined count to a fraction and percent of the total.","Repeat for a different threshold falling on a different bin boundary."],
+   say:[["Teacher","At least 20 means which bins?"],["Expected","20-29 and 30-39, added together."],["Teacher","Now that combined count over the total. Fraction, then percent."]],
+   watch:["Students who read only one bin when the threshold falls inside a range spanning several bins. Underline exactly which bins the question requires before adding anything."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · shading combined bins",
+   moves:["Shade the bins satisfying a stated condition on the histogram.","Draw a bar model showing the shaded total against the grand total.","Write the fraction and percent from the bar model.","Choose an appropriate bin width for a new dataset and justify it before analysing."],
+   say:[["Teacher","Shade every bin the question includes. Now you can see exactly what you are adding."]],
+   readaloud:["Say the picture aloud: 'A histogram with four bins. The rightmost two, covering twenty to thirty-nine, are shaded, together holding nine of the forty total values.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · full solutions",
+   moves:["Solve four combined problems: cumulative frequency, percent of data, comparison across two histograms, and a bin-width justification.","Estimate before each numeric calculation.","State the reading step explicitly before calculating.","Check every answer's plausibility."],
+   say:[["Teacher","Write down which bins you are reading before you add anything. That line is where a mistake would show up."]],
+   watch:["Students who skip the explicit reading step and go straight to a fraction, making an unnoticed bin-selection error. Requiring the reading line in writing catches this before the arithmetic starts."]}
+ ],
+ guided:[["Bins 0-9(4),10-19(10),20-29(8),30-39(3). Find at least 20.","11"],["Find the percent at least 20.","11/25 = 44%"],["Find at most 9.","4, which is 16%"],["Why add adjacent bins for 'at least 20'?","Because 20 falls at the start of a bin, and every bin from there upward satisfies the condition."]],
+ worksheet:[
+  {t:"A · Cumulative frequency",d:"Bins: 0-4(2),5-9(6),10-14(9),15-19(3). Total 20.",items:["At least 10","At most 9","Percent at least 15","Percent at most 4"]},
+  {t:"B · Two histograms compared",d:"Histogram A (30 values): 12 in the top bin. Histogram B (20 values): 6 in the top bin.",items:["Percent in A's top bin","Percent in B's top bin","Which has a higher percent in its top bin?"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A histogram of 50 delivery times shows 8 taking at least 30 minutes. Find the percent, and explain what a company might do with this information.","Choose a bin width for a dataset of 200 house prices, and justify your choice for a buyer trying to understand typical prices in an area.","Explain why the explicit 'reading step' before calculating helps catch mistakes."]}],
+ exit:["Bins 0-9(5),10-19(12),20-29(3). Find the percent at least 10.","Explain which bins you combined and why.","Justify a bin width choice for a new dataset of your choice."],
+ crit:"Mastery: correct combined count and percent, with the reading step shown. Reteach if bin boundaries are misread — the shaded-bins diagram makes the selection error visible immediately.",
+ support:["Provide a frame requiring bins read and listed before any calculation.","Restrict to single-bin conditions before requiring combined bins.","Permit calculators for all percent conversions."],
+ extend:["A histogram's bins do not obviously combine to answer a stated question (the threshold falls mid-bin). What extra information, if any, would you need?","Design a histogram problem requiring three combined bins and a percent calculation, then solve it."],
+ access:["Attention: the explicit reading-step line prevents an unnoticed bin-selection error from propagating.","Language: 'cumulative' is introduced here for the first time; connect it to 'adding running totals' rather than assuming familiarity.","Memory: this reuses Unit 3 and Unit 4's fraction-and-percent moves on a new data source; name that connection.","Vision: shading the relevant bins directly on the histogram makes the selected region unambiguous before any calculation begins."]
+},
+{
+ day:10, short:"Mean", title:"The mean as a fair share",
+ objective:"Calculate the mean of a dataset and explain it as the amount each value would be if the total were shared equally.",
+ standards:["6.SP.B.5c","6.SP.A.3"],
+ vocab:[["Mean","The total of all values divided by how many there are — the fair-share value."],["Fair share","Redistributing a total so every share is equal."],["Sum","Total of all the values, found before dividing."],["Average","A common everyday word for the mean, though not the only kind of average."]],
+ materials:["Unit cubes or counters","The distribution builder tool","Calculators","Whiteboards"],
+ warmup:{mins:5,text:"Give five students different numbers of counters — 2, 4, 4, 6, 9, say. Ask them to redistribute so everyone has the same amount, without changing the total. Let them physically move counters between each other until it balances."},
+ stages:[
+  {k:"c",label:"Concrete",mins:13,sense:"touch · levelling the piles",
+   moves:["Give five students piles of 2, 4, 4, 6 and 9 counters.","Have them pass counters between each other until every pile is equal.","Record the equal amount and the total before and after.","Confirm the total was unchanged throughout."],
+   say:[["Teacher","Pass counters around until everyone has the same. What did each end up with?"],["Expected","Five each."],["Teacher","Total before?"],["Expected","Twenty-five."],["Teacher","Five people, five each — twenty-five either way. The mean is exactly this levelling, done with arithmetic instead of counters."]],
+   watch:["Students who average by eye rather than actually redistributing, guessing a round number. Physically moving counters until level gives the exact answer and shows why it works."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · bars levelling out",
+   moves:["Draw five bars of heights 2, 4, 4, 6, 9.","Draw a horizontal line at the mean height.","Shade the amount above the line on tall bars and the amount needed below the line on short bars.","Confirm the shaded surplus equals the shaded deficit."],
+   say:[["Teacher","Draw the line at five. Which bars have surplus above it, and which have a gap below it?"],["Teacher","Add up the surplus. Add up the gaps. What do you notice?"],["Expected","They're equal — four total each way."],["Teacher","That balance is the mean's whole definition. It is the level where surplus exactly cancels deficit."]],
+   readaloud:["Say the picture aloud: 'Five bars of heights two, four, four, six and nine, with a horizontal dashed line drawn at height five. The bars of height six and nine extend above the line, shaded, while the bars of height two and four fall short of it, also shaded.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · calculating the mean",
+   moves:["Write the formula: mean = sum ÷ count.","Calculate the mean for several datasets.","Handle a dataset where the mean is not a whole number.","Verify a calculated mean using the surplus-equals-deficit check."],
+   say:[["Teacher","Sum first, as its own step. Then divide by how many values there are."],["Teacher","This mean comes out as 5.4. Is that allowed, even though no single value was 5.4?"],["Expected","Yes — the mean is a calculated fair share, not necessarily one of the original values."]],
+   watch:["Students who divide by the wrong count — the number of distinct values rather than the total number of data points, when values repeat. Every value counts once in the sum and once in the count, including repeats."]}
+ ],
+ guided:[["Find the mean of 2,4,4,6,9.","5"],["Find the mean of 3,3,3,7.","4"],["Find the mean of 10,12,14.","12"],["Why can the mean be a decimal even if all the data are whole numbers?","It is a calculated fair share, not required to match any single original value."]],
+ worksheet:[
+  {t:"A · Calculate the mean",d:"Show sum and count.",items:["4,6,8,10,12","3,3,5,5,9","1,2,3,4,5,6","20,22,24,26","7,7,7,7","5,10,15,20,25"]},
+  {t:"B · Working with the mean",d:"Answer using the mean.",wide:true,
+   items:["Five test scores have a mean of 80. Four of them are 75, 80, 82, 85. Find the fifth.","A mean of 12 across 6 values gives what total?","Adding a sixth value of 30 to the dataset 10,12,14,16,18 (mean 14) — find the new mean."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain the mean as a fair-share redistribution, using the counters activity in your explanation.","A dataset has a mean of 10. Can every value in the dataset be above 10? Explain why or why not.","Find a real situation where reporting 'the average' as a mean might be misleading, and explain why."]}],
+ exit:["Find the mean of 6,8,10,12,14.","Find the mean of 2,2,2,2,10.","Explain the mean as a fair share."],
+ crit:"Mastery: correct calculation shown as sum-then-divide, and item 3 describing redistribution. Reteach with the counters activity — a student who can redistribute physically but not calculate needs the arithmetic connected to what they already did with their hands.",
+ support:["Provide the sum as its own labelled step before dividing.","Restrict to small, whole-number-mean datasets before decimal means.","Keep counters available for verifying any calculated mean."],
+ extend:["A dataset of 10 values has a mean of 20. One value is removed and the mean becomes 18. Find the removed value.","Is it possible for the mean of a dataset to equal a value that appears zero times in the dataset? Give an example."],
+ access:["Touch: physically redistributing counters is the definition of the mean, not merely an analogy for it.","Vision: the surplus-and-deficit bars use matching shading so the balance is visually obvious, not just stated.","Attention: writing the sum as its own step before dividing gives a checkpoint that catches arithmetic slips early.","Language: 'average' and 'mean' are used together at first, since 'average' is the everyday word students already have."]
+},
+{
+ day:11, short:"Median and mode", title:"Median and mode as other kinds of centre",
+ objective:"Find the median and mode of a dataset, and explain what each measures differently from the mean.",
+ standards:["6.SP.B.5c","6.SP.A.3"],
+ vocab:[["Median","The middle value when data is ordered — half the values are above it, half below."],["Mode","The most frequently occurring value, or values, in a dataset."],["No mode","When every value is unique, there is no mode."],["Bimodal","A dataset with two values tied for most frequent."]],
+ materials:["Unit cubes or counters","The distribution builder tool","Whiteboards"],
+ warmup:{mins:5,text:"Post the dataset 3,4,4,5,6,7,50. Ask for its mean. It comes out unusually high because of the 50. Ask what a 'typical' value in this dataset actually looks like. Most people will point to somewhere around 4 to 6 — not the mean. Say: today gives you two more ways to describe the centre."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · ordering and finding the middle",
+   moves:["Line students up in order of a number they are each holding.","Identify the middle person as the median.","With an even number of students, identify the two middle people and average them.","Repeat with a dataset containing a repeated value to find the mode."],
+   say:[["Teacher","Order yourselves from smallest to largest. Who is in the middle?"],["Expected","One dead-centre if odd, two people to average if even."],["Teacher","That middle value is the median — literally the middle, once everything is in order."]],
+   watch:["Students who find the median without ordering the data first. The median only means 'the middle' once the values are sorted; an unsorted middle position tells you nothing."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · marking the middle and the peak",
+   moves:["Draw an ordered list of values with the median marked at the centre.","Draw a dot plot and identify the tallest stack as the mode.","Draw a case with two equally tall stacks and label it bimodal.","Draw a case with no repeated values and label it as having no mode."],
+   say:[["Teacher","On the dot plot, which value has the tallest stack? That is the mode — the single most common value."],["Teacher","This one has two equally tall stacks. What do we call that?"],["Expected","Bimodal."]],
+   readaloud:["Say the picture aloud: 'A dot plot with values from two to nine. The value five has three stacked dots, taller than any other stack, marking it as the mode. An ordered list beside it has seven values with the fourth, the middle one, circled as the median.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · calculating both",
+   moves:["Find the median for odd- and even-count datasets.","Find the mode, including cases with none and cases that are bimodal.","Compare the mean, median and mode of the same dataset containing an outlier.","State which measure the outlier affected most and least."],
+   say:[["Teacher","For 3,4,4,5,6,7,50 — find the median."],["Expected","5, the middle value once ordered."],["Teacher","Compare that to the mean you'd get. Which one moved because of the 50, and which one didn't?"],["Expected","The mean moved; the median barely noticed."]],
+   watch:["Students who forget to order the data before finding the median, or who average the two middle values incorrectly for an even-count set. Require the ordered list written out as its own step."]}
+ ],
+ guided:[["Find the median of 3,7,5,9,1.","5, once ordered: 1,3,5,7,9"],["Find the median of 2,4,6,8.","5, averaging 4 and 6"],["Find the mode of 2,3,3,3,5,7.","3"],["Find the mode of 1,2,3,4,5.","No mode — every value is unique"]],
+ worksheet:[
+  {t:"A · Median",d:"Order first, then find the median.",items:["8,3,5,9,1","10,15,12","4,4,4,4,4","20,25,22,28,24,26","1,2,3,4,5,6,7","100,50,75"]},
+  {t:"B · Mode",d:"State the mode, or that there is none.",items:["1,2,2,3,4","5,5,6,6,7","3,3,3,4,4","10,20,30,40","2,2,4,4,6,6","8,8,8,9,9"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["A dataset is 4,5,5,6,7,8,60. Find the mean, median and mode, and explain which best represents a typical value.","Explain why a dataset must be ordered before finding the median, using an example where skipping this step gives a wrong answer.","Can a dataset have a mode equal to its median? Give an example where this happens and one where it doesn't."]}],
+ exit:["Find the median of 12,7,15,9,10.","Find the mode of 4,4,5,6,6,6,7.","Explain why the median is less affected by an outlier than the mean."],
+ crit:"Mastery: both calculated correctly with data properly ordered, and item 3 explaining the median's resistance to outliers. Reteach if the data is not ordered first — the physical line-up activity connects the abstract procedure to something already done with the body.",
+ support:["Provide a checklist: order first, then find the middle.","Restrict to odd-count datasets before even-count averaging.","Keep the physical line-up method available for verification."],
+ extend:["Find a dataset where the mean, median and mode are all different from each other.","Is it possible for the median to equal the maximum value in a dataset? Under what condition?"],
+ access:["Touch: physically lining up in order makes finding the median a bodily, checkable action.","Vision: the mode is identified as the tallest stack on a dot plot, connecting the abstract idea to the visual display from day four.","Attention: writing the ordered list as its own explicit step prevents skipping straight to an unordered middle position.","Memory: contrasting all three measures on the same outlier-containing dataset makes the differences memorable through direct comparison."]
+},
+{
+ day:12, short:"Choosing a measure", title:"Which measure of centre fits the data",
+ objective:"Choose the most appropriate measure of centre for a given dataset and shape, and justify the choice.",
+ standards:["6.SP.A.3","6.SP.B.5d"],
+ vocab:[["Measure of centre","Mean, median or mode — a single value summarising a typical value."],["Skewed","A distribution with a long tail on one side."],["Resistant to outliers","A measure that doesn't shift much when an extreme value is added — the median."],["Best fit","The measure that most honestly represents the data's shape."]],
+ materials:["The distribution builder tool","Sample datasets with different shapes","Whiteboards"],
+ warmup:{mins:5,text:"Post two datasets with the same mean but very different shapes — one symmetric, one heavily skewed by an outlier. Ask whether the mean tells the same story in both cases. It does not. Say: choosing the right measure of centre depends on the shape, not just habit."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · testing measures against shape",
+   moves:["Load a symmetric dataset in the tool and find mean, median and mode.","Load a skewed dataset with an outlier and find all three again.","Compare how much each measure moved between the two datasets.","Identify which measure was most stable despite the outlier."],
+   say:[["Teacher","Symmetric data — how do the three measures compare?"],["Expected","They're close together."],["Teacher","Now skewed data with an outlier. Which measure moved the most?"],["Expected","The mean."],["Teacher","So for skewed data, the median usually tells the more typical story."]],
+   watch:["Students who assume the mean is always the 'proper' or default choice regardless of shape. Push directly: ask what a report using the mean would claim about the skewed dataset, and whether that claim matches most of the actual values."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · shape guiding the choice",
+   moves:["Draw a symmetric dot plot and mark all three measures — close together.","Draw a right-skewed dot plot and mark all three — mean pulled toward the tail.","State the rule: mean suits symmetric data, median suits skewed data or data with outliers.","Identify when mode is the only sensible choice — categorical data with no numerical order."],
+   say:[["Teacher","For categorical data like favourite colour, can you even calculate a mean?"],["Expected","No — you can't average colours."],["Teacher","So mode is not just an alternative there. It is the only measure that makes sense."]],
+   readaloud:["Say the picture aloud: 'Two dot plots stacked. The upper is roughly symmetric, with mean, median and mode all marked close together near the centre. The lower has a long tail to the right, with the mean marked noticeably further right than the median and mode.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · justifying the choice",
+   moves:["State the decision rule in writing: shape and data type determine the best measure.","Choose and justify a measure for five different datasets.","Identify a misleading use of the mean in a skewed real-world context.","Recommend an alternative measure and explain the improvement."],
+   say:[["Teacher","A company reports 'average salary' using the mean, when a few executives earn far more than everyone else. What does that number actually represent?"],["Expected","It's pulled up by the outliers, not typical of most employees."],["Teacher","The median salary would tell a more honest story there."]],
+   watch:["Students who choose a measure without reference to the data's actual shape. Require the shape to be described first — symmetric, skewed, or categorical — before the measure is chosen."]}
+ ],
+ guided:[["Symmetric data: which measure of centre is typically most useful?","Mean"],["Data with a serious outlier: which is more resistant?","Median"],["Categorical data like favourite pet: which measure applies?","Mode — mean and median don't make sense here"],["Why is the median called 'resistant to outliers'?","Because moving one extreme value barely shifts which value sits in the middle position."]],
+ worksheet:[
+  {t:"A · Choose the measure",d:"State mean, median or mode, and why.",wide:true,
+   items:["House prices in a neighbourhood, with one mansion far above the rest.","Shoe sizes sold in a shop.","Heights of students in a symmetric distribution.","Favourite subject across a school."]},
+  {t:"B · Spot the misleading average",d:"Explain what's misleading and suggest a better measure.",wide:true,
+   items:["'Average annual income in this town is $85,000' — but most residents earn $40,000, with a few earning millions.","'The average test score was 75' for a class where most scored either 90 or 60, almost nobody near 75."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain the general rule for choosing between mean and median, referring to shape and outliers.","Why is it meaningless to calculate a 'mean' for favourite colour data?","A bimodal dataset has two separate clusters. Does any single measure of centre honestly describe it? Explain your reasoning."]}],
+ exit:["A dataset is heavily skewed by one outlier. Which measure of centre would you report, and why?","Why can't you find a mean for categorical data?","Explain what 'resistant to outliers' means."],
+ crit:"Mastery: a correct, justified choice referencing shape or data type, with item 3 giving an accurate definition. Reteach with the direct side-by-side comparison from the concrete stage — seeing the mean visibly shift while the median doesn't is more convincing than the rule stated alone.",
+ support:["Provide a decision flowchart: categorical → mode; skewed or outlier → median; symmetric numerical → mean.","Work through the misleading-average examples as a whole class before independent analysis.","Keep the tool's live three-measure comparison available for verifying any choice."],
+ extend:["Find a real published statistic that uses 'average' ambiguously — does it mean mean or median, and does it matter for that context?","Design two datasets with the same mean but where one clearly needs the median instead to be represented fairly. Justify your design."],
+ access:["Touch: the tool's live comparison of all three measures on the same data lets students test their choice before committing to it in writing.","Vision: symmetric and skewed distributions are shown with all three measures marked directly on the plot, not just listed as numbers.","Language: 'resistant to outliers' is a technical phrase; pair it with 'doesn't move much when one weird value shows up'.","Attention: the decision flowchart externalises the choice into two or three short questions rather than one open judgement call."]
+},
+{
+ day:13, short:"Range and spread", title:"Describing spread with range",
+ objective:"Calculate the range of a dataset and explain why two datasets with the same centre can still look very different.",
+ standards:["6.SP.B.5c","6.SP.A.3"],
+ vocab:[["Range","The difference between the maximum and minimum values."],["Spread","How widely the data is scattered, distinct from where its centre sits."],["Same centre, different spread","Two datasets can share a mean or median and still differ enormously in consistency."],["Consistent","Data clustered tightly together has a small range and low spread."]],
+ materials:["The distribution builder tool","Sample datasets","Whiteboards"],
+ warmup:{mins:5,text:"Post two datasets with the same mean of 10 but very different spreads — one tightly clustered (8,9,10,11,12), one widely scattered (0,5,10,15,20). Ask if these two situations feel the same. They clearly don't, despite an identical mean. Say: centre alone doesn't tell the whole story."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · comparing spreads physically",
+   moves:["Build two dot plots with the same mean but visibly different spreads.","Measure the range of each: max minus min.","Discuss what a small range versus a large range means about consistency.","Relate this to a real situation, such as delivery time reliability."],
+   say:[["Teacher","Both these datasets average 10 minutes. Which delivery company would you trust more, and why?"],["Expected","The one with a smaller range — more predictable."],["Teacher","Same average speed, completely different reliability. The mean alone hid that difference."]],
+   watch:["Students who assume equal means mean equal situations. The whole point of today is that centre and spread are two separate, independent pieces of information."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · the range on a dot plot",
+   moves:["Mark the maximum and minimum on a dot plot.","Draw a bracket spanning from min to max, labelled with the range.","Compare two dot plots with the same mean, brackets drawn on both.","Discuss which dataset a range calculation describes more usefully."],
+   say:[["Teacher","Draw the bracket from the smallest to the largest value. That whole span is the range."],["Teacher","Compare the two bracket lengths. What does the difference tell you?"],["Expected","One dataset is far more spread out than the other."]],
+   readaloud:["Say the picture aloud: 'Two dot plots stacked, both centred near ten. The upper plot has all values between eight and twelve, a narrow bracket spanning four. The lower plot has values between zero and twenty, a wide bracket spanning twenty.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · calculating and interpreting",
+   moves:["Calculate the range for several datasets.","State what a small range indicates about consistency.","Compare two datasets by both centre and range together.","Write a full description of a dataset combining a measure of centre with the range."],
+   say:[["Teacher","A full description needs both pieces: a centre and a spread. 'The mean is 10' alone is an incomplete report."]],
+   watch:["Students who report range alone as if it fully described the data, or centre alone. Insist on both being reported together for a genuinely useful summary."]}
+ ],
+ guided:[["Find the range of 4,7,9,12,15.","11"],["Find the range of 20,20,21,22,20.","2"],["Two datasets both have mean 15. One has range 4, the other range 30. Which is more consistent?","The one with range 4"],["Why report both a measure of centre and the range?","Centre alone doesn't show how spread out or consistent the data is."]],
+ worksheet:[
+  {t:"A · Find the range",d:"State max, min and range.",items:["3,8,12,15,20","50,52,49,51","10,10,10,10","1,100,50,25","7,7,8,9,9","0,15,30,45,60"]},
+  {t:"B · Compare two datasets",d:"Both have the mean given. Find each range and compare.",items:["Mean 20: 18,19,20,21,22 vs Mean 20: 5,10,20,30,35","Mean 50: 48,49,50,51,52 vs Mean 50: 10,30,50,70,90"]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Two basketball players both average 15 points per game. One has a range of 4, the other 25. What does this tell you about their consistency as players?","Explain why reporting only the mean of a dataset can be misleading without also reporting its range.","Design two datasets with the same median but very different ranges, and describe the real-world difference this might represent."]}],
+ exit:["Find the range of 6,9,13,20.","Two datasets share a mean. One has a small range, one a large range. What does the difference tell you?","Explain why centre and spread are both needed to describe data fully."],
+ crit:"Mastery: correct range calculation, and item 3 stating that centre and spread are independent pieces of information. Reteach with the direct two-dataset comparison — the same-mean, different-range pairing is what makes the distinction concrete.",
+ support:["Provide the max and min pre-identified so only subtraction remains.","Restrict to small, easily ordered datasets before larger ones.","Keep the comparison pairing (same mean, different range) as the running example throughout."],
+ extend:["Is it possible for two datasets to have the same range but very different means? Construct an example.","A dataset's range is 0. What must be true of every value in it?"],
+ access:["Touch: the tool lets a range be visually bracketed and adjusted by adding or removing values, connecting the abstract number to a visible span.","Vision: the range bracket is drawn directly on the dot plot, spanning from the minimum to the maximum dot.","Language: 'consistent' and 'spread' are used together with 'range' so the everyday meaning supports the technical term.","Attention: comparing exactly two datasets, both with a stated matching centre, keeps the contrast focused rather than open-ended."]
+},
+{
+ day:14, short:"Full description", title:"Describing a distribution fully",
+ objective:"Write a complete description of a dataset combining shape, centre and spread, choosing appropriate measures throughout.",
+ standards:["6.SP.A.3","6.SP.B.5"],
+ vocab:[["Full description","Shape, centre and spread together — the complete summary."],["Shape","Symmetric, skewed, bimodal, or uniform."],["Appropriate measures","The mean or median chosen to fit the shape, alongside the range."],["Context","What the numbers actually represent, stated in the description."]],
+ materials:["The distribution builder tool","Sample datasets","Whiteboards"],
+ warmup:{mins:5,text:"Ask what you would need to know to fully describe a dataset to someone who couldn't see it. Collect suggestions. By the end you should have shape, a measure of centre, and a measure of spread — today's checklist, discovered rather than handed over."},
+ stages:[
+  {k:"c",label:"Concrete",mins:12,sense:"touch · building toward a full report",
+   moves:["Load a dataset in the tool and describe its shape aloud.","Choose and calculate the appropriate measure of centre for that shape.","Calculate the range.","Combine all three into one spoken description."],
+   say:[["Teacher","Shape first. Symmetric, skewed, or something else?"],["Teacher","Given that shape, which measure of centre fits best?"],["Teacher","Now the range. Put all three together in one sentence."]],
+   watch:["Students who report the three pieces separately without connecting them into one coherent description. The final synthesis into a single passage is the actual skill being assessed today."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · annotating a dot plot fully",
+   moves:["Draw a dot plot and annotate it with its shape, chosen centre measure, and range bracket all on one diagram.","Repeat for a histogram of the same or a different dataset.","Compare two fully annotated diagrams and their written descriptions.","Identify any diagram missing one of the three required pieces."],
+   say:[["Teacher","One diagram, three annotations. A description missing any one of the three is incomplete."]],
+   readaloud:["Say the picture aloud: 'A dot plot labelled skewed right, with the median marked rather than the mean, and a bracket spanning the full range from three to twenty-two.'"]},
+  {k:"a",label:"Abstract",mins:14,sense:"symbol · writing full descriptions",
+   moves:["Write a full description for four different datasets, in context.","Include shape, an appropriately chosen measure of centre, and the range.","Critique a description that is missing one of the three components.","Revise the critiqued description to make it complete."],
+   say:[["Teacher","This description says 'the mean is 45'. What is missing?"],["Expected","The shape and the spread."],["Teacher","A single number is never a full description. Say what shape it came from and how spread out it is."]],
+   watch:["Students who report only a number without context or shape. Require every description to be a short passage, not a bare statistic."]}
+ ],
+ guided:[["Dataset is symmetric, mean 50, range 20. Write a full description.","'The data is roughly symmetric with a mean of 50 and a range of 20, indicating moderate consistency.'"],["Dataset is skewed by an outlier, median 12, range 40. Describe it.","'The data is right-skewed; the median of 12 is more representative than the mean, and the wide range of 40 reflects the outlier's influence.'"],["What three things must a full description include?","Shape, an appropriate measure of centre, and spread."],["Why choose median over mean for a skewed dataset in a description?","Because the mean would be pulled toward the tail and misrepresent the typical value."]],
+ worksheet:[
+  {t:"A · Write full descriptions",d:"Include shape, centre and spread for each.",wide:true,
+   items:["Dataset: 45,48,50,50,51,52,55 (roughly symmetric).","Dataset: 10,12,13,14,15,16,80 (one severe outlier).","Dataset: 5,5,5,20,20,20 (bimodal, two clusters)."]},
+  {t:"B · Critique and revise",d:"Identify what's missing, then rewrite completely.",wide:true,
+   items:["'The average score was 72.' What's missing? Rewrite fully given: mean 72, roughly symmetric, range 15.","'Most people chose blue.' What's missing? Rewrite fully given: mode is blue, categorical data, second-most-common is red."]},
+  {t:"C · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain why a full description needs three separate pieces rather than just one number.","Write a full description of the ages in your own family or a group you know well.","Find a published statistic (a headline, an advertisement) missing shape or spread information, and explain what's left out."]}],
+ exit:["Dataset: 8,10,10,11,12,13 (roughly symmetric). Write a full description.","What three components must a full description include?","Explain why a bare number like 'the mean was 60' is incomplete."],
+ crit:"Mastery: a coherent description combining all three components correctly. Reteach by isolating whichever component is consistently missing or wrong — this day synthesises the whole unit, so gaps here point directly back to the specific earlier lesson.",
+ support:["Provide a sentence-frame template: 'The data is [shape], with a [measure] of [value] and a range of [value], meaning [interpretation].'","Work through one full description as a class before independent writing.","Keep the three-item checklist visible throughout."],
+ extend:["Write a full description of a bimodal dataset. Which measure of centre, if any, genuinely fits? Explain the difficulty.","Compare full descriptions of two real datasets you choose. What does comparing them let you say that either alone couldn't?"],
+ access:["Language: the sentence-frame template gives the structural skeleton so the cognitive load falls on the content, not the phrasing.","Attention: annotating one diagram with all three pieces at once, rather than three separate diagrams, keeps the synthesis visible in one place.","Vision: shape, centre and spread are each given a consistent annotation style across every example this lesson.","Memory: the three-item checklist from the warm-up is referred back to explicitly at every stage rather than restated as new content."]
+},
+{
+ day:15, short:"Review", title:"Review stations and unit assessment",
+ objective:"Consolidate statistical questions, displays, and measures of centre and spread, and self-identify which topics need more work.",
+ standards:["6.SP.A.1","6.SP.A.2","6.SP.A.3","6.SP.B.4","6.SP.B.5"],
+ vocab:[["Self-assessment","Judging your own accuracy honestly — a skill, and one being assessed today."],["Station","A short focused task at one topic, then rotate."],["Justify","Say why, not just what — required at every station."],["Next step","A specific action, not a topic name."]],
+ materials:["The distribution builder tool","Station cards","Self-assessment grid","Assessment papers"],
+ warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: those are the stations to visit first, and the tally is data, not a confession."},
+ stages:[
+  {k:"c",label:"Concrete",mins:15,sense:"touch · rotation",
+   moves:["Five stations: statistical questions and displays, dot plots, histograms and bin width, mean/median/mode, range and full descriptions.","Each station holds its manipulative and three graded tasks.","Students choose a starting station from the warm-up tally.","Every station requires one written justification, not just answers."],
+   say:[["Teacher","Start where you are least confident, not where you are quickest."],["Teacher","One sentence per station explaining why your method works."],["Teacher","Twelve minutes per station. Rotate on the signal whether or not you have finished."]],
+   watch:["Students who visit only easy stations. The private warm-up slip is the accountability tool — ask them to show which station addresses what they wrote."]},
+  {k:"p",label:"Pictorial",mins:14,sense:"sight · one example per topic",
+   moves:["On a single page, create one example for each of the five station topics.","Annotate each with the key term or formula it uses.","Keep the page as the revision sheet.","Identify any example that could not be created and return to that station."],
+   say:[["Teacher","One page, five examples, five key ideas. Better than any notes you could copy."],["Teacher","An example you cannot create names the topic to go back to."]],
+   readaloud:["Say the page aloud: 'Five examples across two rows. A statistical question beside a fixed-answer one; a dot plot with a cluster and an outlier; two histograms of the same data at different bin widths; a dataset with its mean, median and mode marked; and a full written description combining shape, centre and spread.'"]},
+  {k:"a",label:"Abstract",mins:13,sense:"symbol · assessment",
+   moves:["Complete the written assessment covering all fifteen days.","Self-mark section A against a displayed key.","Record scores by topic on the self-assessment grid.","Identify two weakest topics and write one specific next step for each."],
+   say:[["Teacher","Self-mark honestly. Marking generously only costs you later."],["Teacher","One specific next step per weak topic. 'Practise statistics' is not a step. 'Redo three median problems, ordering the data first' is."]],
+   watch:["Students whose self-assessment does not match their station work. The mismatch signals either low confidence or an unnoticed gap, and those need opposite responses."]}
+ ],
+ guided:[["Is 'how tall is each student' statistical?","Yes"],["Find the mean of 4,6,8,10,12.","8"],["Find the median of 3,7,9,11,15.","9"],["Group 2,5,8,11,14,17 into bins of width 5 starting at 0.","0-4: 1, 5-9: 2, 10-14: 2, 15-19: 1"]],
+ worksheet:[
+  {t:"A · Questions and displays",d:"Classify and choose displays.",items:["Is 'favourite pizza topping' statistical?","Categorical or numerical: shoe size","Best display for test scores across a class","Best display for favourite pet"]},
+  {t:"B · Centre and spread",d:"Show your working.",items:["Mean of 5,10,15,20,25","Median of 8,3,12,6,10","Mode of 2,2,3,4,4,4","Range of 6,9,15,20"]},
+  {t:"C · Displays and choice",d:"Answer from the data given.",wide:true,
+   items:["Data: 4,6,6,7,8,8,8,9,20. Build a dot plot, find mean, median and mode, and state which measure of centre you would report and why.","Group the same data into bins of width 5. Does the histogram reveal the outlier as clearly as the dot plot did? Explain."]},
+  {t:"D · Reason it out",d:"Answer in a complete sentence.",wide:true,
+   items:["Explain what makes a question statistical, with an example of your own.","Explain why bin width is a choice rather than a fixed fact about a dataset.","Choose the topic you found hardest this unit. Explain it with an example, as if teaching someone who missed the lesson."]}],
+ exit:["Name the topic you are most confident with and give one reason.","Name the topic you want more practice on and give one specific next step.","Complete: the median is resistant to outliers because ___."],
+ crit:"Mastery: assessment sections A through C at 80 percent or better, with self-assessment matching actual performance within one band. Reteach in small groups by topic rather than reteaching the unit; the self-assessment grid tells you how to form those groups.",
+ support:["Reduce to three stations covering displays, centre measures, and full descriptions.","Provide worked examples at each station as reference.","Allow the assessment across two sittings if sustained concentration is the barrier rather than the mathematics."],
+ extend:["Design a station task of your own, including the dataset and the justification prompt.","Collect a real dataset from the class and write a full description of it, combining every skill from this unit."],
+ access:["Motor: stations are arranged so each can be completed seated, with materials brought to the student.","Attention: twelve-minute rotations with a clear signal give predictable structure.","Vision: every station card uses the same layout so the format is never re-learned.","Language: the self-assessment grid pairs picture icons with topic names so it can be completed without heavy reading.","Hearing: the rotation signal is both visual and audible."]
+}
+];
+</script>
+<script src="curriculum-core.js"></script>
+</body>
+</html>
