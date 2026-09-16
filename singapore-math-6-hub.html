@@ -8,12 +8,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="curriculum.css">
+<script src="theme-toggle.js"></script>
 <style>
 :root{
   --ink:#0F2338; --ink-2:#1B3A5C; --ink-3:#33557A;
-  --teal:#1F8A7D; --teal-lt:#37B0A0; --teal-pale:#DCEFEB;
-  --amber:#E4A03C; --amber-dk:#B87C1C; --amber-pale:#FAEDD6;
-  --rose:#C2536B; --peri:#6B7FB3;
+  --header-bg:var(--ink);
+  --teal:#1F8A7D; --teal-lt:#37B0A0; --teal-pale:#DCEFEB; --teal-text:#136155;
+  --amber:#E4A03C; --amber-dk:#96630E; --amber-pale:#FAEDD6;
+  --rose:#C2536B; --rose-pale:#F6E2E6; --rose-text:#9C2C46; --peri:#6B7FB3;
   --paper:#F3F6F8; --card:#FFFFFF; --line:#D3DCE4;
   --grid:rgba(15,35,56,.055);
   --text:#16283C; --muted:#5B7189;
@@ -22,21 +24,35 @@
   --mono:"Inconsolata",ui-monospace,monospace;
   --r:10px;
 }
+:root[data-theme="dark"]{
+  --ink:#EAF2F9; --ink-2:#BFD4E8; --ink-3:#93AEC9;
+  --header-bg:#0A1420;
+  --teal:#3FBFA9; --teal-lt:#5FD9C4; --teal-pale:#153732; --teal-text:#5FE0C7;
+  --amber:#E9AD55; --amber-dk:#F0C77E; --amber-pale:#3A2C13;
+  --rose:#E07992; --rose-pale:#3A1E27; --rose-text:#F5A8BB; --peri:#8FA0D6;
+  --paper:#0F151C; --card:#1A222B; --line:#2B3641;
+  --grid:rgba(255,255,255,.05);
+  --text:#DCE6EE; --muted:#93A7BC;
+}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
 body{
   margin:0; background:var(--paper); color:var(--text);
   font-family:var(--sans); font-size:17px; line-height:1.65;
-  -webkit-font-smoothing:antialiased;
+  -webkit-font-smoothing:antialiased; transition:background-color .2s,color .2s;
 }
+.theme-toggle{font-family:var(--mono);font-size:.82rem;color:#fff;
+  display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.5);border-radius:999px;padding:7px 14px}
+.theme-toggle:hover{background:rgba(255,255,255,.2);border-color:#fff}
 .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
 a{color:var(--ink-2)}
 :focus-visible{outline:3px solid var(--amber);outline-offset:3px;border-radius:3px}
 
 /* ---------- hero ---------- */
 .hero{
-  background:var(--ink);
+  background:var(--header-bg);
   background-image:
     linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),
     linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
@@ -105,7 +121,7 @@ section{padding:64px 0}
 .stage-n{font-family:var(--mono);font-size:.8rem;color:#fff;background:var(--ink-2);
   width:26px;height:26px;border-radius:50%;display:grid;place-items:center;margin-bottom:14px}
 .stage h3{margin:0 0 4px;font-family:var(--serif);font-size:1.3rem;font-weight:600;color:var(--ink)}
-.stage .sense{font-family:var(--mono);font-size:.76rem;color:var(--teal);margin:0 0 12px}
+.stage .sense{font-family:var(--mono);font-size:.85rem;font-weight:600;color:var(--teal-text);margin:0 0 12px}
 .stage p{margin:0 0 12px;font-size:.93rem;color:var(--muted)}
 .stage ul{margin:0;padding-left:17px;font-size:.9rem;color:var(--text)}
 .stage li{margin-bottom:5px}
@@ -126,11 +142,11 @@ a.unit:hover,a.unit:focus-visible{border-color:var(--ink-3);box-shadow:0 2px 0 v
 .unit h3{margin:0 0 8px;font-family:var(--serif);font-size:1.22rem;font-weight:600;line-height:1.2;color:var(--ink)}
 .unit p{margin:0 0 14px;font-size:.9rem;color:var(--muted);flex:1}
 .status{font-size:.8rem;font-weight:600;padding:4px 10px;border-radius:4px;align-self:flex-start}
-.ready{background:var(--teal-pale);color:#14655B}
-.soon{background:#EEF1F4;color:var(--muted)}
+.ready{background:var(--teal-pale);color:var(--teal-text)}
+.soon{background:var(--paper);color:var(--muted);border:1px solid var(--line)}
 
 /* ---------- access ---------- */
-.access{background:var(--ink);color:#D8E5F0}
+.access{background:var(--header-bg);color:#D8E5F0}
 .access .sec-head{color:#fff}
 .access .sec-sub{color:#A9BFD3}
 .acc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
@@ -151,19 +167,30 @@ footer{padding:36px 0;font-size:.85rem;color:var(--muted);border-top:1px solid v
   .yearbar{height:64px}
 }
 @media print{
+  :root,:root[data-theme="dark"]{
+    --ink:#0F2338;--ink-2:#1B3A5C;--ink-3:#33557A;--header-bg:#0F2338;
+    --teal:#1F8A7D;--teal-pale:#DCEFEB;--teal-text:#136155;
+    --amber:#E4A03C;--amber-dk:#96630E;--amber-pale:#FAEDD6;
+    --rose:#C2536B;--rose-pale:#F6E2E6;--rose-text:#9C2C46;--peri:#6B7FB3;
+    --paper:#fff;--card:#fff;--line:#999;--text:#000;--muted:#333;
+  }
   .hero{background:#fff;color:#000;border-bottom:2px solid #000}
   .hero h1,.access .sec-head{color:#000}
   body{background:#fff}
   .access{background:#fff;color:#000}
+  .theme-toggle{display:none}
 }
 </style>
 </head>
 <body>
 
 <header class="hero">
+  <div class="wrap">
+    <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark mode" style="margin-bottom:18px">🌙 Dark</button>
+  </div>
   <div class="wrap hero-grid">
     <div>
-      <p class="kicker">Grade 6 · 36 weeks · 150 instructional days</p>
+      <p class="kicker">Grade 6 · 36 weeks · 149 instructional days</p>
       <h1>Mathematics through concrete, pictorial, abstract</h1>
       <p>A full-year sixth grade curriculum built on the Singapore CPA progression. Every concept starts in students' hands, moves to a drawn model, and only then becomes a symbol on the page.</p>
       <div class="hero-meta">
@@ -284,7 +311,7 @@ const UNITS=[
  {n:4,w:3,days:15,c:C.peri,title:"Percentage",blurb:"Percent as a rate per hundred, finding the whole, percent increase and decrease.",tags:["6.RP.A.3c"],file:"unit-04-percentage.html",ready:true},
  {n:5,w:4,days:20,c:C.rose,title:"Algebraic Expressions & Equations",blurb:"Letters as unknowns, writing and evaluating expressions, solving one-step equations, inequalities.",tags:["6.EE.A.2","6.EE.B.5","6.EE.B.7"],file:"unit-05-algebra.html",ready:true},
  {n:6,w:3,days:13,c:C.inkLt,title:"Angles & Geometric Figures",blurb:"Unknown angles in triangles, parallelograms, trapezoids and rhombuses through reasoning.",tags:["6.G.A.1"],file:"unit-06-angles-and-figures.html",ready:true},
- {n:7,w:3,days:15,c:C.tealLt,title:"Circles",blurb:"Radius, diameter, circumference and area; composite figures and semicircle perimeters.",tags:["6.G.A.1"],file:"unit-07-circles.html",ready:true},
+ {n:7,w:3,days:13,c:C.tealLt,title:"Circles",blurb:"Radius, diameter, circumference and area; composite figures and semicircle perimeters.",tags:["6.G.A.1"],file:"unit-07-circles.html",ready:true},
  {n:8,w:3,days:15,c:C.amberLt,title:"Volume of Solids",blurb:"Volume of rectangular prisms with fractional edges, surface area from nets, capacity.",tags:["6.G.A.2","6.G.A.4"],file:"unit-08-volume.html",ready:true},
  {n:9,w:3,days:15,c:C.periLt,title:"Data Analysis & Statistics",blurb:"Statistical questions, dot plots and histograms, mean, median, mode and variability.",tags:["6.SP.A.1","6.SP.B.4","6.SP.B.5"],file:"unit-09-data-and-statistics.html",ready:true},
  {n:10,w:3,days:13,c:C.roseLt,title:"Negative Numbers & the Coordinate Plane",blurb:"Integers in context, absolute value, ordering, and plotting in all four quadrants, including geometric figures on the grid.",tags:["6.NS.C.5","6.NS.C.6","6.NS.C.8","6.G.A.3"],file:"unit-10-integers-and-coordinates.html",ready:true}
