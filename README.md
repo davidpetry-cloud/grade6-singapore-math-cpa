@@ -92,3 +92,8 @@ algebraic unknowns, deriving π, distribution builders — are worth Opus.
 Units reusing existing tools are template work; Sonnet handles them well.
 One unit per session either way: unit files are large, and carrying two of them
 in context degrades output before you finish the second.
+
+## License
+
+Licensed under [CC BY 4.0](LICENSE) — free to use, adapt, and share
+(including commercially) with attribution to David Petry.
