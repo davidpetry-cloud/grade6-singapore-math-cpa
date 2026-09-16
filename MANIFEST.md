@@ -1,7 +1,9 @@
 # MANIFEST — Grade 6 Singapore Math (CPA)
 
 **Bundle version:** complete (through-u10)
-**Built:** 2026-09-13
+**Built:** 2026-09-16 — UI/dark-mode pass, plus a content consistency audit (deduped
+cloned review-day text, deepened thin dialogue, fixed two reasoning prompts,
+corrected Unit 7's day count)
 
 The hub's `UNITS` array is the source of truth for what exists. This file is a
 convenience snapshot — if the two ever disagree, believe the hub.
@@ -30,7 +32,7 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 
 | file | bytes | sha256 (first 16) |
 |---|---|---|
-| `CLAUDE.md` | 12,737 | `0e943ed1b8b34a4d` |
+| `CLAUDE.md` | 14,392 | `f3efecce649d26cc` |
 | `README.md` | 4,714 | `6d2d5ebf47ada6c8` |
 | `angle-chase.js` | 10,540 | `64345ee7b08fb720` |
 | `angle-chase.test.js` | 4,719 | `59cf3f33124df385` |
@@ -41,28 +43,29 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 | `coord-plane.js` | 11,556 | `e75b1e65f83ee155` |
 | `coord-plane.test.js` | 4,516 | `62238f169083fde3` |
 | `curriculum-core.js` | 51,921 | `bd010e838ba2a847` |
-| `curriculum.css` | 13,193 | `b67d7d1bf35ce4af` |
+| `curriculum.css` | 15,115 | `ac592cbd2b00315e` |
 | `dist-builder.js` | 9,161 | `4f8f09c5a6594861` |
 | `dist-builder.test.js` | 3,911 | `0910cafcf6db26fc` |
 | `net-fold.js` | 9,248 | `1fb9b6210fdc651c` |
 | `net-fold.test.js` | 4,433 | `8e918d5ca40037fc` |
-| `singapore-math-6-hub.html` | 20,657 | `ebef8fbe62506191` |
+| `singapore-math-6-hub.html` | 22,470 | `7d5d94647a9351b4` |
 | `test-unit.js` | 4,235 | `760c86dcdd48f57f` |
-| `unit-01-whole-numbers-and-operations.html` | 62,096 | `fd32edf62e0a2b75` |
-| `unit-02-fractions-and-decimals.html` | 158,134 | `794f8298cbf5223b` |
-| `unit-03-ratio-and-rate.html` | 104,085 | `e5ee14b100258515` |
-| `unit-04-percentage.html` | 87,767 | `54bd3f4dc7161ce6` |
-| `unit-05-algebra.html` | 125,841 | `68ff6a91a38e9c57` |
-| `unit-06-angles-and-figures.html` | 93,992 | `f41d6652553310e8` |
-| `unit-07-circles.html` | 92,162 | `db5724ed77e05cf6` |
-| `unit-08-volume.html` | 92,567 | `f76d2ccdb4cb17f6` |
-| `unit-09-data-and-statistics.html` | 102,789 | `7ee0c62833b83ce8` |
-| `unit-10-integers-and-coordinates.html` | 93,165 | `9fedcff34a950102` |
-| `unit-template.html` | 5,434 | `136b856553bad138` |
+| `theme-toggle.js` | 1,187 | `18c8994a2a613f0c` |
+| `unit-01-whole-numbers-and-operations.html` | 62,534 | `05f42bc7026e545e` |
+| `unit-02-fractions-and-decimals.html` | 158,640 | `2fe629450663f29c` |
+| `unit-03-ratio-and-rate.html` | 104,492 | `5e8e539de10ab35c` |
+| `unit-04-percentage.html` | 88,295 | `e975f4c2f66727dd` |
+| `unit-05-algebra.html` | 126,469 | `2e40ca9d9f5127e4` |
+| `unit-06-angles-and-figures.html` | 95,185 | `5b1e08430efdfd54` |
+| `unit-07-circles.html` | 92,730 | `55a03b4d2f281086` |
+| `unit-08-volume.html` | 93,139 | `afea2482e68e12ec` |
+| `unit-09-data-and-statistics.html` | 103,946 | `1d21ca1907e22772` |
+| `unit-10-integers-and-coordinates.html` | 93,883 | `709dd3df97e00b9c` |
+| `unit-template.html` | 5,872 | `fc16ae3bd77a8956` |
 
 ## Unit status
 
-**All ten units complete. 148 instructional days across the full Grade 6 year.**
+**All ten units complete. 149 instructional days across the full Grade 6 year.**
 
 
 | unit | topic | days | status |
@@ -72,7 +75,7 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 | 03 | Ratio & Rate | 15 | ready |
 | 04 | Percentage | 15 | ready |
 | 05 | Algebraic Expressions & Equations | 20 | ready |
-| 06 | Angles & Geometric Figures | 15 | not built |
+| 06 | Angles & Geometric Figures | 13 | ready |
 | 07 | Circles | 13 | ready |
 | 08 | Volume of Solids | 15 | ready |
 | 09 | Data Analysis & Statistics | 15 | ready |

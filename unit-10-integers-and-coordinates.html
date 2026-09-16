@@ -8,12 +8,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="curriculum.css">
+<script src="theme-toggle.js"></script>
 </head>
 <body>
 
 <header class="top">
   <div class="wrap">
-    <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+    <div class="hdr-row">
+      <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+      <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark mode">🌙 Dark</button>
+    </div>
     <h1>Unit 10 &mdash; Negative Numbers &amp; the Coordinate Plane</h1>
     <p class="sub">The final unit of the year, and the one that ties the loose thread from Unit 6 back in: polygons on a grid, now that the grid itself &mdash; negative numbers, absolute value, all four quadrants &mdash; has been properly built first. A submarine's depth, a debt, a temperature below freezing: negative numbers get a reason to exist before they get a rule.</p>
     <div class="facts">
@@ -421,7 +425,7 @@ window.LESSONS=
    watch:["Students who think absolute value depends on the sign, expecting |−6| to give a different number than |6|. The step count is identical either way — walking is walking, regardless of direction."]},
   {k:"p",label:"Pictorial",mins:14,sense:"sight · matching distances on the line",
    moves:["Draw a number line with 5 and −5 both marked.","Draw a bracket from zero to each, both the same length.","Label both brackets with the same distance value.","Repeat for a pair including zero and note its distance is zero."],
-   say:[["Teacher","Both brackets are exactly the same length. That is the entire idea — direction differs, distance does not."]],
+   say:[["Teacher","Measure both brackets. Which one is longer?"],["Expected","Neither — they're exactly the same length."],["Teacher","That is the entire idea — direction differs, distance does not."]],
    readaloud:["Say the picture aloud: 'A number line with negative five and positive five both marked. Two brackets span from zero to each point, both exactly five units long and both labelled with the value five.'"]},
   {k:"a",label:"Abstract",mins:14,sense:"symbol · the notation",
    moves:["Write absolute value using the |n| notation.","Calculate |n| for several positive and negative integers.","Compare two absolute values to determine which represents a greater distance.","Solve a context problem: which of two account overdrafts is the larger debt, regardless of the negative sign."],
@@ -554,7 +558,7 @@ window.LESSONS=
    watch:["Students who count only from zero to one point rather than the full span between both points. The distance is the full gap between the two given points, not each one's individual distance from the origin."]},
   {k:"p",label:"Pictorial",mins:14,sense:"sight · the tool's reflect mode",
    moves:["Use the coordinate plane tool's reflect mode to reflect several points across each axis.","Observe the dashed line connecting a point to its reflection.","Note that both the original and reflected point sit the same distance from the axis.","Draw the distance calculation for two points sharing a coordinate on the same diagram."],
-   say:[["Teacher","The dashed line always crosses the axis at a right angle, and both points are the same distance from it. That is what makes it a reflection, not just any old point."]],
+   say:[["Teacher","Look at the dashed line. What angle does it make with the axis it crosses?"],["Expected","A right angle, every time."],["Teacher","And both points sit the same distance from it. That is what makes it a reflection, not just any old point."]],
    readaloud:["Say the picture aloud: 'A point P at four, three, connected by a dashed line straight down to its reflection P prime at four, negative three, crossing the x-axis exactly halfway between them.'"]},
   {k:"a",label:"Abstract",mins:14,sense:"symbol · the rules and calculations",
    moves:["Write the reflection rules: (x,y) → (x,−y) for the x-axis, (x,y) → (−x,y) for the y-axis.","Reflect a set of given points across each axis.","Calculate distances between points sharing a coordinate using |difference|.","Solve a combined problem requiring both a reflection and a distance calculation."],
@@ -683,20 +687,20 @@ window.LESSONS=
  standards:["6.NS.C.5","6.NS.C.6","6.NS.C.7","6.NS.C.8","6.G.A.3"],
  vocab:[["Self-assessment","Judging your own accuracy honestly — a skill, and one being assessed today."],["Station","A short focused task at one topic, then rotate."],["Justify","Say why, not just what — required at every station."],["Next step","A specific action, not a topic name."]],
  materials:["The coordinate plane tool","Station cards","Self-assessment grid","Assessment papers"],
- warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: those are the stations to visit first, and the tally is data, not a confession."},
+ warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: even this tally has a sign — leaning toward one topic is still a direction, like a negative number."},
  stages:[
   {k:"c",label:"Concrete",mins:15,sense:"touch · rotation",
    moves:["Five stations: integers in context and ordering, absolute value, plotting and quadrants, reflections and distance, polygon perimeter and area.","Each station holds its manipulative and three graded tasks.","Students choose a starting station from the warm-up tally.","Every station requires one written justification, not just answers."],
-   say:[["Teacher","Start where you are least confident, not where you are quickest."],["Teacher","One sentence per station explaining why your method works."],["Teacher","Twelve minutes per station. Rotate on the signal whether or not you have finished."]],
-   watch:["Students who visit only easy stations. The private warm-up slip is the accountability tool — ask them to show which station addresses what they wrote."]},
+   say:[["Teacher","Start at the station your slip named, not the quadrant that already feels familiar."],["Teacher","One sentence per station naming the direction or distance you found, not just the coordinate."],["Teacher","Twelve minutes a station, then rotate on the signal — point plotted or not."]],
+   watch:["Students who visit only the stations in the quadrant they already trust. Point back at their warm-up slip and ask which station actually answers it."]},
   {k:"p",label:"Pictorial",mins:14,sense:"sight · one example per topic",
    moves:["On a single page, create one example for each of the five station topics.","Annotate each with its key rule or formula.","Keep the page as the revision sheet.","Identify any example that could not be created and return to that station."],
    say:[["Teacher","One page, five examples, five key ideas. Better than any notes you could copy."],["Teacher","An example you cannot create names the topic to go back to."]],
    readaloud:["Say the page aloud: 'Five examples across two rows. A number line with negative and positive integers in a real context; a distance bracket showing absolute value; a coordinate plane with all four quadrants labelled; a point and its reflection; and a polygon with its perimeter and area marked.'"]},
   {k:"a",label:"Abstract",mins:13,sense:"symbol · assessment",
    moves:["Complete the written assessment covering all thirteen days.","Self-mark section A against a displayed key.","Record scores by topic on the self-assessment grid.","Identify two weakest topics and write one specific next step for each."],
-   say:[["Teacher","Self-mark honestly. Marking generously only costs you later."],["Teacher","One specific next step per weak topic. 'Practise integers' is not a step. 'Redo three ordering problems on a physical number line' is."]],
-   watch:["Students whose self-assessment does not match their station work. The mismatch signals either low confidence or an unnoticed gap, and those need opposite responses."]}
+   say:[["Teacher","Self-mark honestly. A sign error self-marked as correct is a debt that comes due on the next coordinate problem."],["Teacher","One specific next step per weak topic. 'Practise integers' is not a step. 'Redo three ordering problems on a physical number line' is."]],
+   watch:["Students whose self-assessment doesn’t match their station work. A sign error is easy to wave through by habit — have them recheck direction before magnitude."]}
  ],
  guided:[["Order −5, 3, −8, 0 from least to greatest.","−8, −5, 0, 3"],["Find |−17|.","17"],["Plot (−3, 6). Which quadrant?","Quadrant II"],["Rectangle (1,1),(1,6),(8,6),(8,1). Find perimeter and area.","Perimeter 24, area 35"]],
  worksheet:[
@@ -705,7 +709,7 @@ window.LESSONS=
   {t:"C · Polygons",d:"Find the perimeter and area.",wide:true,
    items:["Rectangle: (0,0),(0,5),(9,5),(9,0)","L-shape: (0,0),(0,6),(4,6),(4,3),(7,3),(7,0)"]},
   {t:"D · Reason it out",d:"Answer in a complete sentence.",wide:true,
-   items:["Explain why −20 is less than −5, even though 20 is a bigger number than 5.","Explain the reflection rule for the x-axis and the y-axis, and why only one coordinate changes each time.","Choose the topic you found hardest this unit. Explain it with an example, as if teaching someone who missed the lesson."]}],
+   items:["Explain why −20 is less than −5, even though 20 is a bigger number than 5.","Explain the reflection rule for the x-axis and the y-axis, and why only one coordinate changes each time.","Pick the integer or coordinate idea your warm-up slip named. Explain it with an example, as if teaching someone who missed the lesson."]}],
  exit:["Name the topic you are most confident with and give one reason.","Name the topic you want more practice on and give one specific next step.","Complete: a point's absolute value distance from zero is always ___."],
  crit:"Mastery: assessment sections A through C at 80 percent or better, with self-assessment matching actual performance within one band. Reteach in small groups by topic rather than reteaching the unit; the self-assessment grid tells you how to form those groups.",
  support:["Reduce to three stations covering integers/ordering, plotting/reflecting, and polygon area.","Provide worked examples at each station as reference.","Allow the assessment across two sittings if sustained concentration is the barrier rather than the mathematics."],

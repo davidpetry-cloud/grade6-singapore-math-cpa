@@ -8,12 +8,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="curriculum.css">
+<script src="theme-toggle.js"></script>
 </head>
 <body>
 
 <header class="top">
   <div class="wrap">
-    <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+    <div class="hdr-row">
+      <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+      <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark mode">🌙 Dark</button>
+    </div>
     <h1>Unit 4 &mdash; Percentage</h1>
     <p class="sub">Percent is not a fourth kind of number. It is the rate from Unit 3 with the second quantity fixed at one hundred, drawn on the hundredths grid from Unit 2. The question that runs through every lesson here is the same one: a percent of <i>what</i>? Most errors in this unit are answers to that question rather than to the arithmetic.</p>
     <div class="facts">
@@ -530,20 +534,20 @@ window.LESSONS=
  standards:["6.RP.A.3c","6.RP.A.3","6.NS.B.3"],
  vocab:[["Self-assessment","Judging your own accuracy honestly — a skill, and one being assessed today."],["Station","A short focused task at one method, then rotate."],["Signal word","The phrase that tells you which method the question wants."],["Justify","Say why, not just what — required at every station."]],
  materials:["All manipulatives from the unit","Station cards, one per method","Self-assessment grid","Assessment papers"],
- warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: those are the stations to visit first, and the tally is data, not a confession."},
+ warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: that tally is a percentage of its own — of the class still unsure about one topic — and the stations exist to shrink it."},
  stages:[
   {k:"c",label:"Concrete",mins:15,sense:"touch · rotation",
    moves:["Five stations: converting notations, percent of a quantity, finding the whole, percent change, successive change and context problems.","Each station holds its manipulative and three graded tasks.","Students choose a starting station from the warm-up tally.","Every station requires one written justification, not just answers."],
-   say:[["Teacher","Start where you are least confident, not where you are quickest."],["Teacher","One sentence per station explaining why your method works. Answers alone do not count as finished."],["Teacher","Twelve minutes per station. Rotate on the signal whether or not you have finished."]],
-   watch:["Students who visit only easy stations. The private warm-up slip is the accountability tool — ask them to show which station addresses what they wrote."]},
+   say:[["Teacher","Start at the station your slip named, not the one that feels like free marks."],["Teacher","One sentence per station explaining why your method works, not just the answer it produces."],["Teacher","Twelve minutes a station, then rotate on the signal — exact answer or estimate, finished or not."]],
+   watch:["Students who visit only the stations that already feel comfortable. Point back at their warm-up slip and ask which station actually answers it."]},
   {k:"p",label:"Pictorial",mins:14,sense:"sight · one model per method",
    moves:["On a single page, draw one model for each of the five station topics.","Annotate each with its explaining sentence and the signal word that triggers it.","Keep the page as the revision sheet.","Identify any model that could not be drawn and return to that station."],
    say:[["Teacher","One page, five models, five sentences. Better than any notes you could copy."],["Teacher","A model you cannot draw names the topic to go back to. The blank space is the useful part."]],
    readaloud:["Say the page aloud: 'Five diagrams across two rows. A hundredths grid; a percent bar with a shaded part; a percent bar with a question mark under one hundred percent; an original bar with an extension beyond it; and two sequential bars, the second beginning where the first ended.'"]},
   {k:"a",label:"Abstract",mins:13,sense:"symbol · assessment",
    moves:["Complete the written assessment covering all fifteen days.","Self-mark section A against a displayed key.","Record scores by topic on the self-assessment grid.","Identify two weakest topics and write one specific next step for each."],
-   say:[["Teacher","Self-mark honestly. Marking generously only costs you later, and the gaps show up in Unit 5 anyway."],["Teacher","One specific next step per weak topic. 'Practise percents' is not a step. 'Redraw the find-the-whole bar for three problems' is."]],
-   watch:["Students whose self-assessment does not match their station work. The mismatch signals either low confidence or an unnoticed gap, and those need opposite responses."]}
+   say:[["Teacher","Self-mark honestly. A percent change you wave through today is the one that resurfaces in Unit 5’s word problems."],["Teacher","One specific next step per weak topic. 'Practise percents' is not a step. 'Redraw the find-the-whole bar for three problems' is."]],
+   watch:["Students whose self-assessment doesn’t match their station work. Often the gap is between a percent they can compute and one they can explain — ask for the explanation first."]}
  ],
  guided:[["Write 3/8 as a percent.","37.5%"],["Find 45% of 260.","117"],["30% of a number is 42. Find the number.","140"],["$120 up 15%, then down 10%.","$124.20"]],
  worksheet:[
@@ -552,7 +556,7 @@ window.LESSONS=
   {t:"C · Two steps",d:"Draw a model for each step.",wide:true,
    items:["A $320 coat has 25% off, then 8% tax. Find the final price.","A town of 8000 grows 15%, then falls 10%. Find the population.","Of 500 students, 42% take the bus. Of those, 3 : 7 are boys to girls. How many boys?"]},
   {t:"D · Reason it out",d:"Answer in a complete sentence.",wide:true,
-   items:["Explain why a 20% rise followed by a 20% fall does not return to the original.","Explain why the original amount is the denominator when finding percent change.","Choose the topic you found hardest this unit. Explain it with a picture, as if teaching someone who missed the lesson."]}],
+   items:["Explain why a 20% rise followed by a 20% fall does not return to the original.","Explain why the original amount is the denominator when finding percent change.","Pick the percent skill your warm-up slip named. Explain it with a picture, as if teaching someone who missed the lesson."]}],
  exit:["Name the topic you are most confident with and give one reason.","Name the topic you want more practice on and give one specific next step.","Complete: percent means ___."],
  crit:"Mastery: assessment sections A and B at 80 percent or better, with self-assessment matching actual performance within one band. Reteach in small groups by method rather than reteaching the unit; the self-assessment grid tells you how to form those groups.",
  support:["Reduce to three stations covering conversion, percent of, and finding the whole.","Provide worked examples at each station as reference.","Allow the assessment across two sittings if sustained concentration is the barrier rather than the mathematics."],

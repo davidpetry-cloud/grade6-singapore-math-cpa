@@ -8,12 +8,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="curriculum.css">
+<script src="theme-toggle.js"></script>
 </head>
 <body>
 
 <header class="top">
   <div class="wrap">
-    <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+    <div class="hdr-row">
+      <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+      <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark mode">🌙 Dark</button>
+    </div>
     <h1>Unit 7 &mdash; Circles</h1>
     <p class="sub">&pi; is not handed over in this unit &mdash; it is measured. Students wrap string around tins for two days, divide circumference by diameter, and find the same number coming back from a coin and a bucket alike. The area formula is built the same way, by cutting a circle into wedges and fanning them into a shape they already know how to measure. The scatter in their measurements is kept, not tidied away: a pattern that survives messy data is one worth believing.</p>
     <div class="facts">
@@ -658,20 +662,20 @@ window.LESSONS=
  standards:["6.G.A.1"],
  vocab:[["Self-assessment","Judging your own accuracy honestly — a skill, and one being assessed today."],["Station","A short focused task at one topic, then rotate."],["Justify","Say why, not just what — required at every station."],["Next step","A specific action, not a topic name."]],
  materials:["Both circle tools","Circular objects and string","Station cards, one per topic","Self-assessment grid","Assessment papers"],
- warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: those are the stations to visit first, and the tally is data, not a confession."},
+ warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: that tally has a circumference too — the number of slips on the board — and today we work all the way round it."},
  stages:[
   {k:"c",label:"Concrete",mins:15,sense:"touch · rotation",
    moves:["Five stations: parts of a circle, measuring and π, circumference, area, part-circles and composites.","Each station holds its materials and three graded tasks.","Students choose a starting station from the warm-up tally.","Every station requires one written justification, not just answers."],
-   say:[["Teacher","Start where you are least confident, not where you are quickest."],["Teacher","One sentence per station explaining why your method works. Answers alone do not count as finished."],["Teacher","Twelve minutes per station. Rotate on the signal whether or not you have finished."]],
-   watch:["Students who visit only easy stations. The private warm-up slip is the accountability tool — ask them to show which station addresses what they wrote."]},
+   say:[["Teacher","Start at the station your slip named, not the one where the formula is already automatic."],["Teacher","One sentence per station naming which formula you used and why, not just the number it gave."],["Teacher","Twelve minutes a station, then rotate on the signal — calculation finished or not."]],
+   watch:["Students who visit only the stations where π already feels tame. Point back at their warm-up slip and ask which station actually answers it."]},
   {k:"p",label:"Pictorial",mins:14,sense:"sight · one diagram per topic",
    moves:["On a single page, draw one diagram for each of the five station topics.","Annotate each with its formula and units.","Keep the page as the revision sheet.","Identify any diagram that could not be drawn and return to that station."],
    say:[["Teacher","One page, five diagrams, five formulas. Better than any notes you could copy."],["Teacher","A diagram you cannot draw names the topic to go back to."]],
    readaloud:["Say the page aloud: 'Five diagrams across two rows. A circle with radius and diameter labelled; a circumference unrolled against diameter-lengths; a circle with its edge traced in bold; a circle cut into wedges and rearranged; and a ring between two concentric circles.'"]},
   {k:"a",label:"Abstract",mins:13,sense:"symbol · assessment",
    moves:["Complete the written assessment covering all thirteen days.","Self-mark section A against a displayed key.","Record scores by topic on the self-assessment grid.","Identify two weakest topics and write one specific next step for each."],
-   say:[["Teacher","Self-mark honestly. Marking generously only costs you later."],["Teacher","One specific next step per weak topic. 'Practise circles' is not a step. 'Redo three area problems writing the squared radius as its own line' is."]],
-   watch:["Students whose self-assessment does not match their station work. The mismatch signals either low confidence or an unnoticed gap, and those need opposite responses."]}
+   say:[["Teacher","Self-mark honestly. Mixing up circumference and area on your own paper is the same mix-up you’d flag on someone else’s."],["Teacher","One specific next step per weak topic. 'Practise circles' is not a step. 'Redo three area problems writing the squared radius as its own line' is."]],
+   watch:["Students whose self-assessment doesn’t match their station work. Ask them to name the formula before checking the number — the mismatch is usually which formula, not the arithmetic."]}
  ],
  guided:[["Radius 9 cm. Find the circumference.","56.52 cm"],["Radius 9 cm. Find the area.","254.34 cm²"],["Semicircle r = 6 cm. Find the perimeter.","18.84 + 12 = 30.84 cm"],["Ring: outer r = 5, inner r = 3. Find the area.","50.24 cm²"]],
  worksheet:[
@@ -680,7 +684,7 @@ window.LESSONS=
   {t:"C · Part circles and composites",d:"Show every step.",wide:true,
    items:["Semicircle r = 8 cm. Find the perimeter and the area.","Ring: outer r = 9 m, inner r = 6 m. Find the area.","A rectangle 14 cm by 6 cm with a semicircle of diameter 6 cm on one end. Find the total area."]},
   {t:"D · Reason it out",d:"Answer in a complete sentence.",wide:true,
-   items:["Explain what π actually is, in your own words.","Describe the wedge derivation of the circle area formula.","Choose the topic you found hardest this unit. Explain it with a diagram, as if teaching someone who missed the lesson."]}],
+   items:["Explain what π actually is, in your own words.","Describe the wedge derivation of the circle area formula.","Pick the circle idea your warm-up slip named. Explain it with a diagram, as if teaching someone who missed the lesson."]}],
  exit:["Name the topic you are most confident with and give one reason.","Name the topic you want more practice on and give one specific next step.","Complete: π is the number you get when you divide ___ by ___."],
  crit:"Mastery: assessment sections A through C at 80 percent or better, with self-assessment matching actual performance within one band. Reteach in small groups by topic rather than reteaching the unit; the self-assessment grid tells you how to form those groups.",
  support:["Reduce to three stations covering parts of a circle, circumference, and area.","Provide worked examples at each station as reference.","Allow the assessment across two sittings if sustained concentration is the barrier rather than the mathematics."],

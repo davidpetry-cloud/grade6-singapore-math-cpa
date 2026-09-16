@@ -8,12 +8,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="curriculum.css">
+<script src="theme-toggle.js"></script>
 </head>
 <body>
 
 <header class="top">
   <div class="wrap">
-    <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+    <div class="hdr-row">
+      <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+      <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark mode">🌙 Dark</button>
+    </div>
     <h1>Unit 8 &mdash; Volume of Solids</h1>
     <p class="sub">Boxes get filled with cubes before any formula appears, and nets get folded before they are judged. The folding tool exists for one reason paper cannot manage: when a net fails, it names which of the three conditions was broken, so a student learns why rather than just that. Volume and surface area are kept deliberately side by side, because the box is the same and only the question changes.</p>
     <div class="facts">
@@ -716,20 +720,20 @@ window.LESSONS=
  standards:["6.G.A.2","6.G.A.4"],
  vocab:[["Self-assessment","Judging your own accuracy honestly — a skill, and one being assessed today."],["Station","A short focused task at one topic, then rotate."],["Justify","Say why, not just what — required at every station."],["Next step","A specific action, not a topic name."]],
  materials:["Unit cubes","Net-folding tool","Boxes and card models","Station cards","Self-assessment grid","Assessment papers"],
- warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: those are the stations to visit first, and the tally is data, not a confession."},
+ warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: that tally has volume too — the fuller pile is where today’s twelve minutes should start."},
  stages:[
   {k:"c",label:"Concrete",mins:15,sense:"touch · rotation",
    moves:["Five stations: volume by counting and formula, fractional edges and capacity, nets, surface area, composites and working backwards.","Each station holds its materials and three graded tasks.","Students choose a starting station from the warm-up tally.","Every station requires one written justification."],
-   say:[["Teacher","Start where you are least confident, not where you are quickest."],["Teacher","One sentence per station explaining why your method works."],["Teacher","Twelve minutes per station. Rotate on the signal whether or not you have finished."]],
-   watch:["Students who visit only easy stations. The private warm-up slip is the accountability tool — ask them to show which station addresses what they wrote."]},
+   say:[["Teacher","Start at the station your slip named, not the one where the box already folds cleanly."],["Teacher","One sentence per station naming which measure you’re finding and why, not just the number."],["Teacher","Twelve minutes a station, then rotate on the signal — net folded or not."]],
+   watch:["Students who visit only the stations with the friendliest net. Point back at their warm-up slip and ask which station actually answers it."]},
   {k:"p",label:"Pictorial",mins:14,sense:"sight · one diagram per topic",
    moves:["On a single page, draw one diagram for each of the five station topics.","Annotate each with its formula and units.","Keep the page as the revision sheet.","Identify any diagram that could not be drawn and return to that station."],
    say:[["Teacher","One page, five diagrams, five formulas. Better than any notes you could copy."],["Teacher","A diagram you cannot draw names the topic to go back to."]],
    readaloud:["Say the page aloud: 'Five diagrams across two rows. A prism split into layers; a prism with a fractional edge marked; a flat net of six squares; a net with each face's area labelled; and a composite solid with its join shaded.'"]},
   {k:"a",label:"Abstract",mins:13,sense:"symbol · assessment",
    moves:["Complete the written assessment covering all fifteen days.","Self-mark section A against a displayed key.","Record scores by topic on the self-assessment grid.","Identify two weakest topics and write one specific next step for each."],
-   say:[["Teacher","Self-mark honestly. Marking generously only costs you later."],["Teacher","One specific next step per weak topic. 'Practise volume' is not a step. 'Rebuild three prisms from cubes and check the formula' is."]],
-   watch:["Students whose self-assessment does not match their station work. The mismatch signals either low confidence or an unnoticed gap, and those need opposite responses."]}
+   say:[["Teacher","Self-mark honestly. Confusing volume with surface area on your own paper is the same mix-up you’d mark wrong on someone else’s."],["Teacher","One specific next step per weak topic. 'Practise volume' is not a step. 'Rebuild three prisms from cubes and check the formula' is."]],
+   watch:["Students whose self-assessment doesn’t match their station work. Check whether they’re confusing volume with surface area before assuming the arithmetic is the problem."]}
  ],
  guided:[["Prism 5 by 4 by 3. Volume and surface area.","60 cubic units; 94 square units"],["A box 20 by 20 by 10 cm. Capacity in litres.","4 L"],["Is a strip of six squares a valid cube net?","No — faces overlap."],["Two 3-cubes joined. Surface area.","90"]],
  worksheet:[
@@ -738,7 +742,7 @@ window.LESSONS=
   {t:"C · Nets and composites",d:"Show every step.",wide:true,
    items:["Sketch two different valid cube nets and explain why a 2 by 3 block is not one.","A 6 by 4 by 2 block has a 2 by 2 by 2 cube on top. Find the volume and surface area.","A box has volume 144 cm³ and a base of 12 cm by 3 cm. Find its height."]},
   {t:"D · Reason it out",d:"Answer in a complete sentence.",wide:true,
-   items:["Explain why volume uses cubic units and surface area uses squared units.","Explain the three conditions a cube net must satisfy.","Choose the topic you found hardest this unit. Explain it with a diagram, as if teaching someone who missed the lesson."]}],
+   items:["Explain why volume uses cubic units and surface area uses squared units.","Explain the three conditions a cube net must satisfy.","Pick the volume or net idea your warm-up slip named. Explain it with a diagram, as if teaching someone who missed the lesson."]}],
  exit:["Name the topic you are most confident with and give one reason.","Name the topic you want more practice on and give one specific next step.","Complete: volume is measured in ___ units because ___."],
  crit:"Mastery: assessment sections A through C at 80 percent or better, with self-assessment matching actual performance within one band. Reteach in small groups by topic rather than reteaching the unit; the self-assessment grid tells you how to form those groups.",
  support:["Reduce to three stations covering volume, nets and surface area.","Provide worked examples at each station as reference.","Allow the assessment across two sittings if sustained concentration is the barrier rather than the mathematics."],

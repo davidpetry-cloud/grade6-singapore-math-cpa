@@ -105,6 +105,18 @@ concrete stage uses, and which contexts to lean on.
 Treat the day splits as a starting proposal, not a mandate. If a strand needs
 an extra day, take it from review — but never from the concrete stage.
 
+**"D · Reason it out" placement is deliberately inconsistent.** Units 2–10
+place their one open-ended reasoning worksheet section on the unit's review
+day only. Unit 1 instead distributes it across five lessons (days 3, 4, 6, 9,
+10). This is not drift to be cleaned up — daily reasoning practice is the
+stronger pattern pedagogically, and Unit 1 keeping it is correct. Units 2–10
+concentrating it on review day was an authoring simplification, not an
+improvement; don't "fix" Unit 1 to match them. Retrofitting daily reasoning
+sections into the other nine units is a legitimate future improvement, but a
+real authoring project (roughly 15–20 new prompts per unit), not a quick
+consistency pass — scope it separately if it's ever worth doing. Decided
+2026-09-16.
+
 ### Unit 3 — Ratio & Rate (15 days)
 
 - Days 1–4 ratio language, part-part vs part-whole, notation, simplest form
@@ -171,14 +183,21 @@ producing the missing angle.
 Concrete: protractors, torn-triangle angle sum (tear the corners, line them
 up), geoboards.
 
-### Unit 7 — Circles (15 days) — Opus
+### Unit 7 — Circles (13 days) — Opus
 
-- Days 1–3 centre, radius, diameter, naming and notation
-- Days 4–6 deriving π by measuring real circles
-- Days 7–9 circumference problems
-- Days 10–12 area of a circle by wedge rearrangement
-- Days 13–14 composite figures, semicircle perimeter
-- Day 15 review and assessment
+Shipped at 13 days, not the 15 originally planned below — semicircle
+perimeter absorbed into day 7 and composite/part-circle problems compressed
+into days 11–12 rather than getting two days each. Fixed 2026-09-16 after the
+hub and this file both still advertised 15.
+
+- Day 1 centre, radius, diameter, naming and notation
+- Days 2–3 measuring real circles and deriving π
+- Days 4–6 circumference: calculating it, working backwards, real contexts
+- Day 7 perimeter of semicircles and part-circles
+- Days 8–9 deriving and calculating the area of a circle by wedge rearrangement
+- Day 10 choosing between area and circumference
+- Days 11–12 area of part-circles, multi-step composite problems
+- Day 13 review and assessment
 
 **Corrected from the earlier model table, which said Sonnet.** Two genuinely
 new visuals are needed: unrolling a circumference against its diameter to show
@@ -283,4 +302,4 @@ get their own commits so `git log --oneline` stays readable as a build history.
 
 ## Status: complete
 
-All ten units built and tested — 148 instructional days, 259 test assertions, zero failures. `fractionModel` and `fractionDivide` (unit-02) remain the only tools never reused by a second unit, so they were never promoted into core; that's fine and matches the promotion rule as written.
+All ten units built and tested — 149 instructional days, 259 test assertions, zero failures. `fractionModel` and `fractionDivide` (unit-02) remain the only tools never reused by a second unit, so they were never promoted into core; that's fine and matches the promotion rule as written.

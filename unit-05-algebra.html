@@ -8,12 +8,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="curriculum.css">
+<script src="theme-toggle.js"></script>
 </head>
 <body>
 
 <header class="top">
   <div class="wrap">
-    <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+    <div class="hdr-row">
+      <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+      <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark mode">🌙 Dark</button>
+    </div>
     <h1>Unit 5 &mdash; Algebra</h1>
     <p class="sub">A letter is a number nobody has told you yet, and an equation is a claim you can test. This unit keeps both of those physical for as long as possible: cups hide the unknown, and a balance decides whether a claim is still true. The rule about doing the same to both sides is never asserted here &mdash; students break it on purpose and watch the beam drop.</p>
     <div class="facts">
@@ -862,20 +866,20 @@ window.LESSONS=
  standards:["6.EE.A.2","6.EE.A.3","6.EE.A.4","6.EE.B.5","6.EE.B.7","6.EE.B.8","6.EE.C.9"],
  vocab:[["Self-assessment","Judging your own accuracy honestly — a skill, and one being assessed today."],["Station","A short focused task at one method, then rotate."],["Justify","Say why, not just what — required at every station."],["Next step","A specific action, not a topic name."]],
  materials:["All manipulatives from the unit","Station cards, one per method","Self-assessment grid","Assessment papers"],
- warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: those are the stations to visit first, and the tally is data, not a confession."},
+ warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: an anonymous tally is just a frequency table with feelings attached — today’s stations are how we balance it out."},
  stages:[
   {k:"c",label:"Concrete",mins:15,sense:"touch · rotation",
    moves:["Six stations: writing expressions, substitution, collecting and expanding, solving equations, inequalities, and relationships with graphs.","Each station holds its manipulative and three graded tasks.","Students choose a starting station from the warm-up tally.","Every station requires one written justification."],
-   say:[["Teacher","Start where you are least confident, not where you are quickest."],["Teacher","One sentence per station explaining why your method works."],["Teacher","Twelve minutes per station. Rotate on the signal whether or not you have finished."]],
-   watch:["Students who visit only easy stations. The private warm-up slip is the accountability tool — ask them to show which station addresses what they wrote."]},
+   say:[["Teacher","Start at the station your slip named, not the one where the variable already behaves."],["Teacher","One sentence per station explaining why your method works, not just the value you landed on."],["Teacher","Twelve minutes a station, then rotate on the signal — equation solved or not."]],
+   watch:["Students who visit only the stations where x already feels familiar. Point back at their warm-up slip and ask which station actually answers it."]},
   {k:"p",label:"Pictorial",mins:14,sense:"sight · one model per method",
    moves:["On a single page, draw one model for each of the six station topics.","Annotate each with its explaining sentence.","Keep the page as the revision sheet.","Identify any model that could not be drawn and return to that station."],
    say:[["Teacher","One page, six models, six sentences. Better than any notes you could copy."],["Teacher","A model you cannot draw names the topic to go back to."]],
    readaloud:["Say the page aloud: 'Six diagrams across two rows. Cups and counters forming an expression; a filled cup showing substitution; tiles grouped into a rectangle; a level balance; a number line with an open circle; and a grid with a straight line rising from the vertical axis.'"]},
   {k:"a",label:"Abstract",mins:13,sense:"symbol · assessment",
    moves:["Complete the written assessment covering all twenty days.","Self-mark section A against a displayed key.","Record scores by topic on the self-assessment grid.","Identify two weakest topics and write one specific next step for each."],
-   say:[["Teacher","Self-mark honestly. Marking generously only costs you later."],["Teacher","One specific next step per weak topic. 'Practise algebra' is not a step. 'Rebuild three two-step equations on the balance' is."]],
-   watch:["Students whose self-assessment does not match their station work. The mismatch signals either low confidence or an unnoticed gap, and those need opposite responses."]}
+   say:[["Teacher","Self-mark honestly. An equation that balances on the page but not in your grading helps no one, least of all you."],["Teacher","One specific next step per weak topic. 'Practise algebra' is not a step. 'Rebuild three two-step equations on the balance' is."]],
+   watch:["Students whose self-assessment doesn’t match their station work. Treat the mismatch like an unbalanced equation — find exactly where the two sides stopped agreeing."]}
  ],
  guided:[["Simplify 5x + 3 + 2x − 1.","7x + 2"],["Expand 4(n − 3).","4n − 12"],["Solve 3x + 5 = 26.","x = 7"],["Solve n − 4 ≥ 10 and draw it.","n ≥ 14, closed circle"]],
  worksheet:[
@@ -883,7 +887,7 @@ window.LESSONS=
   {t:"B · Substitute",d:"Show the substitution line.",items:["3x + 4, x = 6","2(n − 1), n = 9","20 − 4a, a = 3","m² + 2, m = 4"]},
   {t:"C · Solve",d:"Check every answer.",items:["x + 9 = 21","5n = 60","3a + 4 = 25","2m − 7 = 9","x + 6 > 14","4p ≤ 28"]},
   {t:"D · Reason it out",d:"Answer in a complete sentence.",wide:true,
-   items:["Explain why the same operation must be done to both sides of an equation.","A gym charges $30 joining plus $6 per visit. Write the equation, find the cost of 9 visits, and find how many visits cost $102.","Choose the topic you found hardest this unit. Explain it with a picture, as if teaching someone who missed the lesson."]}],
+   items:["Explain why the same operation must be done to both sides of an equation.","A classmate solves 3x + 5 = 26 by subtracting 5 from only the left side, then can't see why the balance model still shows it tipped. Using the balance, explain what went wrong.","Pick the algebra skill your warm-up slip named. Explain it with a picture, as if teaching someone who missed the lesson."]}],
  exit:["Name the topic you are most confident with and give one reason.","Name the topic you want more practice on and give one specific next step.","Complete: a letter in an expression stands for ___."],
  crit:"Mastery: assessment sections A through C at 80 percent or better, with self-assessment matching actual performance within one band. Reteach in small groups by method rather than reteaching the unit; the self-assessment grid tells you how to form those groups.",
  support:["Reduce to four stations covering expressions, substitution, equations and inequalities.","Provide worked examples at each station as reference.","Allow the assessment across two sittings if sustained concentration is the barrier rather than the mathematics."],

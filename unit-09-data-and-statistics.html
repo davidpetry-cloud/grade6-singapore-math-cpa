@@ -8,12 +8,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="curriculum.css">
+<script src="theme-toggle.js"></script>
 </head>
 <body>
 
 <header class="top">
   <div class="wrap">
-    <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+    <div class="hdr-row">
+      <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+      <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark mode">🌙 Dark</button>
+    </div>
     <h1>Unit 9 &mdash; Data Analysis &amp; Statistics</h1>
     <p class="sub">A dot plot, a histogram, and the mean and median of a dataset are three views of one thing, and this unit keeps them moving together rather than teaching them as separate topics. Drag the bin-width slider on a real outlier and watch it vanish into a bar; drag the outlier itself and watch the mean chase it while the median holds still. Both are arguments a printed chart cannot make.</p>
     <div class="facts">
@@ -471,7 +475,7 @@ window.LESSONS=
    readaloud:["Say the three pictures aloud: 'Three histograms of the same twenty values. The first, with narrow bins, shows two distinct peaks with a gap between them. The second, with medium bins, shows two peaks merging into a wide, low valley. The third, with wide bins, shows a single smooth hump.'"]},
   {k:"a",label:"Abstract",mins:14,sense:"symbol · describing the effect",
    moves:["State in writing how bin width changed the number of visible peaks in a dataset.","Choose an appropriate bin width for a stated purpose and justify it.","Identify a histogram that looks suspiciously smoothed and explain what a narrower bin width might reveal.","Compare two histograms of the same data at different widths and describe the difference precisely."],
-   say:[["Teacher","Justify your bin width choice in a sentence. Not 'it looked good' — what question does this width actually answer?"]],
+   say:[["Teacher","Justify your bin width choice in a sentence. Not 'it looked good' — what question does this width actually answer?"],["Expected","Narrow bins, because I need to show the two groups are separate, not just that scores vary."],["Teacher","That is a real justification — tied to a question, not a default setting. Keep that habit for every histogram you build from here on."]],
    watch:["Students who pick a bin width arbitrarily without being able to justify it. The point of today is that the choice should be deliberate and stated, not simply whatever the software defaults to."]}
  ],
  guided:[["A histogram with narrow bins shows two peaks. Wide bins show one. Which is 'correct'?","Neither alone — both are true descriptions at different resolutions."],["Why might someone choose wide bins deliberately?","To present an overall trend without highlighting individual variation, sometimes to obscure real structure."],["What does a very narrow bin width risk?","Looking cluttered, similar to an unsorted dot plot, hiding the overall shape."],["What should guide a bin width choice?","The question the histogram is meant to answer."]],
@@ -640,7 +644,7 @@ window.LESSONS=
    readaloud:["Say the picture aloud: 'Two dot plots stacked, both centred near ten. The upper plot has all values between eight and twelve, a narrow bracket spanning four. The lower plot has values between zero and twenty, a wide bracket spanning twenty.'"]},
   {k:"a",label:"Abstract",mins:14,sense:"symbol · calculating and interpreting",
    moves:["Calculate the range for several datasets.","State what a small range indicates about consistency.","Compare two datasets by both centre and range together.","Write a full description of a dataset combining a measure of centre with the range."],
-   say:[["Teacher","A full description needs both pieces: a centre and a spread. 'The mean is 10' alone is an incomplete report."]],
+   say:[["Teacher","'The mean is 10.' Is that a complete report?"],["Expected","No — you don't know if it's consistent or all over the place."],["Teacher","A full description needs both pieces: a centre and a spread. Neither one alone tells the whole story."]],
    watch:["Students who report range alone as if it fully described the data, or centre alone. Insist on both being reported together for a genuinely useful summary."]}
  ],
  guided:[["Find the range of 4,7,9,12,15.","11"],["Find the range of 20,20,21,22,20.","2"],["Two datasets both have mean 15. One has range 4, the other range 30. Which is more consistent?","The one with range 4"],["Why report both a measure of centre and the range?","Centre alone doesn't show how spread out or consistent the data is."]],
@@ -669,7 +673,7 @@ window.LESSONS=
    watch:["Students who report the three pieces separately without connecting them into one coherent description. The final synthesis into a single passage is the actual skill being assessed today."]},
   {k:"p",label:"Pictorial",mins:14,sense:"sight · annotating a dot plot fully",
    moves:["Draw a dot plot and annotate it with its shape, chosen centre measure, and range bracket all on one diagram.","Repeat for a histogram of the same or a different dataset.","Compare two fully annotated diagrams and their written descriptions.","Identify any diagram missing one of the three required pieces."],
-   say:[["Teacher","One diagram, three annotations. A description missing any one of the three is incomplete."]],
+   say:[["Teacher","Look at your annotated diagram. Cover up the range bracket — do you still know how consistent the data is?"],["Expected","No, you'd just have the shape and the centre."],["Teacher","One diagram, three annotations. A description missing any one of the three is incomplete."]],
    readaloud:["Say the picture aloud: 'A dot plot labelled skewed right, with the median marked rather than the mean, and a bracket spanning the full range from three to twenty-two.'"]},
   {k:"a",label:"Abstract",mins:14,sense:"symbol · writing full descriptions",
    moves:["Write a full description for four different datasets, in context.","Include shape, an appropriately chosen measure of centre, and the range.","Critique a description that is missing one of the three components.","Revise the critiqued description to make it complete."],
@@ -696,20 +700,20 @@ window.LESSONS=
  standards:["6.SP.A.1","6.SP.A.2","6.SP.A.3","6.SP.B.4","6.SP.B.5"],
  vocab:[["Self-assessment","Judging your own accuracy honestly — a skill, and one being assessed today."],["Station","A short focused task at one topic, then rotate."],["Justify","Say why, not just what — required at every station."],["Next step","A specific action, not a topic name."]],
  materials:["The distribution builder tool","Station cards","Self-assessment grid","Assessment papers"],
- warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: those are the stations to visit first, and the tally is data, not a confession."},
+ warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: that tally is itself a dataset — today’s stations are how we describe one properly."},
  stages:[
   {k:"c",label:"Concrete",mins:15,sense:"touch · rotation",
    moves:["Five stations: statistical questions and displays, dot plots, histograms and bin width, mean/median/mode, range and full descriptions.","Each station holds its manipulative and three graded tasks.","Students choose a starting station from the warm-up tally.","Every station requires one written justification, not just answers."],
-   say:[["Teacher","Start where you are least confident, not where you are quickest."],["Teacher","One sentence per station explaining why your method works."],["Teacher","Twelve minutes per station. Rotate on the signal whether or not you have finished."]],
-   watch:["Students who visit only easy stations. The private warm-up slip is the accountability tool — ask them to show which station addresses what they wrote."]},
+   say:[["Teacher","Start at the station your slip named, not the one where the mean is already obvious."],["Teacher","One sentence per station describing what the display shows, not just a number pulled from it."],["Teacher","Twelve minutes a station, then rotate on the signal — plot finished or not."]],
+   watch:["Students who visit only the stations with the easiest chart to read. Point back at their warm-up slip and ask which station actually answers it."]},
   {k:"p",label:"Pictorial",mins:14,sense:"sight · one example per topic",
    moves:["On a single page, create one example for each of the five station topics.","Annotate each with the key term or formula it uses.","Keep the page as the revision sheet.","Identify any example that could not be created and return to that station."],
    say:[["Teacher","One page, five examples, five key ideas. Better than any notes you could copy."],["Teacher","An example you cannot create names the topic to go back to."]],
    readaloud:["Say the page aloud: 'Five examples across two rows. A statistical question beside a fixed-answer one; a dot plot with a cluster and an outlier; two histograms of the same data at different bin widths; a dataset with its mean, median and mode marked; and a full written description combining shape, centre and spread.'"]},
   {k:"a",label:"Abstract",mins:13,sense:"symbol · assessment",
    moves:["Complete the written assessment covering all fifteen days.","Self-mark section A against a displayed key.","Record scores by topic on the self-assessment grid.","Identify two weakest topics and write one specific next step for each."],
-   say:[["Teacher","Self-mark honestly. Marking generously only costs you later."],["Teacher","One specific next step per weak topic. 'Practise statistics' is not a step. 'Redo three median problems, ordering the data first' is."]],
-   watch:["Students whose self-assessment does not match their station work. The mismatch signals either low confidence or an unnoticed gap, and those need opposite responses."]}
+   say:[["Teacher","Self-mark honestly. A generous mark on ‘describes the distribution’ is the one measure here that won’t show up as a clean number to check."],["Teacher","One specific next step per weak topic. 'Practise statistics' is not a step. 'Redo three median problems, ordering the data first' is."]],
+   watch:["Students whose self-assessment doesn’t match their station work. Ask them to describe one dataset out loud — the mismatch usually lives in the describing, not the calculating."]}
  ],
  guided:[["Is 'how tall is each student' statistical?","Yes"],["Find the mean of 4,6,8,10,12.","8"],["Find the median of 3,7,9,11,15.","9"],["Group 2,5,8,11,14,17 into bins of width 5 starting at 0.","0-4: 1, 5-9: 2, 10-14: 2, 15-19: 1"]],
  worksheet:[
@@ -718,7 +722,7 @@ window.LESSONS=
   {t:"C · Displays and choice",d:"Answer from the data given.",wide:true,
    items:["Data: 4,6,6,7,8,8,8,9,20. Build a dot plot, find mean, median and mode, and state which measure of centre you would report and why.","Group the same data into bins of width 5. Does the histogram reveal the outlier as clearly as the dot plot did? Explain."]},
   {t:"D · Reason it out",d:"Answer in a complete sentence.",wide:true,
-   items:["Explain what makes a question statistical, with an example of your own.","Explain why bin width is a choice rather than a fixed fact about a dataset.","Choose the topic you found hardest this unit. Explain it with an example, as if teaching someone who missed the lesson."]}],
+   items:["Explain what makes a question statistical, with an example of your own.","Explain why bin width is a choice rather than a fixed fact about a dataset.","Pick the data idea your warm-up slip named. Explain it with an example, as if teaching someone who missed the lesson."]}],
  exit:["Name the topic you are most confident with and give one reason.","Name the topic you want more practice on and give one specific next step.","Complete: the median is resistant to outliers because ___."],
  crit:"Mastery: assessment sections A through C at 80 percent or better, with self-assessment matching actual performance within one band. Reteach in small groups by topic rather than reteaching the unit; the self-assessment grid tells you how to form those groups.",
  support:["Reduce to three stations covering displays, centre measures, and full descriptions.","Provide worked examples at each station as reference.","Allow the assessment across two sittings if sustained concentration is the barrier rather than the mathematics."],

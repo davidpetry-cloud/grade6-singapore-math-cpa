@@ -8,12 +8,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Libre+Franklin:wght@400;500;600;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="curriculum.css">
+<script src="theme-toggle.js"></script>
 </head>
 <body>
 
 <header class="top">
   <div class="wrap">
-    <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+    <div class="hdr-row">
+      <a class="back" href="singapore-math-6-hub.html">&larr; Curriculum overview</a>
+      <button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark mode">🌙 Dark</button>
+    </div>
     <h1>Unit 6 &mdash; Angles &amp; Geometric Figures</h1>
     <p class="sub">Every unknown angle in this unit comes with a reason, not just a number &mdash; torn paper corners lining up into a straight edge, a fold that maps one base angle exactly onto the other, a diagonal that turns any quadrilateral into two triangles. The coordinate-plane strand of this standard now lives in Unit 10, once integers and plotting are in place; this unit stays with reasoning about shapes themselves.</p>
     <div class="facts">
@@ -491,11 +495,11 @@ window.LESSONS=
    watch:["Students who think the diagonal adds new angle to the total. The two new angles created by the diagonal are interior to each triangle and cancel when the triangles are put back together — they are not extra material, they are where the split happened."]},
   {k:"p",label:"Pictorial",mins:14,sense:"sight · the angle chase tool",
    moves:["Set the angle chase tool to 'quadrilateral angle sum' with three known angles.","Reveal the step and read the diagonal-split reasoning.","Try an irregular quadrilateral shape and confirm the rule still applies.","Draw a quadrilateral with a diagonal marked, labelling the resulting two triangles."],
-   say:[["Teacher","However strange the quadrilateral looks, one diagonal always splits it into two triangles. That is what makes 360 a rule and not a coincidence of squares and rectangles."]],
+   say:[["Teacher","However strange the quadrilateral looks, one diagonal always splits it into two triangles. Try the strangest shape you can draw."],["Expected","It still works — 360, every time."],["Teacher","That is what makes 360 a rule and not a coincidence of squares and rectangles. A rule that only works on tidy shapes is not a rule yet."]],
    readaloud:["Say the picture aloud: 'An irregular four-sided shape with a dashed diagonal splitting it into two triangles. Three of the four corner angles are labelled with known values; the fourth carries a question mark.'"]},
   {k:"a",label:"Abstract",mins:13,sense:"symbol · applying the rule",
    moves:["Write the general rule: a + b + c + d = 360.","Solve for a missing angle given the other three.","Handle a case with two equal unknown angles.","Justify with the diagonal-split reasoning stated as a sentence, not just the arithmetic."],
-   say:[["Teacher","The sentence today names the diagonal, not just the number 360. 'A diagonal splits the quadrilateral into two triangles, so the angles sum to 360, and the missing angle is...' Say the whole thing."]],
+   say:[["Teacher","The sentence today names the diagonal, not just the number 360. Try it: 'A diagonal splits the quadrilateral into two triangles, so the angles sum to 360, and the missing angle is...'"],["Expected","A diagonal splits the quadrilateral into two triangles, so the angles sum to 360, and the missing angle is 360 minus the other three."],["Teacher","That is the whole proof in one sentence, not just an answer. Keep saying it that way until the diagonal stops needing mentioning — by then it will not need proving either."]],
    watch:["Students who state 360 as a memorised fact without the diagonal justification. Ask them to draw the diagonal on their diagram before answering; the picture and the sentence should match."]}
  ],
  guided:[["Angles 80°, 90°, 100°. Find the fourth.","90°"],["Angles 70°, 120°, 60°. Find the fourth.","110°"],["Angles 90°, 90°, x, x. Find x.","90° each"],["Why does splitting with a diagonal prove the 360° rule?","It turns the quadrilateral into two triangles, each summing to 180°, and the total is unchanged by the split."]],
@@ -591,7 +595,7 @@ window.LESSONS=
    watch:["Students who cut along the slanted side instead of the perpendicular height. The rearranged piece will not form a clean rectangle unless the cut is perpendicular; a messy result is useful evidence that the wrong line was chosen."]},
   {k:"p",label:"Pictorial",mins:14,sense:"sight · the transformation",
    moves:["Draw the original parallelogram with the perpendicular height marked.","Draw the cut and the resulting rectangle beside it.","Label both shapes' base and height as identical.","Draw a second parallelogram, more heavily slanted, and repeat the reasoning."],
-   say:[["Teacher","Same base, same height, both times. That is why the area formula for a parallelogram looks identical to a rectangle's — because after the cut, it is one."]],
+   say:[["Teacher","Look at the two drawings side by side. What's different between the parallelogram and the rectangle?"],["Expected","Just the shape — the base and height are the same."],["Teacher","Same base, same height, both times. That is why the area formula for a parallelogram looks identical to a rectangle's — because after the cut, it is one."]],
    readaloud:["Say the picture aloud: 'A slanted parallelogram is shown with a dashed perpendicular line marking its height. Beside it, an arrow points to a rectangle of the same base and height, showing the triangular end piece relocated from the left side to the right.'"]},
   {k:"a",label:"Abstract",mins:13,sense:"symbol · applying the formula",
    moves:["Write A = b × h for a parallelogram, distinguishing it from the triangle's halved formula.","Apply it given base and height directly.","Identify the height correctly when only slant-side and base are labelled.","Compare with the wrong guess from the warm-up and calculate the actual area to show the difference."],
@@ -652,20 +656,20 @@ window.LESSONS=
  standards:["6.G.A.1"],
  vocab:[["Self-assessment","Judging your own accuracy honestly — a skill, and one being assessed today."],["Station","A short focused task at one topic, then rotate."],["Justify","Say why, not just what — required at every station."],["Next step","A specific action, not a topic name."]],
  materials:["Angle chase tool","All manipulatives from the unit","Station cards, one per topic","Self-assessment grid","Assessment papers"],
- warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: those are the stations to visit first, and the tally is data, not a confession."},
+ warmup:{mins:5,text:"Ask students to write privately the one topic from this unit they would least like to see on the test. Collect anonymously and tally on the board. Say: that tally is its own angle chase — start at the vertex the class avoided."},
  stages:[
   {k:"c",label:"Concrete",mins:15,sense:"touch · rotation",
    moves:["Five stations: lines and points, triangle angles, quadrilateral angles, triangle area, parallelogram area.","Each station holds its manipulative and three graded tasks.","Students choose a starting station from the warm-up tally.","Every station requires one written justification, not just answers."],
-   say:[["Teacher","Start where you are least confident, not where you are quickest."],["Teacher","One sentence per station explaining why your method works. Answers alone do not count as finished."],["Teacher","Twelve minutes per station. Rotate on the signal whether or not you have finished."]],
-   watch:["Students who visit only easy stations. The private warm-up slip is the accountability tool — ask them to show which station addresses what they wrote."]},
+   say:[["Teacher","Start at the station your slip named, not the one where the angles already add up easily."],["Teacher","One sentence per station naming the rule that justifies your answer, not just the number."],["Teacher","Twelve minutes a station, then rotate on the signal — angle found or not."]],
+   watch:["Students who visit only the stations with the friendliest protractor work. Point back at their warm-up slip and ask which station actually answers it."]},
   {k:"p",label:"Pictorial",mins:14,sense:"sight · one diagram per topic",
    moves:["On a single page, draw one diagram for each of the five station topics.","Annotate each with its rule or formula.","Keep the page as the revision sheet.","Identify any diagram that could not be drawn and return to that station."],
    say:[["Teacher","One page, five diagrams, five rules. Better than any notes you could copy."],["Teacher","A diagram you cannot draw names the topic to go back to."]],
    readaloud:["Say the page aloud: 'Five diagrams across two rows. A straight line split by a ray; two crossing lines; a triangle with two known angles; a quadrilateral split by a diagonal; and a parallelogram beside its rearranged rectangle.'"]},
   {k:"a",label:"Abstract",mins:13,sense:"symbol · assessment",
    moves:["Complete the written assessment covering all thirteen days.","Self-mark section A against a displayed key.","Record scores by topic on the self-assessment grid.","Identify two weakest topics and write one specific next step for each."],
-   say:[["Teacher","Self-mark honestly. Marking generously only costs you later."],["Teacher","One specific next step per weak topic. 'Practise angles' is not a step. 'Redo the isosceles apex problems with the folding proof' is."]],
-   watch:["Students whose self-assessment does not match their station work. The mismatch signals either low confidence or an unnoticed gap, and those need opposite responses."]}
+   say:[["Teacher","Self-mark honestly. A missing-angle rule you wave through today is one you’ll need again in Unit 10’s coordinate polygons."],["Teacher","One specific next step per weak topic. 'Practise angles' is not a step. 'Redo the isosceles apex problems with the folding proof' is."]],
+   watch:["Students whose self-assessment doesn’t match their station work. Ask them to justify one angle out loud — the mismatch usually lives in the reasoning, not the arithmetic."]}
  ],
  guided:[["Two angles on a line, one 58°. Find the other.","122°"],["Triangle: 40°, 75°. Find the third.","65°"],["Quadrilateral: 80°, 95°, 100°. Find the fourth.","85°"],["Triangle base 9, height 6. Find the area.","27"]],
  worksheet:[
@@ -674,7 +678,7 @@ window.LESSONS=
   {t:"C · Composite",d:"Find the angle first, then the area.",wide:true,
    items:["Isosceles triangle apex 52°, base 11 cm, height 14 cm. Find the base angles and the area.","Irregular shape splits into a triangle (base 7, height 6) and a parallelogram (base 7, height 4). Find the total area."]},
   {t:"D · Reason it out",d:"Answer in a complete sentence.",wide:true,
-   items:["Explain the tear-and-line-up proof for the triangle angle sum, in your own words.","Explain the cut-and-slide derivation for a parallelogram's area.","Choose the topic you found hardest this unit. Explain it with a diagram, as if teaching someone who missed the lesson."]}],
+   items:["Explain the tear-and-line-up proof for the triangle angle sum, in your own words.","Explain the cut-and-slide derivation for a parallelogram's area.","Pick the angle or shape idea your warm-up slip named. Explain it with a diagram, as if teaching someone who missed the lesson."]}],
  exit:["Name the topic you are most confident with and give one reason.","Name the topic you want more practice on and give one specific next step.","Complete: the angles in any triangle always sum to ___."],
  crit:"Mastery: assessment sections A through C at 80 percent or better, with self-assessment matching actual performance within one band. Reteach in small groups by topic rather than reteaching the unit; the self-assessment grid tells you how to form those groups.",
  support:["Reduce to three stations covering line-and-point angles, triangle angles, and one area formula.","Provide worked examples at each station as reference.","Allow the assessment across two sittings if sustained concentration is the barrier rather than the mathematics."],
