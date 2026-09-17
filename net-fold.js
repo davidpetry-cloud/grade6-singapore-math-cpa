@@ -123,7 +123,7 @@ function netFold(host){
       }
       s+=`<rect class="nfsq" data-x="${x}" data-y="${y}" x="${GX+x*CW}" y="${GY+y*CW}" width="${CW}" height="${CW}" fill="${fill}" fill-opacity="${on?".85":"1"}" stroke="${stroke}" stroke-width="${sw}" style="cursor:pointer"/>`;
       if(label){
-        s+=`<text x="${GX+x*CW+CW/2}" y="${GY+y*CW+CW/2+4}" font-family="Atkinson Hyperlegible Mono" font-size="11" fill="#fff" text-anchor="middle" pointer-events="none">${label}</text>`;
+        s+=`<text x="${GX+x*CW+CW/2}" y="${GY+y*CW+CW/2+4}" font-family="Roboto Mono" font-size="11" fill="#fff" text-anchor="middle" pointer-events="none">${label}</text>`;
       }
     }
     svg.innerHTML=s;

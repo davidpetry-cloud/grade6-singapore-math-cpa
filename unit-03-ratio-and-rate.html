@@ -6,7 +6,7 @@
 <title>Unit 3 &mdash; Ratio &amp; Rate | Grade 6 CPA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Atkinson+Hyperlegible:wght@400;700&family=Atkinson+Hyperlegible+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Atkinson+Hyperlegible:wght@400;700&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="curriculum.css">
 <script src="theme-toggle.js"></script>
 </head>
@@ -105,12 +105,12 @@ function rateLine(host){
   const X0=74,W=560;
   function scale(y,label,vals,unit,colour,dash){
     let s=`<line x1="${X0}" y1="${y}" x2="${X0+W}" y2="${y}" stroke="${INK}" stroke-width="2"/>`;
-    s+=`<text x="${X0-10}" y="${y+4}" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="${MUT}" text-anchor="end">${label}</text>`;
+    s+=`<text x="${X0-10}" y="${y+4}" font-family="Roboto Mono" font-size="12" fill="${MUT}" text-anchor="end">${label}</text>`;
     vals.forEach((v,i)=>{
       const x=X0+(i/(vals.length-1))*W;
       s+=`<line x1="${x}" y1="${y-7}" x2="${x}" y2="${y+7}" stroke="${INK}" stroke-width="2"/>`;
       s+=`<circle class="bmseg" cx="${x}" cy="${y}" r="4" fill="${colour}"/>`;
-      s+=`<text x="${x}" y="${y+(dash?24:-15)}" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="${INK}" text-anchor="middle">${q(v,unit)}</text>`;
+      s+=`<text x="${x}" y="${y+(dash?24:-15)}" font-family="Roboto Mono" font-size="12" fill="${INK}" text-anchor="middle">${q(v,unit)}</text>`;
     });
     return s;
   }

@@ -136,13 +136,13 @@ function rounding(host){
       <line x1="60" y1="48" x2="60" y2="72" stroke="#33557A" stroke-width="2"/>
       <line x1="640" y1="48" x2="640" y2="72" stroke="#33557A" stroke-width="2"/>
       <line x1="350" y1="42" x2="350" y2="78" stroke="#E4A03C" stroke-width="2" stroke-dasharray="5 4"/>
-      <text x="60" y="92" font-family="Atkinson Hyperlegible Mono" font-size="13" fill="#5B7189" text-anchor="middle">${cm(lo)}</text>
-      <text x="640" y="92" font-family="Atkinson Hyperlegible Mono" font-size="13" fill="#5B7189" text-anchor="middle">${cm(hi)}</text>
-      <text x="350" y="106" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="#B87C1C" text-anchor="middle">midpoint ${cm(mid)}</text>
+      <text x="60" y="92" font-family="Roboto Mono" font-size="13" fill="#5B7189" text-anchor="middle">${cm(lo)}</text>
+      <text x="640" y="92" font-family="Roboto Mono" font-size="13" fill="#5B7189" text-anchor="middle">${cm(hi)}</text>
+      <text x="350" y="106" font-family="Roboto Mono" font-size="12" fill="#B87C1C" text-anchor="middle">midpoint ${cm(mid)}</text>
       <g class="mk" style="transform:translateX(${mx-350}px)">
         <polygon points="350,50 344,34 356,34" fill="#1F8A7D"/>
         <rect x="290" y="10" width="120" height="22" rx="4" fill="#1F8A7D"/>
-        <text x="350" y="26" font-family="Atkinson Hyperlegible Mono" font-size="13" fill="#fff" text-anchor="middle">${cm(rounded?target:n)}</text>
+        <text x="350" y="26" font-family="Roboto Mono" font-size="13" fill="#fff" text-anchor="middle">${cm(rounded?target:n)}</text>
       </g>`;
     out.innerHTML=rounded
       ? `${cm(n)} is ${n>=mid?"at or right of":"left of"} the midpoint, so it rounds to <b>${cm(target)}</b>.`
@@ -361,7 +361,7 @@ function barModel(host){
 
   function bar(x,y,w,h,fill,label){
     return `<rect class="bmseg" x="${x}" y="${y}" width="${w}" height="${h}" rx="3" style="fill:${fill}" stroke="#fff" stroke-width="1.5"/>
-      <text x="${x+w/2}" y="${y+h/2+5}" font-family="Atkinson Hyperlegible Mono" font-size="14" fill="#fff" text-anchor="middle">${label}</text>`;
+      <text x="${x+w/2}" y="${y+h/2+5}" font-family="Roboto Mono" font-size="14" fill="#fff" text-anchor="middle">${label}</text>`;
   }
   function draw(){
     svg.classList.remove("anim");void svg.offsetWidth;if(!rm())svg.classList.add("anim");
@@ -371,11 +371,11 @@ function barModel(host){
       const wa=W*(p/w);
       svg.setAttribute("aria-label",`Part-whole bar model. One bar with a whole of ${cm(w)}, split into a known part of ${cm(p)} and an unknown part.`);
       svg.innerHTML=`
-        <text x="${X0+W/2}" y="26" font-family="Atkinson Hyperlegible Mono" font-size="13" style="fill:var(--muted)" text-anchor="middle">whole = ${cm(w)}</text>
+        <text x="${X0+W/2}" y="26" font-family="Roboto Mono" font-size="13" style="fill:var(--muted)" text-anchor="middle">whole = ${cm(w)}</text>
         <path d="M${X0} 44 L${X0} 36 L${X0+W} 36 L${X0+W} 44" fill="none" style="stroke:var(--muted)" stroke-width="1.5"/>
         ${bar(X0,56,wa,44,"var(--bar-2)",cm(p))}
         ${bar(X0+wa,56,W-wa,44,"var(--bar-4)","?")}
-        <text x="${X0+W/2}" y="132" font-family="Atkinson Hyperlegible Mono" font-size="15" style="fill:var(--ink-2)" text-anchor="middle">${cm(w)} − ${cm(p)} = ${cm(r)}</text>`;
+        <text x="${X0+W/2}" y="132" font-family="Roboto Mono" font-size="15" style="fill:var(--ink-2)" text-anchor="middle">${cm(w)} − ${cm(p)} = ${cm(r)}</text>`;
       out.innerHTML=`The unknown part is <b>${cm(r)}</b>. Check the picture: is the coral section about the right size compared with the blue one?`;
     }else{
       const a=Math.max(1,+q("#ua").value||1),b=Math.max(1,+q("#ub").value||1);
@@ -390,7 +390,7 @@ function barModel(host){
       for(let i=0;i<b;i++)s+=bar(X0+i*uw,106,uw-2,36,"var(--bar-3)",u%1?u.toFixed(1):cm(u));
       const diffX=X0+Math.min(a,b)*uw, diffW=Math.abs(b-a)*uw;
       if(diffW>0)s+=`<path d="M${diffX} 158 L${diffX} 166 L${diffX+diffW} 166 L${diffX+diffW} 158" fill="none" style="stroke:var(--amber-dk)" stroke-width="1.5"/>
-        <text x="${diffX+diffW/2}" y="182" font-family="Atkinson Hyperlegible Mono" font-size="13" style="fill:var(--amber-dk)" text-anchor="middle">difference ${cm(Math.abs(b-a)*u)}</text>`;
+        <text x="${diffX+diffW/2}" y="182" font-family="Roboto Mono" font-size="13" style="fill:var(--amber-dk)" text-anchor="middle">difference ${cm(Math.abs(b-a)*u)}</text>`;
       svg.innerHTML=s;
       out.innerHTML=`${denom} unit${denom>1?"s":""} = ${cm(gv)}, so <b>1 unit = ${u%1?u.toFixed(2):cm(u)}</b>.<br>
         A = ${a}u = <b>${cm(a*u)}</b> &nbsp; B = ${b}u = <b>${cm(b*u)}</b> &nbsp; total = ${cm((a+b)*u)} &nbsp; difference = ${cm(Math.abs(b-a)*u)}<br>
@@ -539,7 +539,7 @@ function decimalGrid(host){
       s+=`<line x1="${x+i*c}" y1="${y}" x2="${x+i*c}" y2="${y+S}" stroke="${INK}" stroke-width="${w}" opacity=".5"/>`;
       s+=`<line x1="${x}" y1="${y+i*c}" x2="${x+S}" y2="${y+i*c}" stroke="${INK}" stroke-width="${w}" opacity=".5"/>`;
     }
-    if(label)s+=`<text x="${x+S/2}" y="${y+S+22}" font-family="Atkinson Hyperlegible Mono" font-size="14" fill="${INK}" text-anchor="middle">${label}</text>`;
+    if(label)s+=`<text x="${x+S/2}" y="${y+S+22}" font-family="Roboto Mono" font-size="14" fill="${INK}" text-anchor="middle">${label}</text>`;
     return s;
   }
   function vis(){q("#dgb2").hidden=$m.value==="show";q("#dgops").hidden=$m.value!=="add";}
@@ -554,7 +554,7 @@ function decimalGrid(host){
       let s="",x=40;const n=Math.min(3,wholes)+(frac>0?1:0);
       for(let i=0;i<Math.min(3,wholes);i++){s+=grid(x,30,S*0.62,1,T,"1 whole");x+=S*0.62+22;}
       if(frac>0)s+=grid(x,30,S*0.62,frac,A,frac.toFixed(2).replace(/0+$/,"").replace(/\.$/,""));
-      s+=`<text x="40" y="${30+S*0.62+52}" font-family="Atkinson Hyperlegible Mono" font-size="13" fill="${MUT}">tenths = full columns · hundredths = single cells</text>`;
+      s+=`<text x="40" y="${30+S*0.62+52}" font-family="Roboto Mono" font-size="13" fill="${MUT}">tenths = full columns · hundredths = single cells</text>`;
       svg.innerHTML=s;
       const t=Math.round(frac*10)/1,h=Math.round(frac*100);
       svg.setAttribute("aria-label",`${wholes} full unit squares shaded, plus a square with ${h} of its 100 cells shaded, representing ${a}.`);
@@ -576,10 +576,10 @@ function decimalGrid(host){
         s+=`<line x1="${GX}" y1="${GY+i*c}" x2="${GX+S}" y2="${GY+i*c}" stroke="${INK}" stroke-width=".7" opacity=".5"/>`;
       }
       const cells=ac*bc,val=r2(ac*bc/100);
-      s+=`<text x="${GX+S/2}" y="${GY+S+24}" font-family="Atkinson Hyperlegible Mono" font-size="13" fill="${MUT}" text-anchor="middle">${(bc/10)} across</text>`;
-      s+=`<text x="${GX-14}" y="${GY+S/2}" font-family="Atkinson Hyperlegible Mono" font-size="13" fill="${MUT}" text-anchor="middle" transform="rotate(-90 ${GX-14} ${GY+S/2})">${(ac/10)} down</text>`;
-      s+=`<text x="${GX+S+40}" y="${GY+70}" font-family="Atkinson Hyperlegible Mono" font-size="14" fill="${INK}">overlap = ${cells} cells</text>`;
-      s+=`<text x="${GX+S+40}" y="${GY+94}" font-family="Atkinson Hyperlegible Mono" font-size="14" fill="${INK}">each cell = 0.01</text>`;
+      s+=`<text x="${GX+S/2}" y="${GY+S+24}" font-family="Roboto Mono" font-size="13" fill="${MUT}" text-anchor="middle">${(bc/10)} across</text>`;
+      s+=`<text x="${GX-14}" y="${GY+S/2}" font-family="Roboto Mono" font-size="13" fill="${MUT}" text-anchor="middle" transform="rotate(-90 ${GX-14} ${GY+S/2})">${(ac/10)} down</text>`;
+      s+=`<text x="${GX+S+40}" y="${GY+70}" font-family="Roboto Mono" font-size="14" fill="${INK}">overlap = ${cells} cells</text>`;
+      s+=`<text x="${GX+S+40}" y="${GY+94}" font-family="Roboto Mono" font-size="14" fill="${INK}">each cell = 0.01</text>`;
       s+=`<text x="${GX+S+40}" y="${GY+128}" font-family="Fraunces" font-size="22" fill="${T}">${val}</text>`;
       svg.innerHTML=s;
       svg.setAttribute("aria-label",`A unit square. ${ac} of ten rows shaded one way, ${bc} of ten columns the other. The ${cells} cells shaded both ways equal ${val}.`);
@@ -592,7 +592,7 @@ function decimalGrid(host){
     /* cmp and add */
     if(m==="cmp"){
       svg.innerHTML=grid(70,26,S,Math.min(1,a),T,String(a))+grid(330,26,S,Math.min(1,b),A,String(b))+
-        `<text x="350" y="${26+S+52}" font-family="Atkinson Hyperlegible Mono" font-size="13" fill="${MUT}" text-anchor="middle">shade both, then look — no digit-counting required</text>`;
+        `<text x="350" y="${26+S+52}" font-family="Roboto Mono" font-size="13" fill="${MUT}" text-anchor="middle">shade both, then look — no digit-counting required</text>`;
       svg.setAttribute("aria-label",`Two unit squares side by side. The left has ${Math.round(a*100)} of 100 cells shaded for ${a}; the right has ${Math.round(b*100)} for ${b}. ${a===b?"They match.":a>b?"The left is larger.":"The right is larger."}`);
       const pad=(x)=>x.toFixed(2);
       out.innerHTML=`${a} ${a===b?"=":a>b?"&gt;":"&lt;"} ${b}.<br>
@@ -663,12 +663,12 @@ function rateLine(host){
   const X0=74,W=560;
   function scale(y,label,vals,unit,colour,dash){
     let s=`<line x1="${X0}" y1="${y}" x2="${X0+W}" y2="${y}" stroke="${INK}" stroke-width="2"/>`;
-    s+=`<text x="${X0-10}" y="${y+4}" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="${MUT}" text-anchor="end">${label}</text>`;
+    s+=`<text x="${X0-10}" y="${y+4}" font-family="Roboto Mono" font-size="12" fill="${MUT}" text-anchor="end">${label}</text>`;
     vals.forEach((v,i)=>{
       const x=X0+(i/(vals.length-1))*W;
       s+=`<line x1="${x}" y1="${y-7}" x2="${x}" y2="${y+7}" stroke="${INK}" stroke-width="2"/>`;
       s+=`<circle class="bmseg" cx="${x}" cy="${y}" r="4" fill="${colour}"/>`;
-      s+=`<text x="${x}" y="${y+(dash?24:-15)}" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="${INK}" text-anchor="middle">${q(v,unit)}</text>`;
+      s+=`<text x="${x}" y="${y+(dash?24:-15)}" font-family="Roboto Mono" font-size="12" fill="${INK}" text-anchor="middle">${q(v,unit)}</text>`;
     });
     return s;
   }

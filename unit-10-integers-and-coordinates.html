@@ -6,7 +6,7 @@
 <title>Unit 10 &mdash; Negative Numbers &amp; the Coordinate Plane | Grade 6 CPA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Atkinson+Hyperlegible:wght@400;700&family=Atkinson+Hyperlegible+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Atkinson+Hyperlegible:wght@400;700&family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="curriculum.css">
 <script src="theme-toggle.js"></script>
 </head>
@@ -110,11 +110,11 @@ function coordPlane(host){
       s+=`<line x1="${px(-RANGE)}" y1="${py(i)}" x2="${px(RANGE)}" y2="${py(i)}" stroke="${major?INK:'#D3DCE4'}" stroke-width="${major?2:1}"/>`;
     }
     for(let i=-RANGE;i<=RANGE;i+=2){
-      if(i!==0)s+=`<text x="${px(i)}" y="${py(0)+16}" font-family="Atkinson Hyperlegible Mono" font-size="10" fill="${MUT}" text-anchor="middle">${i}</text>`;
-      if(i!==0)s+=`<text x="${px(0)-8}" y="${py(i)+3}" font-family="Atkinson Hyperlegible Mono" font-size="10" fill="${MUT}" text-anchor="end">${i}</text>`;
+      if(i!==0)s+=`<text x="${px(i)}" y="${py(0)+16}" font-family="Roboto Mono" font-size="10" fill="${MUT}" text-anchor="middle">${i}</text>`;
+      if(i!==0)s+=`<text x="${px(0)-8}" y="${py(i)+3}" font-family="Roboto Mono" font-size="10" fill="${MUT}" text-anchor="end">${i}</text>`;
     }
-    s+=`<text x="${px(RANGE)+10}" y="${py(0)+4}" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="${INK}">x</text>`;
-    s+=`<text x="${px(0)-6}" y="${py(RANGE)-8}" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="${INK}">y</text>`;
+    s+=`<text x="${px(RANGE)+10}" y="${py(0)+4}" font-family="Roboto Mono" font-size="12" fill="${INK}">x</text>`;
+    s+=`<text x="${px(0)-6}" y="${py(RANGE)-8}" font-family="Roboto Mono" font-size="12" fill="${INK}">y</text>`;
     /* clickable intersections */
     for(let x=-RANGE;x<=RANGE;x++)for(let y=-RANGE;y<=RANGE;y++){
       s+=`<circle class="cpgrid" data-x="${x}" data-y="${y}" cx="${px(x)}" cy="${py(y)}" r="9" fill="transparent" style="cursor:pointer"/>`;
@@ -123,7 +123,7 @@ function coordPlane(host){
   }
   function dot(x,y,fill,label,dy){
     return `<circle cx="${px(x)}" cy="${py(y)}" r="6" fill="${fill}" stroke="#fff" stroke-width="1.5"/>` +
-      (label?`<text x="${px(x)}" y="${py(y)+(dy||-12)}" font-family="Atkinson Hyperlegible Mono" font-size="13" fill="${fill}" text-anchor="middle">${label} (${x}, ${y})</text>`:"");
+      (label?`<text x="${px(x)}" y="${py(y)+(dy||-12)}" font-family="Roboto Mono" font-size="13" fill="${fill}" text-anchor="middle">${label} (${x}, ${y})</text>`:"");
   }
 
   function vis(){
