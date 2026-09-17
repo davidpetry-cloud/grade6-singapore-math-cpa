@@ -43,7 +43,7 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 | `coord-plane.js` | 11,556 | `e75b1e65f83ee155` |
 | `coord-plane.test.js` | 4,516 | `62238f169083fde3` |
 | `curriculum-core.js` | 52,034 | `14672705ecac7e16` |
-| `curriculum.css` | 16,728 | `dc637d0869db54e4` |
+| `curriculum.css` | 16,732 | `79153058c6ae9ef1` |
 | `dist-builder.js` | 9,161 | `4f8f09c5a6594861` |
 | `dist-builder.test.js` | 3,911 | `0910cafcf6db26fc` |
 | `net-fold.js` | 9,248 | `1fb9b6210fdc651c` |
