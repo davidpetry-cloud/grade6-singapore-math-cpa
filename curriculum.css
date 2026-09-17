@@ -9,9 +9,9 @@
   --rose:#C2536B; --rose-pale:#F6E2E6; --rose-text:#9C2C46;
   --paper:#F3F6F8; --card:#FFFFFF; --line:#D3DCE4;
   --text:#16283C; --muted:#5B7189;
-  --sans:"Atkinson Hyperlegible",system-ui,sans-serif;
+  --sans:"Lexend",system-ui,sans-serif;
   --serif:"Fraunces",Georgia,serif;
-  --mono:"Roboto Mono",ui-monospace,monospace;
+  --mono:"Lexend",ui-monospace,monospace;
   /* bar-model diagram palette: one hue per quantity in a comparison.
      bar-1/bar-5 double as the brand teal/amber; bar-2/3/4 are new.
      Reserved for "which quantity is which" in diagrams only — never
