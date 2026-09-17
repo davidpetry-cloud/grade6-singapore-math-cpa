@@ -5,13 +5,18 @@
   --header-bg:var(--ink);
   --teal:#1F8A7D; --teal-pale:#DCEFEB; --teal-text:#136155;
   --amber:#E4A03C; --amber-dk:#96630E; --amber-pale:#FAEDD6;
-  --peri:#6B7FB3; --peri-pale:#E4E9F4;
+  --peri:#6B7FB3; --peri-pale:#E4E9F4; --peri-text:#414F82;
   --rose:#C2536B; --rose-pale:#F6E2E6; --rose-text:#9C2C46;
   --paper:#F3F6F8; --card:#FFFFFF; --line:#D3DCE4;
   --text:#16283C; --muted:#5B7189;
   --sans:"Libre Franklin",system-ui,sans-serif;
   --serif:"Fraunces",Georgia,serif;
   --mono:"Inconsolata",ui-monospace,monospace;
+  /* bar-model diagram palette: one hue per quantity in a comparison.
+     bar-1/bar-5 double as the brand teal/amber; bar-2/3/4 are new.
+     Reserved for "which quantity is which" in diagrams only — never
+     reused for correct/incorrect feedback (that stays teal/rose). */
+  --bar-1:#1F8A7D; --bar-2:#2E7FB8; --bar-3:#7B5EC7; --bar-4:#D9673F; --bar-5:#E4A03C;
 }
 /* dark theme — toggled via [data-theme] on <html>, see theme-toggle.js.
    Header stays a dark band in both themes; only body chrome inverts. */
@@ -20,10 +25,26 @@
   --header-bg:#0A1420;
   --teal:#3FBFA9; --teal-pale:#153732; --teal-text:#5FE0C7;
   --amber:#E9AD55; --amber-dk:#F0C77E; --amber-pale:#3A2C13;
-  --peri:#8FA0D6; --peri-pale:#232B47;
+  --peri:#8FA0D6; --peri-pale:#232B47; --peri-text:#C7D2F0;
   --rose:#E07992; --rose-pale:#3A1E27; --rose-text:#F5A8BB;
   --paper:#0F151C; --card:#1A222B; --line:#2B3641;
   --text:#DCE6EE; --muted:#93A7BC;
+  --bar-1:#3FBFA9; --bar-2:#5FA8DB; --bar-3:#A98CE8; --bar-4:#E8926B; --bar-5:#E9AD55;
+}
+/* Interactive manipulatives draw with hardcoded hex in raw SVG (7 tool
+   files, predating dark mode) — theirs is the one part of the page
+   that stays a light "paper" surface in dark mode rather than trying
+   to re-theme hand-drawn diagrams. Pinning the tokens here means every
+   var()-based label inside a .tool card matches that paper surface too. */
+:root[data-theme="dark"] .tool{
+  --ink:#0F2338; --ink-2:#1B3A5C; --ink-3:#33557A;
+  --teal:#1F8A7D; --teal-pale:#DCEFEB; --teal-text:#136155;
+  --amber:#E4A03C; --amber-dk:#96630E; --amber-pale:#FAEDD6;
+  --peri:#6B7FB3; --peri-pale:#E4E9F4; --peri-text:#414F82;
+  --rose:#C2536B; --rose-pale:#F6E2E6; --rose-text:#9C2C46;
+  --paper:#F3F6F8; --card:#FFFFFF; --line:#D3DCE4;
+  --text:#16283C; --muted:#5B7189;
+  --bar-1:#1F8A7D; --bar-2:#2E7FB8; --bar-3:#7B5EC7; --bar-4:#D9673F; --bar-5:#E4A03C;
 }
 *{box-sizing:border-box}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
@@ -88,10 +109,16 @@ main{padding:34px 0 70px}
 .say p{margin:0 0 9px;font-size:.97rem;color:var(--ink-2)}
 .say p:last-child{margin-bottom:0}
 .say .who{font-family:var(--mono);font-size:.74rem;color:var(--muted);display:block;margin-bottom:2px}
-.watch{background:var(--amber-pale);border-radius:7px;padding:13px 16px;font-size:.92rem;margin-top:14px}
-.watch b{font-family:var(--serif);font-weight:600;display:block;margin-bottom:3px}
-.readaloud{background:var(--peri-pale);border-radius:7px;padding:13px 16px;font-size:.92rem;margin-top:12px}
-.readaloud b{font-family:var(--serif);font-weight:600;display:block;margin-bottom:3px}
+.watch,.readaloud{position:relative;border-radius:10px;padding:20px 16px 15px;font-size:.92rem;
+  margin-top:22px;box-shadow:0 2px 0 rgba(0,0,0,.07)}
+.watch{background:var(--amber-pale)}
+.readaloud{background:var(--peri-pale)}
+.watch b,.readaloud b{position:absolute;top:-13px;left:14px;font-family:var(--sans);font-weight:700;
+  font-size:.74rem;letter-spacing:.02em;padding:6px 13px;border-radius:7px;
+  box-shadow:0 2px 5px rgba(0,0,0,.22)}
+.watch b{background:var(--amber);color:#2B1B04}
+.readaloud b{background:var(--peri-text);color:#fff}
+:root[data-theme="dark"] .readaloud b{color:#0F2338}
 
 ol.probs,ul.probs{margin:0;padding-left:20px}
 ol.probs li,ul.probs li{margin-bottom:9px;font-size:.96rem}
@@ -125,7 +152,7 @@ ol.probs li,ul.probs li{margin-bottom:9px;font-size:.96rem}
 .std span{font-family:var(--mono);font-size:.76rem;background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:3px 8px}
 .diff h4{color:var(--teal-text)}
 .diff.ext h4{color:var(--amber-dk)}
-.diff.acc h4{color:var(--peri)}
+.diff.acc h4{color:var(--peri-text)}
 
 .pager{display:flex;justify-content:space-between;gap:12px;margin-top:26px}
 .pager button{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:11px 18px;

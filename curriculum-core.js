@@ -360,7 +360,7 @@ function barModel(host){
   $m.addEventListener("change",()=>{q("#pwc").hidden=$m.value!=="pw";q("#cmpc").hidden=$m.value!=="cmp";draw();});
 
   function bar(x,y,w,h,fill,label){
-    return `<rect class="bmseg" x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${fill}" stroke="#fff" stroke-width="1.5"/>
+    return `<rect class="bmseg" x="${x}" y="${y}" width="${w}" height="${h}" rx="3" style="fill:${fill}" stroke="#fff" stroke-width="1.5"/>
       <text x="${x+w/2}" y="${y+h/2+5}" font-family="Inconsolata" font-size="14" fill="#fff" text-anchor="middle">${label}</text>`;
   }
   function draw(){
@@ -371,12 +371,12 @@ function barModel(host){
       const wa=W*(p/w);
       svg.setAttribute("aria-label",`Part-whole bar model. One bar with a whole of ${cm(w)}, split into a known part of ${cm(p)} and an unknown part.`);
       svg.innerHTML=`
-        <text x="${X0+W/2}" y="26" font-family="Inconsolata" font-size="13" fill="#5B7189" text-anchor="middle">whole = ${cm(w)}</text>
-        <path d="M${X0} 44 L${X0} 36 L${X0+W} 36 L${X0+W} 44" fill="none" stroke="#5B7189" stroke-width="1.5"/>
-        ${bar(X0,56,wa,44,"#1F8A7D",cm(p))}
-        ${bar(X0+wa,56,W-wa,44,"#E4A03C","?")}
-        <text x="${X0+W/2}" y="132" font-family="Inconsolata" font-size="15" fill="#1B3A5C" text-anchor="middle">${cm(w)} − ${cm(p)} = ${cm(r)}</text>`;
-      out.innerHTML=`The unknown part is <b>${cm(r)}</b>. Check the picture: is the orange section about the right size compared with the teal one?`;
+        <text x="${X0+W/2}" y="26" font-family="Inconsolata" font-size="13" style="fill:var(--muted)" text-anchor="middle">whole = ${cm(w)}</text>
+        <path d="M${X0} 44 L${X0} 36 L${X0+W} 36 L${X0+W} 44" fill="none" style="stroke:var(--muted)" stroke-width="1.5"/>
+        ${bar(X0,56,wa,44,"var(--bar-2)",cm(p))}
+        ${bar(X0+wa,56,W-wa,44,"var(--bar-4)","?")}
+        <text x="${X0+W/2}" y="132" font-family="Inconsolata" font-size="15" style="fill:var(--ink-2)" text-anchor="middle">${cm(w)} − ${cm(p)} = ${cm(r)}</text>`;
+      out.innerHTML=`The unknown part is <b>${cm(r)}</b>. Check the picture: is the coral section about the right size compared with the blue one?`;
     }else{
       const a=Math.max(1,+q("#ua").value||1),b=Math.max(1,+q("#ub").value||1);
       const gv=Math.max(0,+q("#gv").value||0),mode=q("#giv").value;
@@ -384,17 +384,17 @@ function barModel(host){
       if(denom===0){out.textContent="With equal bars there is no difference to divide. Change the unit counts.";return;}
       const u=gv/denom,mx=Math.max(a,b),uw=W/mx;
       svg.setAttribute("aria-label",`Comparison bar model, both bars aligned at the left. Bar A is ${a} units, bar B is ${b} units. One unit is ${cm(u)}.`);
-      let s=`<text x="30" y="66" font-family="Libre Franklin" font-size="13" fill="#5B7189">A</text>
-             <text x="30" y="124" font-family="Libre Franklin" font-size="13" fill="#5B7189">B</text>`;
-      for(let i=0;i<a;i++)s+=bar(X0+i*uw,48,uw-2,36,"#1F8A7D",u%1?u.toFixed(1):cm(u));
-      for(let i=0;i<b;i++)s+=bar(X0+i*uw,106,uw-2,36,"#6B7FB3",u%1?u.toFixed(1):cm(u));
+      let s=`<text x="30" y="66" font-family="Libre Franklin" font-size="13" style="fill:var(--muted)">A</text>
+             <text x="30" y="124" font-family="Libre Franklin" font-size="13" style="fill:var(--muted)">B</text>`;
+      for(let i=0;i<a;i++)s+=bar(X0+i*uw,48,uw-2,36,"var(--bar-2)",u%1?u.toFixed(1):cm(u));
+      for(let i=0;i<b;i++)s+=bar(X0+i*uw,106,uw-2,36,"var(--bar-3)",u%1?u.toFixed(1):cm(u));
       const diffX=X0+Math.min(a,b)*uw, diffW=Math.abs(b-a)*uw;
-      if(diffW>0)s+=`<path d="M${diffX} 158 L${diffX} 166 L${diffX+diffW} 166 L${diffX+diffW} 158" fill="none" stroke="#B87C1C" stroke-width="1.5"/>
-        <text x="${diffX+diffW/2}" y="182" font-family="Inconsolata" font-size="13" fill="#B87C1C" text-anchor="middle">difference ${cm(Math.abs(b-a)*u)}</text>`;
+      if(diffW>0)s+=`<path d="M${diffX} 158 L${diffX} 166 L${diffX+diffW} 166 L${diffX+diffW} 158" fill="none" style="stroke:var(--amber-dk)" stroke-width="1.5"/>
+        <text x="${diffX+diffW/2}" y="182" font-family="Inconsolata" font-size="13" style="fill:var(--amber-dk)" text-anchor="middle">difference ${cm(Math.abs(b-a)*u)}</text>`;
       svg.innerHTML=s;
       out.innerHTML=`${denom} unit${denom>1?"s":""} = ${cm(gv)}, so <b>1 unit = ${u%1?u.toFixed(2):cm(u)}</b>.<br>
         A = ${a}u = <b>${cm(a*u)}</b> &nbsp; B = ${b}u = <b>${cm(b*u)}</b> &nbsp; total = ${cm((a+b)*u)} &nbsp; difference = ${cm(Math.abs(b-a)*u)}<br>
-        <span style="color:#5B7189">Now re-read the question. Which of those numbers did it actually ask for?</span>`;
+        <span style="color:var(--muted)">Now re-read the question. Which of those numbers did it actually ask for?</span>`;
     }
   }
   box.querySelector("#bgo").addEventListener("click",draw);
