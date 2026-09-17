@@ -109,12 +109,12 @@ main{padding:34px 0 70px}
 .say p{margin:0 0 9px;font-size:.97rem;color:var(--ink-2)}
 .say p:last-child{margin-bottom:0}
 .say .who{font-family:var(--mono);font-size:.74rem;color:var(--muted);display:block;margin-bottom:2px}
-.watch,.readaloud{position:relative;border-radius:10px;padding:20px 16px 15px;font-size:.92rem;
-  margin-top:22px;box-shadow:0 2px 0 rgba(0,0,0,.07)}
+.watch,.readaloud{position:relative;border-radius:10px;padding:24px 16px 15px;font-size:.92rem;
+  margin-top:24px;box-shadow:0 2px 0 rgba(0,0,0,.07)}
 .watch{background:var(--amber-pale)}
 .readaloud{background:var(--peri-pale)}
-.watch b,.readaloud b{position:absolute;top:-13px;left:14px;font-family:var(--sans);font-weight:700;
-  font-size:.74rem;letter-spacing:.02em;padding:6px 13px;border-radius:7px;
+.watch b,.readaloud b{position:absolute;top:-16px;left:14px;font-family:var(--sans);font-weight:700;
+  font-size:.85rem;line-height:1;letter-spacing:.01em;padding:8px 17px;border-radius:8px;
   box-shadow:0 2px 5px rgba(0,0,0,.22)}
 .watch b{background:var(--amber);color:#2B1B04}
 .readaloud b{background:var(--peri-text);color:#fff}
