@@ -43,25 +43,25 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 | `coord-plane.js` | 11,556 | `e75b1e65f83ee155` |
 | `coord-plane.test.js` | 4,516 | `62238f169083fde3` |
 | `curriculum-core.js` | 52,034 | `14672705ecac7e16` |
-| `curriculum.css` | 16,687 | `8a67db93387633ee` |
+| `curriculum.css` | 16,728 | `dc637d0869db54e4` |
 | `dist-builder.js` | 9,161 | `4f8f09c5a6594861` |
 | `dist-builder.test.js` | 3,911 | `0910cafcf6db26fc` |
 | `net-fold.js` | 9,248 | `1fb9b6210fdc651c` |
 | `net-fold.test.js` | 4,433 | `8e918d5ca40037fc` |
-| `singapore-math-6-hub.html` | 22,470 | `7d5d94647a9351b4` |
+| `singapore-math-6-hub.html` | 22,494 | `374da3667ceceb0a` |
 | `test-unit.js` | 4,235 | `760c86dcdd48f57f` |
 | `theme-toggle.js` | 1,187 | `18c8994a2a613f0c` |
-| `unit-01-whole-numbers-and-operations.html` | 62,534 | `05f42bc7026e545e` |
-| `unit-02-fractions-and-decimals.html` | 158,640 | `2fe629450663f29c` |
-| `unit-03-ratio-and-rate.html` | 104,492 | `5e8e539de10ab35c` |
-| `unit-04-percentage.html` | 88,295 | `e975f4c2f66727dd` |
-| `unit-05-algebra.html` | 126,469 | `2e40ca9d9f5127e4` |
-| `unit-06-angles-and-figures.html` | 95,185 | `5b1e08430efdfd54` |
-| `unit-07-circles.html` | 92,730 | `55a03b4d2f281086` |
-| `unit-08-volume.html` | 93,139 | `afea2482e68e12ec` |
-| `unit-09-data-and-statistics.html` | 103,946 | `1d21ca1907e22772` |
-| `unit-10-integers-and-coordinates.html` | 93,883 | `709dd3df97e00b9c` |
-| `unit-template.html` | 5,872 | `fc16ae3bd77a8956` |
+| `unit-01-whole-numbers-and-operations.html` | 62,533 | `eafae926615998ba` |
+| `unit-02-fractions-and-decimals.html` | 158,639 | `c3fd5353af5f768a` |
+| `unit-03-ratio-and-rate.html` | 104,491 | `0039f377da93287d` |
+| `unit-04-percentage.html` | 88,294 | `96bda583b78f40d3` |
+| `unit-05-algebra.html` | 126,468 | `da6caaa26d84eba2` |
+| `unit-06-angles-and-figures.html` | 95,184 | `f70a2b87d28fa821` |
+| `unit-07-circles.html` | 92,729 | `1875db289276260b` |
+| `unit-08-volume.html` | 93,138 | `3e064930f505d356` |
+| `unit-09-data-and-statistics.html` | 103,945 | `698ba3d1b5a78d92` |
+| `unit-10-integers-and-coordinates.html` | 93,882 | `29cf6b9096a3bd47` |
+| `unit-template.html` | 5,871 | `3a660bf7345ee1d5` |
 
 ## Unit status
 
