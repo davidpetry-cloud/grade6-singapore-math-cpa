@@ -85,7 +85,7 @@ function balanceScale(host){
     let x=cx-46,y=cy-26;
     for(let i=0;i<cups;i++){
       s+=`<path d="M${x} ${y-18} L${x+20} ${y-18} L${x+16} ${y} L${x+4} ${y} Z" fill="${P}" stroke="#4A5C8C" stroke-width="1.5"/>
-          <text x="${x+10}" y="${y-4}" font-family="Inconsolata" font-size="11" fill="#fff" text-anchor="middle">x</text>`;
+          <text x="${x+10}" y="${y-4}" font-family="Atkinson Hyperlegible Mono" font-size="11" fill="#fff" text-anchor="middle">x</text>`;
       x+=24; if(x>cx+34){x=cx-46;y-=24;}
     }
     let dx=cx-46, dy=y-(cups?26:0);
@@ -93,7 +93,7 @@ function balanceScale(host){
       s+=`<circle cx="${dx+7}" cy="${dy-7}" r="6.5" fill="${tone}" stroke="${INK}" stroke-width="1"/>`;
       dx+=16; if(dx>cx+40){dx=cx-46;dy-=16;}
     }
-    if(units>60)s+=`<text x="${cx}" y="${dy-22}" font-family="Inconsolata" font-size="12" fill="${MUT}" text-anchor="middle">+${units-60} more</text>`;
+    if(units>60)s+=`<text x="${cx}" y="${dy-22}" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="${MUT}" text-anchor="middle">+${units-60} more</text>`;
     return s;
   }
 
@@ -125,7 +125,7 @@ function balanceScale(host){
     /* the sentence, above the beam */
     const relShown = rel==="=" ? (L===R?"=":(L>R?"&gt;":"&lt;")) : "&gt;";
     s+=`<text x="${cx}" y="34" font-family="Fraunces" font-size="26" fill="${broken&&rel==="="?ROSE:INK}" text-anchor="middle">${expr(st.lc,st.lu)} ${relShown} ${expr(st.rc,st.ru)}</text>`;
-    if(rel==="="&&broken)s+=`<text x="${cx}" y="58" font-family="Inconsolata" font-size="13" fill="${ROSE}" text-anchor="middle">no longer the sentence you started with</text>`;
+    if(rel==="="&&broken)s+=`<text x="${cx}" y="58" font-family="Atkinson Hyperlegible Mono" font-size="13" fill="${ROSE}" text-anchor="middle">no longer the sentence you started with</text>`;
     svg.innerHTML=s;
 
     const solved = rel==="=" && !broken && st.lc===1 && st.lu===0 && st.rc===0;

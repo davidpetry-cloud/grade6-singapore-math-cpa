@@ -34,34 +34,34 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 |---|---|---|
 | `CLAUDE.md` | 14,392 | `f3efecce649d26cc` |
 | `README.md` | 4,714 | `6d2d5ebf47ada6c8` |
-| `angle-chase.js` | 10,540 | `64345ee7b08fb720` |
+| `angle-chase.js` | 10,690 | `0fe1e93cc4136fea` |
 | `angle-chase.test.js` | 4,719 | `59cf3f33124df385` |
-| `balance-scale.js` | 9,739 | `fb82b099870cd770` |
+| `balance-scale.js` | 9,784 | `1c7144532d4740ad` |
 | `balance-scale.test.js` | 3,260 | `18d60ecff41e5566` |
-| `circle-tools.js` | 12,165 | `463bdc8224da371b` |
+| `circle-tools.js` | 12,300 | `78027e23759480dd` |
 | `circle-tools.test.js` | 3,842 | `458c1ec1afe4c5d9` |
-| `coord-plane.js` | 11,556 | `e75b1e65f83ee155` |
+| `coord-plane.js` | 11,631 | `8b70335ebd2f321d` |
 | `coord-plane.test.js` | 4,516 | `62238f169083fde3` |
-| `curriculum-core.js` | 52,034 | `14672705ecac7e16` |
-| `curriculum.css` | 16,732 | `79153058c6ae9ef1` |
-| `dist-builder.js` | 9,161 | `4f8f09c5a6594861` |
+| `curriculum-core.js` | 52,289 | `704dc279ba7b9062` |
+| `curriculum.css` | 16,747 | `042a8f90bf22e3ec` |
+| `dist-builder.js` | 9,266 | `7f25a60e47aed0f2` |
 | `dist-builder.test.js` | 3,911 | `0910cafcf6db26fc` |
-| `net-fold.js` | 9,248 | `1fb9b6210fdc651c` |
+| `net-fold.js` | 9,263 | `558fa0a339dae45d` |
 | `net-fold.test.js` | 4,433 | `8e918d5ca40037fc` |
-| `singapore-math-6-hub.html` | 22,494 | `374da3667ceceb0a` |
+| `singapore-math-6-hub.html` | 22,554 | `6eeee2213f60689d` |
 | `test-unit.js` | 4,235 | `760c86dcdd48f57f` |
 | `theme-toggle.js` | 1,187 | `18c8994a2a613f0c` |
-| `unit-01-whole-numbers-and-operations.html` | 62,533 | `eafae926615998ba` |
-| `unit-02-fractions-and-decimals.html` | 158,639 | `c3fd5353af5f768a` |
-| `unit-03-ratio-and-rate.html` | 104,491 | `0039f377da93287d` |
-| `unit-04-percentage.html` | 88,294 | `96bda583b78f40d3` |
-| `unit-05-algebra.html` | 126,468 | `da6caaa26d84eba2` |
-| `unit-06-angles-and-figures.html` | 95,184 | `f70a2b87d28fa821` |
-| `unit-07-circles.html` | 92,729 | `1875db289276260b` |
-| `unit-08-volume.html` | 93,138 | `3e064930f505d356` |
-| `unit-09-data-and-statistics.html` | 103,945 | `698ba3d1b5a78d92` |
-| `unit-10-integers-and-coordinates.html` | 93,882 | `29cf6b9096a3bd47` |
-| `unit-template.html` | 5,871 | `3a660bf7345ee1d5` |
+| `unit-01-whole-numbers-and-operations.html` | 62,548 | `4ff050fe27cb0893` |
+| `unit-02-fractions-and-decimals.html` | 158,954 | `33df5eb5e49bcf19` |
+| `unit-03-ratio-and-rate.html` | 104,536 | `d215178eeb01ee6f` |
+| `unit-04-percentage.html` | 88,309 | `aca4322fd5016cb4` |
+| `unit-05-algebra.html` | 126,528 | `a096c0251ac3ce0e` |
+| `unit-06-angles-and-figures.html` | 95,349 | `557063eadd4368d6` |
+| `unit-07-circles.html` | 92,879 | `181e4bb97d1f17df` |
+| `unit-08-volume.html` | 93,168 | `1433b5d46501a80e` |
+| `unit-09-data-and-statistics.html` | 104,065 | `18d3dfac86155904` |
+| `unit-10-integers-and-coordinates.html` | 93,972 | `5b2874413547295c` |
+| `unit-template.html` | 5,886 | `b589f78f77d9fb6b` |
 
 ## Unit status
 

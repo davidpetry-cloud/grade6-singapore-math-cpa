@@ -6,7 +6,7 @@
 <title>Unit 7 &mdash; Circles | Grade 6 CPA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Atkinson+Hyperlegible:wght@400;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Atkinson+Hyperlegible:wght@400;700&family=Atkinson+Hyperlegible+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="curriculum.css">
 <script src="theme-toggle.js"></script>
 </head>
@@ -103,8 +103,8 @@ function circleUnroll(host){
     const R=52, cx=110, cy=68;
     s+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${INK}" stroke-width="2.5"/>`;
     s+=`<line x1="${cx-R}" y1="${cy}" x2="${cx+R}" y2="${cy}" stroke="${A}" stroke-width="2.5"/>`;
-    s+=`<text x="${cx}" y="${cy-8}" font-family="Inconsolata" font-size="12" fill="${A}" text-anchor="middle">d = ${r2(d)}</text>`;
-    s+=`<text x="${cx}" y="${cy+R+20}" font-family="Inconsolata" font-size="12" fill="${MUT}" text-anchor="middle">circumference ${r2(c)}</text>`;
+    s+=`<text x="${cx}" y="${cy-8}" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="${A}" text-anchor="middle">d = ${r2(d)}</text>`;
+    s+=`<text x="${cx}" y="${cy+R+20}" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="${MUT}" text-anchor="middle">circumference ${r2(c)}</text>`;
 
     /* the measuring line, marked in diameter-lengths */
     const LY=190;
@@ -112,7 +112,7 @@ function circleUnroll(host){
     for(let i=0;i<=4;i++){
       const x=X0+i*per;
       s+=`<line x1="${x}" y1="${LY-9}" x2="${x}" y2="${LY+9}" stroke="${INK}" stroke-width="2"/>`;
-      s+=`<text x="${x}" y="${LY+26}" font-family="Inconsolata" font-size="12" fill="${MUT}" text-anchor="middle">${i}d</text>`;
+      s+=`<text x="${x}" y="${LY+26}" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="${MUT}" text-anchor="middle">${i}d</text>`;
       if(i<4){
         s+=`<line x1="${x+3}" y1="${LY+13}" x2="${x+per-3}" y2="${LY+13}" stroke="${A}" stroke-width="1" opacity=".5"/>`;
       }
@@ -120,12 +120,12 @@ function circleUnroll(host){
     /* the unrolled circumference laid along it */
     s+=`<rect class="bmseg" x="${X0}" y="${LY-24}" width="${cLen}" height="14" rx="3" fill="${T}" opacity=".85"${noAnim?"":' style="transform-origin:left center"'}/>`;
     s+=`<line x1="${X0+cLen}" y1="${LY-30}" x2="${X0+cLen}" y2="${LY+9}" stroke="${ROSE}" stroke-width="2"/>`;
-    s+=`<text x="${X0+cLen}" y="${LY-38}" font-family="Inconsolata" font-size="13" fill="${ROSE}" text-anchor="middle">lands here</text>`;
+    s+=`<text x="${X0+cLen}" y="${LY-38}" font-family="Atkinson Hyperlegible Mono" font-size="13" fill="${ROSE}" text-anchor="middle">lands here</text>`;
     /* the leftover past 3d, called out */
     if(ratio>3&&ratio<4){
       const x3=X0+3*per;
       s+=`<path d="M${x3} ${LY+44} L${x3} ${LY+52} L${X0+cLen} ${LY+52} L${X0+cLen} ${LY+44}" fill="none" stroke="${ROSE}" stroke-width="1.5"/>`;
-      s+=`<text x="${(x3+X0+cLen)/2}" y="${LY+68}" font-family="Inconsolata" font-size="12" fill="${ROSE}" text-anchor="middle">a bit more: ${r2(ratio-3)} of a diameter</text>`;
+      s+=`<text x="${(x3+X0+cLen)/2}" y="${LY+68}" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="${ROSE}" text-anchor="middle">a bit more: ${r2(ratio-3)} of a diameter</text>`;
     }
     svg.innerHTML=s;
     svg.setAttribute("aria-label",
@@ -193,8 +193,8 @@ function circleWedges(host){
       const fill = i%2 ? T : A;
       s+=`<path d="${wedgePath(cx,cy,R,i*per,(i+1)*per)}" fill="${fill}" opacity=".8" stroke="#fff" stroke-width="1"/>`;
     }
-    s+=`<text x="${cx}" y="${cy+R+24}" font-family="Inconsolata" font-size="12" fill="${MUT}" text-anchor="middle">radius ${r2(r)}</text>`;
-    s+=`<text x="${cx}" y="${cy+R+42}" font-family="Inconsolata" font-size="12" fill="${MUT}" text-anchor="middle">${n} wedges</text>`;
+    s+=`<text x="${cx}" y="${cy+R+24}" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="${MUT}" text-anchor="middle">radius ${r2(r)}</text>`;
+    s+=`<text x="${cx}" y="${cy+R+42}" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="${MUT}" text-anchor="middle">${n} wedges</text>`;
 
     /* right: the same wedges fanned into a near-parallelogram */
     const BX=270, BY=150, halfW=190, wW=(halfW*2)/(n/2);
@@ -211,9 +211,9 @@ function circleWedges(host){
     /* the bounding shape it is approaching */
     s+=`<rect x="${BX}" y="${BY-R}" width="${halfW*2}" height="${R*2}" fill="none" stroke="${INK}" stroke-width="2" stroke-dasharray="6 4"/>`;
     s+=`<line x1="${BX-14}" y1="${BY-R}" x2="${BX-14}" y2="${BY+R}" stroke="${P}" stroke-width="2"/>`;
-    s+=`<text x="${BX-22}" y="${BY}" font-family="Inconsolata" font-size="12" fill="${P}" text-anchor="middle" transform="rotate(-90 ${BX-22} ${BY})">height = r</text>`;
+    s+=`<text x="${BX-22}" y="${BY}" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="${P}" text-anchor="middle" transform="rotate(-90 ${BX-22} ${BY})">height = r</text>`;
     s+=`<line x1="${BX}" y1="${BY+R+22}" x2="${BX+halfW*2}" y2="${BY+R+22}" stroke="${P}" stroke-width="2"/>`;
-    s+=`<text x="${BX+halfW}" y="${BY+R+40}" font-family="Inconsolata" font-size="12" fill="${P}" text-anchor="middle">base = half the circumference = πr</text>`;
+    s+=`<text x="${BX+halfW}" y="${BY+R+40}" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="${P}" text-anchor="middle">base = half the circumference = πr</text>`;
     svg.innerHTML=s;
 
     const area=Math.PI*r*r;

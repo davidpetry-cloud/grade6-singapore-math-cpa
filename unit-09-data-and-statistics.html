@@ -6,7 +6,7 @@
 <title>Unit 9 &mdash; Data Analysis &amp; Statistics | Grade 6 CPA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Atkinson+Hyperlegible:wght@400;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Atkinson+Hyperlegible:wght@400;700&family=Atkinson+Hyperlegible+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="curriculum.css">
 <script src="theme-toggle.js"></script>
 </head>
@@ -119,12 +119,12 @@ function distBuilder(host){
 
     /* ---- dot plot ---- */
     const DY=150;
-    s+=`<text x="${X0}" y="26" font-family="Inconsolata" font-size="12" fill="${MUT}">dot plot — one dot per value</text>`;
+    s+=`<text x="${X0}" y="26" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="${MUT}">dot plot — one dot per value</text>`;
     s+=`<line x1="${X0}" y1="${DY}" x2="${X0+W}" y2="${DY}" stroke="${INK}" stroke-width="1.5"/>`;
     const step=Math.max(1,Math.ceil((hi-lo)/12));
     for(let v=lo;v<=hi;v+=step){
       s+=`<line x1="${px(v)}" y1="${DY-5}" x2="${px(v)}" y2="${DY+5}" stroke="${MUT}" stroke-width="1"/>`;
-      s+=`<text x="${px(v)}" y="${DY+20}" font-family="Inconsolata" font-size="11" fill="${MUT}" text-anchor="middle">${v}</text>`;
+      s+=`<text x="${px(v)}" y="${DY+20}" font-family="Atkinson Hyperlegible Mono" font-size="11" fill="${MUT}" text-anchor="middle">${v}</text>`;
     }
     const stack=new Map();
     [...data].sort((a,b)=>a-b).forEach(v=>{
@@ -134,14 +134,14 @@ function distBuilder(host){
     /* mean as a balance point, median as a line */
     if(st){
       s+=`<polygon points="${px(st.mean)},${DY+8} ${px(st.mean)-7},${DY+22} ${px(st.mean)+7},${DY+22}" fill="${A}"/>`;
-      s+=`<text x="${px(st.mean)}" y="${DY+36}" font-family="Inconsolata" font-size="11" fill="#B87C1C" text-anchor="middle">mean</text>`;
+      s+=`<text x="${px(st.mean)}" y="${DY+36}" font-family="Atkinson Hyperlegible Mono" font-size="11" fill="#B87C1C" text-anchor="middle">mean</text>`;
       s+=`<line x1="${px(st.median)}" y1="${DY-95}" x2="${px(st.median)}" y2="${DY-6}" stroke="${P}" stroke-width="2" stroke-dasharray="4 3"/>`;
-      s+=`<text x="${px(st.median)}" y="${DY-100}" font-family="Inconsolata" font-size="11" fill="${P}" text-anchor="middle">median</text>`;
+      s+=`<text x="${px(st.median)}" y="${DY-100}" font-family="Atkinson Hyperlegible Mono" font-size="11" fill="${P}" text-anchor="middle">median</text>`;
     }
 
     /* ---- histogram ---- */
     const HY=340, HH=110;
-    s+=`<text x="${X0}" y="${HY-HH-16}" font-family="Inconsolata" font-size="12" fill="${MUT}">histogram — values grouped into bins of ${bin}</text>`;
+    s+=`<text x="${X0}" y="${HY-HH-16}" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="${MUT}">histogram — values grouped into bins of ${bin}</text>`;
     if(st){
       const start=Math.floor(lo/bin)*bin;
       const bins=[];
@@ -153,8 +153,8 @@ function distBuilder(host){
       bins.forEach((b,i)=>{
         const h=(b.c/maxC)*HH;
         s+=`<rect class="bmseg" x="${X0+i*bw+1}" y="${HY-h}" width="${bw-2}" height="${h}" fill="${P}" opacity=".85"/>`;
-        if(b.c)s+=`<text x="${X0+i*bw+bw/2}" y="${HY-h-5}" font-family="Inconsolata" font-size="10" fill="${INK}" text-anchor="middle">${b.c}</text>`;
-        if(bins.length<=14)s+=`<text x="${X0+i*bw+bw/2}" y="${HY+15}" font-family="Inconsolata" font-size="9" fill="${MUT}" text-anchor="middle">${b.from}</text>`;
+        if(b.c)s+=`<text x="${X0+i*bw+bw/2}" y="${HY-h-5}" font-family="Atkinson Hyperlegible Mono" font-size="10" fill="${INK}" text-anchor="middle">${b.c}</text>`;
+        if(bins.length<=14)s+=`<text x="${X0+i*bw+bw/2}" y="${HY+15}" font-family="Atkinson Hyperlegible Mono" font-size="9" fill="${MUT}" text-anchor="middle">${b.from}</text>`;
       });
       s+=`<line x1="${X0}" y1="${HY}" x2="${X0+W}" y2="${HY}" stroke="${INK}" stroke-width="1.5"/>`;
     }

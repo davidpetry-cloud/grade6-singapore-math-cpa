@@ -6,7 +6,7 @@
 <title>Unit 2 &mdash; Fractions &amp; Decimals | Grade 6 CPA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Atkinson+Hyperlegible:wght@400;700&family=Inconsolata:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Atkinson+Hyperlegible:wght@400;700&family=Atkinson+Hyperlegible+Mono:wght@400;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="curriculum.css">
 <script src="theme-toggle.js"></script>
 </head>
@@ -119,7 +119,7 @@ function fractionModel(host){
     }
     return s;
   }
-  const lab=(x,y,t,c,sz)=>`<text x="${x}" y="${y}" font-family="Inconsolata" font-size="${sz||13}" fill="${c||MUT}" text-anchor="middle">${t}</text>`;
+  const lab=(x,y,t,c,sz)=>`<text x="${x}" y="${y}" font-family="Atkinson Hyperlegible Mono" font-size="${sz||13}" fill="${c||MUT}" text-anchor="middle">${t}</text>`;
 
   function draw(){
     const a=Math.max(0,+q("#fa").value||0),b=Math.max(1,+q("#fb").value||1);
@@ -155,9 +155,9 @@ function fractionModel(host){
       for(let j=1;j<d;j++)s+=`<line x1="${GX+j*cw}" y1="${GY}" x2="${GX+j*cw}" y2="${GY+S}" stroke="${INK}" stroke-width="1"/>`;
       const n=a*c,den=b*d,[sn,sd]=simp(n,den);
       s+=lab(GX+S/2,GY+S+22,`${c}/${d} of the width (shaded down)`,MUT)+
-         `<text x="${GX-12}" y="${GY+S/2}" font-family="Inconsolata" font-size="13" fill="${MUT}" text-anchor="middle" transform="rotate(-90 ${GX-12} ${GY+S/2})">${a}/${b} of the height</text>`+
-         `<text x="${GX+S+40}" y="${GY+60}" font-family="Inconsolata" font-size="14" fill="${INK}">overlap = ${n} small pieces</text>`+
-         `<text x="${GX+S+40}" y="${GY+84}" font-family="Inconsolata" font-size="14" fill="${INK}">whole square = ${den} small pieces</text>`+
+         `<text x="${GX-12}" y="${GY+S/2}" font-family="Atkinson Hyperlegible Mono" font-size="13" fill="${MUT}" text-anchor="middle" transform="rotate(-90 ${GX-12} ${GY+S/2})">${a}/${b} of the height</text>`+
+         `<text x="${GX+S+40}" y="${GY+60}" font-family="Atkinson Hyperlegible Mono" font-size="14" fill="${INK}">overlap = ${n} small pieces</text>`+
+         `<text x="${GX+S+40}" y="${GY+84}" font-family="Atkinson Hyperlegible Mono" font-size="14" fill="${INK}">whole square = ${den} small pieces</text>`+
          `<text x="${GX+S+40}" y="${GY+116}" font-family="Fraunces" font-size="20" fill="${T}">${n}/${den} = ${mixed(n,den)}</text>`;
       svg.innerHTML=s;
       svg.setAttribute("aria-label",`A unit square cut into ${b} rows and ${d} columns, making ${den} small pieces. ${a} rows are shaded one way and ${c} columns the other. The ${n} pieces shaded both ways are the product, ${n} out of ${den}.`);
@@ -170,11 +170,11 @@ function fractionModel(host){
     /* cmp and add share the common-denominator picture */
     const L=lcm(b,d),ka=L/b,kb=L/d;
     let s=lab(X0+W/2,20,`${a}/${b} and ${c}/${d} — different sized pieces, so they cannot be compared yet`,MUT);
-    s+=strip(X0,30,W,40,b,a,T)+`<text x="${X0-34}" y="${55}" font-family="Inconsolata" font-size="13" fill="${MUT}">${a}/${b}</text>`;
-    s+=strip(X0,80,W,40,d,c,A)+`<text x="${X0-34}" y="${105}" font-family="Inconsolata" font-size="13" fill="${MUT}">${c}/${d}</text>`;
+    s+=strip(X0,30,W,40,b,a,T)+`<text x="${X0-34}" y="${55}" font-family="Atkinson Hyperlegible Mono" font-size="13" fill="${MUT}">${a}/${b}</text>`;
+    s+=strip(X0,80,W,40,d,c,A)+`<text x="${X0-34}" y="${105}" font-family="Atkinson Hyperlegible Mono" font-size="13" fill="${MUT}">${c}/${d}</text>`;
     s+=lab(X0+W/2,144,`both re-cut into ${L}ths — now the pieces match`,INK,14);
-    s+=strip(X0,154,W,32,L,a*ka,T)+`<text x="${X0-34}" y="${174}" font-family="Inconsolata" font-size="13" fill="${MUT}">${a*ka}/${L}</text>`;
-    s+=strip(X0,192,W,32,L,c*kb,A)+`<text x="${X0-34}" y="${212}" font-family="Inconsolata" font-size="13" fill="${MUT}">${c*kb}/${L}</text>`;
+    s+=strip(X0,154,W,32,L,a*ka,T)+`<text x="${X0-34}" y="${174}" font-family="Atkinson Hyperlegible Mono" font-size="13" fill="${MUT}">${a*ka}/${L}</text>`;
+    s+=strip(X0,192,W,32,L,c*kb,A)+`<text x="${X0-34}" y="${212}" font-family="Atkinson Hyperlegible Mono" font-size="13" fill="${MUT}">${c*kb}/${L}</text>`;
     svg.innerHTML=s;
     svg.setAttribute("aria-label",`Four bars of equal length. The first is ${a} of ${b} parts shaded, the second ${c} of ${d}. Below, both are re-cut into ${L} equal parts: ${a*ka} shaded and ${c*kb} shaded, so the pieces are now the same size and can be compared directly.`);
 
@@ -240,25 +240,25 @@ function fractionDivide(host){
     const px=x=>X0+(x/span)*W;
     const groups=V/D, whole=Math.floor(groups+1e-9), left=groups-whole;
 
-    let s=`<text x="${X0}" y="30" font-family="Inconsolata" font-size="13" fill="${MUT}">we have ${mixed(n,d)}</text>`;
+    let s=`<text x="${X0}" y="30" font-family="Atkinson Hyperlegible Mono" font-size="13" fill="${MUT}">we have ${mixed(n,d)}</text>`;
     s+=`<rect x="${X0}" y="${Y}" width="${px(V)-X0}" height="${H}" fill="${T}" opacity=".18" stroke="${INK}" stroke-width="1.5"/>`;
     /* whole-unit ticks along the bar */
-    for(let u=1;u<=Math.ceil(span);u++){const x=px(u);if(x<=X0+W+.5)s+=`<line x1="${x}" y1="${Y-6}" x2="${x}" y2="${Y+H+6}" stroke="${MUT}" stroke-width="1" stroke-dasharray="2 3"/><text x="${x}" y="${Y+H+22}" font-family="Inconsolata" font-size="11" fill="${MUT}" text-anchor="middle">${u}</text>`;}
+    for(let u=1;u<=Math.ceil(span);u++){const x=px(u);if(x<=X0+W+.5)s+=`<line x1="${x}" y1="${Y-6}" x2="${x}" y2="${Y+H+6}" stroke="${MUT}" stroke-width="1" stroke-dasharray="2 3"/><text x="${x}" y="${Y+H+22}" font-family="Atkinson Hyperlegible Mono" font-size="11" fill="${MUT}" text-anchor="middle">${u}</text>`;}
     /* group segments */
     const cap=Math.min(whole,40);
     for(let i=0;i<cap;i++){
       const x1=px(i*D),x2=px((i+1)*D);
       s+=`<rect class="bmseg" x="${x1+1.5}" y="${Y+7}" width="${Math.max(1,x2-x1-3)}" height="${H-14}" rx="3" fill="${T}" stroke="#fff" stroke-width="1.5"/>`;
-      if(x2-x1>22)s+=`<text x="${(x1+x2)/2}" y="${Y+H/2+5}" font-family="Inconsolata" font-size="12" fill="#fff" text-anchor="middle">${i+1}</text>`;
+      if(x2-x1>22)s+=`<text x="${(x1+x2)/2}" y="${Y+H/2+5}" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="#fff" text-anchor="middle">${i+1}</text>`;
     }
     if(left>1e-9){
       const x1=px(whole*D),x2=px(V);
       s+=`<rect class="bmseg" x="${x1+1.5}" y="${Y+7}" width="${Math.max(1,x2-x1-3)}" height="${H-14}" rx="3" fill="${A}" stroke="#fff" stroke-width="1.5"/>`;
       const [ln,ld]=simp(Math.round(left*sd*d*100)/100===0?0:1,1);
       s+=`<path d="M${x1} ${Y+H+30} L${x1} ${Y+H+38} L${x2} ${Y+H+38} L${x2} ${Y+H+30}" fill="none" stroke="#B87C1C" stroke-width="1.5"/>`;
-      s+=`<text x="${(x1+x2)/2}" y="${Y+H+54}" font-family="Inconsolata" font-size="12" fill="#B87C1C" text-anchor="middle">part of a group</text>`;
+      s+=`<text x="${(x1+x2)/2}" y="${Y+H+54}" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="#B87C1C" text-anchor="middle">part of a group</text>`;
     }
-    s+=`<text x="${X0}" y="${Y-16}" font-family="Inconsolata" font-size="12" fill="${MUT}">each group is ${mixed(sn,sd)} long</text>`;
+    s+=`<text x="${X0}" y="${Y-16}" font-family="Atkinson Hyperlegible Mono" font-size="12" fill="${MUT}">each group is ${mixed(sn,sd)} long</text>`;
     svg.innerHTML=s;
 
     /* exact answer as a fraction */
@@ -328,7 +328,7 @@ function decimalGrid(host){
       s+=`<line x1="${x+i*c}" y1="${y}" x2="${x+i*c}" y2="${y+S}" stroke="${INK}" stroke-width="${w}" opacity=".5"/>`;
       s+=`<line x1="${x}" y1="${y+i*c}" x2="${x+S}" y2="${y+i*c}" stroke="${INK}" stroke-width="${w}" opacity=".5"/>`;
     }
-    if(label)s+=`<text x="${x+S/2}" y="${y+S+22}" font-family="Inconsolata" font-size="14" fill="${INK}" text-anchor="middle">${label}</text>`;
+    if(label)s+=`<text x="${x+S/2}" y="${y+S+22}" font-family="Atkinson Hyperlegible Mono" font-size="14" fill="${INK}" text-anchor="middle">${label}</text>`;
     return s;
   }
   function vis(){q("#dgb2").hidden=$m.value==="show";q("#dgops").hidden=$m.value!=="add";}
@@ -343,7 +343,7 @@ function decimalGrid(host){
       let s="",x=40;const n=Math.min(3,wholes)+(frac>0?1:0);
       for(let i=0;i<Math.min(3,wholes);i++){s+=grid(x,30,S*0.62,1,T,"1 whole");x+=S*0.62+22;}
       if(frac>0)s+=grid(x,30,S*0.62,frac,A,frac.toFixed(2).replace(/0+$/,"").replace(/\.$/,""));
-      s+=`<text x="40" y="${30+S*0.62+52}" font-family="Inconsolata" font-size="13" fill="${MUT}">tenths = full columns · hundredths = single cells</text>`;
+      s+=`<text x="40" y="${30+S*0.62+52}" font-family="Atkinson Hyperlegible Mono" font-size="13" fill="${MUT}">tenths = full columns · hundredths = single cells</text>`;
       svg.innerHTML=s;
       const t=Math.round(frac*10)/1,h=Math.round(frac*100);
       svg.setAttribute("aria-label",`${wholes} full unit squares shaded, plus a square with ${h} of its 100 cells shaded, representing ${a}.`);
@@ -365,10 +365,10 @@ function decimalGrid(host){
         s+=`<line x1="${GX}" y1="${GY+i*c}" x2="${GX+S}" y2="${GY+i*c}" stroke="${INK}" stroke-width=".7" opacity=".5"/>`;
       }
       const cells=ac*bc,val=r2(ac*bc/100);
-      s+=`<text x="${GX+S/2}" y="${GY+S+24}" font-family="Inconsolata" font-size="13" fill="${MUT}" text-anchor="middle">${(bc/10)} across</text>`;
-      s+=`<text x="${GX-14}" y="${GY+S/2}" font-family="Inconsolata" font-size="13" fill="${MUT}" text-anchor="middle" transform="rotate(-90 ${GX-14} ${GY+S/2})">${(ac/10)} down</text>`;
-      s+=`<text x="${GX+S+40}" y="${GY+70}" font-family="Inconsolata" font-size="14" fill="${INK}">overlap = ${cells} cells</text>`;
-      s+=`<text x="${GX+S+40}" y="${GY+94}" font-family="Inconsolata" font-size="14" fill="${INK}">each cell = 0.01</text>`;
+      s+=`<text x="${GX+S/2}" y="${GY+S+24}" font-family="Atkinson Hyperlegible Mono" font-size="13" fill="${MUT}" text-anchor="middle">${(bc/10)} across</text>`;
+      s+=`<text x="${GX-14}" y="${GY+S/2}" font-family="Atkinson Hyperlegible Mono" font-size="13" fill="${MUT}" text-anchor="middle" transform="rotate(-90 ${GX-14} ${GY+S/2})">${(ac/10)} down</text>`;
+      s+=`<text x="${GX+S+40}" y="${GY+70}" font-family="Atkinson Hyperlegible Mono" font-size="14" fill="${INK}">overlap = ${cells} cells</text>`;
+      s+=`<text x="${GX+S+40}" y="${GY+94}" font-family="Atkinson Hyperlegible Mono" font-size="14" fill="${INK}">each cell = 0.01</text>`;
       s+=`<text x="${GX+S+40}" y="${GY+128}" font-family="Fraunces" font-size="22" fill="${T}">${val}</text>`;
       svg.innerHTML=s;
       svg.setAttribute("aria-label",`A unit square. ${ac} of ten rows shaded one way, ${bc} of ten columns the other. The ${cells} cells shaded both ways equal ${val}.`);
@@ -381,7 +381,7 @@ function decimalGrid(host){
     /* cmp and add */
     if(m==="cmp"){
       svg.innerHTML=grid(70,26,S,Math.min(1,a),T,String(a))+grid(330,26,S,Math.min(1,b),A,String(b))+
-        `<text x="350" y="${26+S+52}" font-family="Inconsolata" font-size="13" fill="${MUT}" text-anchor="middle">shade both, then look — no digit-counting required</text>`;
+        `<text x="350" y="${26+S+52}" font-family="Atkinson Hyperlegible Mono" font-size="13" fill="${MUT}" text-anchor="middle">shade both, then look — no digit-counting required</text>`;
       svg.setAttribute("aria-label",`Two unit squares side by side. The left has ${Math.round(a*100)} of 100 cells shaded for ${a}; the right has ${Math.round(b*100)} for ${b}. ${a===b?"They match.":a>b?"The left is larger.":"The right is larger."}`);
       const pad=(x)=>x.toFixed(2);
       out.innerHTML=`${a} ${a===b?"=":a>b?"&gt;":"&lt;"} ${b}.<br>
