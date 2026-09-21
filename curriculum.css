@@ -208,7 +208,7 @@ ol.probs li,ul.probs li{margin-bottom:9px;font-size:.96rem}
 .btn.go:hover{background:var(--ink)}
 .btn.amb{background:var(--amber);border-color:var(--amber);color:#2B1B04}
 .btn.sm{padding:5px 10px;font-size:.8rem}
-.stage-area{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:16px;overflow-x:auto}
+.stage-area{container-type:inline-size;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:16px;overflow-x:auto}
 .out{margin-top:14px;font-family:var(--mono);font-size:.95rem;color:var(--ink-2);line-height:1.9}
 .out b{color:var(--teal-text);font-weight:600}
 .note{font-size:.88rem;color:var(--muted);margin-top:10px}
@@ -224,6 +224,19 @@ ol.probs li,ul.probs li{margin-bottom:9px;font-size:.96rem}
 .disc.pop{animation:pop .3s ease both}
 @keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
 .pvcol .btns{display:flex;gap:3px;margin-top:6px;justify-content:center}
+.pvcol .lab .short{display:none}
+@container (max-width:640px){
+  .pv{min-width:0;gap:3px}
+  .pvcol{min-width:0}
+  .pvcol .lab{overflow:hidden}
+  .pvcol .lab{height:auto;margin-bottom:5px;font-size:.78rem;font-weight:600}
+  .pvcol .lab .full{display:none}
+  .pvcol .lab .short{display:block}
+  .pvcol .bin{min-height:120px;padding:3px;gap:2px}
+  .pvcol .disc{width:10px;height:10px}
+  .pvcol .btns{flex-direction:column;gap:4px}
+  .pvcol .btns .btn{padding:0;height:34px;width:100%;font-size:1.1rem}
+}
 .pvcol .cnt{font-family:var(--mono);font-size:.8rem;color:var(--ink-2);margin-top:4px}
 
 /* shift machine */

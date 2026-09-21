@@ -7,6 +7,7 @@
 (function(){
 const PLACES=[["millions","1,000,000"],["hundred<br>thousands","100,000"],["ten<br>thousands","10,000"],["thousands","1,000"],["hundreds","100"],["tens","10"],["ones","1"]];
 const PV=[1000000,100000,10000,1000,100,10,1];
+const SHORT=["1M","100K","10K","1K","100","10","1"];
 const rm=()=>(!!window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
 const words=n=>{
@@ -43,7 +44,7 @@ function placeValue(host){
 
   PLACES.forEach((p,i)=>{
     const col=el("div","pvcol");
-    col.innerHTML=`<div class="lab">${p[0]}<br>${p[1]}</div><div class="bin"></div>
+    col.innerHTML=`<div class="lab"><span class="full">${p[0]}<br>${p[1]}</span><span class="short" aria-hidden="true">${SHORT[i]}</span></div><div class="bin"></div>
       <div class="cnt">0</div><div class="btns">
       <button class="btn sm" data-i="${i}" data-d="1" aria-label="Add one ${p[0].replace(/<br>/g," ")} disc">+</button>
       <button class="btn sm" data-i="${i}" data-d="-1" aria-label="Remove one ${p[0].replace(/<br>/g," ")} disc">−</button></div>`;
