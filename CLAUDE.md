@@ -55,6 +55,24 @@ Add new ones via `window.__EXTRA_TOOLS__` / `window.__EXTRA_NAMES__`, declared
 BEFORE the `curriculum-core.js` tag. Reuse the shared classes (`.tool`, `.ctl`,
 `.btn`, `.stage-area`, `.out`, `.note`, `.picker`) so no new CSS is needed.
 
+## Design principles
+
+**Readability comes first.** Learners are usually about 12 years old, and
+teachers read these pages aloud and on projectors. When a design choice
+trades looks against readability, readability wins.
+
+- Body text is Lexend (research-backed for reading fluency); headings are
+  Fraunces. Do not reintroduce a font whose zero is slashed or dotted —
+  the Atkinson Hyperlegible family slashes it, which was rejected.
+- Contrast: WCAG AA minimum (4.5:1) for every text/background pair, in both
+  light and dark themes. Use the `-text` colour tokens for coloured text.
+- Never fill a badge with `--ink`/`--ink-2`/`--ink-3` under white text: those
+  tokens flip light in dark mode. Use `--header-bg`.
+- Interactive tools stay a light "paper" surface in dark mode (`.tool`).
+- Primary controls are larger than body text; small mono labels stay at
+  .83rem or above.
+- Verify by rendering, not by reading specs.
+
 ## Non-negotiables
 
 - **CPA order holds.** Concrete means a physical object in a student's hands.
@@ -105,17 +123,11 @@ concrete stage uses, and which contexts to lean on.
 Treat the day splits as a starting proposal, not a mandate. If a strand needs
 an extra day, take it from review — but never from the concrete stage.
 
-**"D · Reason it out" placement is deliberately inconsistent.** Units 2–10
-place their one open-ended reasoning worksheet section on the unit's review
-day only. Unit 1 instead distributes it across five lessons (days 3, 4, 6, 9,
-10). This is not drift to be cleaned up — daily reasoning practice is the
-stronger pattern pedagogically, and Unit 1 keeping it is correct. Units 2–10
-concentrating it on review day was an authoring simplification, not an
-improvement; don't "fix" Unit 1 to match them. Retrofitting daily reasoning
-sections into the other nine units is a legitimate future improvement, but a
-real authoring project (roughly 15–20 new prompts per unit), not a quick
-consistency pass — scope it separately if it's ever worth doing. Decided
-2026-09-16.
+**Reasoning sections.** Nearly every lesson in Units 2-10 carries a
+"Reason it out" worksheet section, lettered C or D depending on how many
+sections precede it, so it looks inconsistent when grepping for one letter.
+It is not. Lessons with a different closing section (Unit 1 days 9-10 ask
+"which method and why" in context) are deliberate. Count by title, not letter.
 
 ### Unit 3 — Ratio & Rate (15 days)
 

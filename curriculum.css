@@ -108,7 +108,7 @@ main{padding:34px 0 70px}
 .say{border-left:3px solid var(--line);padding:2px 0 2px 16px;margin:0 0 14px}
 .say p{margin:0 0 9px;font-size:.97rem;color:var(--ink-2)}
 .say p:last-child{margin-bottom:0}
-.say .who{font-family:var(--mono);font-size:.74rem;color:var(--muted);display:block;margin-bottom:2px}
+.say .who{font-family:var(--mono);font-size:.8rem;color:var(--muted);display:block;margin-bottom:2px}
 .watch,.readaloud{position:relative;border-radius:10px;padding:24px 16px 15px;font-size:.92rem;
   margin-top:24px;box-shadow:0 2px 0 rgba(0,0,0,.07)}
 .watch{background:var(--amber-pale)}
@@ -149,7 +149,7 @@ ol.probs li,ul.probs li{margin-bottom:9px;font-size:.96rem}
 .card li{margin-bottom:5px}
 .vocab li b{font-family:var(--serif);font-weight:600}
 .std{display:flex;flex-wrap:wrap;gap:6px}
-.std span{font-family:var(--mono);font-size:.76rem;background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:3px 8px}
+.std span{font-family:var(--mono);font-size:.8rem;background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:3px 8px}
 .diff h4{color:var(--teal-text)}
 .diff.ext h4{color:var(--amber-dk)}
 .diff.acc h4{color:var(--peri-text)}
@@ -216,7 +216,7 @@ ol.probs li,ul.probs li{margin-bottom:9px;font-size:.96rem}
 /* place value */
 .pv{display:flex;gap:4px;min-width:640px}
 .pvcol{flex:1;text-align:center}
-.pvcol .lab{font-family:var(--mono);font-size:.68rem;color:var(--muted);line-height:1.25;margin-bottom:5px;height:30px}
+.pvcol .lab{font-family:var(--mono);font-size:.78rem;color:var(--muted);line-height:1.25;margin-bottom:6px;height:54px}
 .pvcol .bin{min-height:132px;border:1px dashed var(--line);border-radius:6px;background:var(--card);
   display:flex;flex-wrap:wrap-reverse;align-content:flex-start;gap:3px;padding:5px;justify-content:center}
 .pvcol.hot .bin{border-color:var(--amber);background:var(--amber-pale)}
@@ -229,7 +229,7 @@ ol.probs li,ul.probs li{margin-bottom:9px;font-size:.96rem}
 /* shift machine */
 .sm-chart{display:flex;gap:3px;min-width:600px}
 .smcol{flex:1;text-align:center}
-.smcol .lab{font-family:var(--mono);font-size:.66rem;color:var(--muted);margin-bottom:5px;height:26px;line-height:1.2}
+.smcol .lab{font-family:var(--mono);font-size:.78rem;color:var(--muted);margin-bottom:5px;height:34px;line-height:1.2}
 .smcol .cell{height:52px;border:1px solid var(--line);border-radius:6px;background:var(--card);
   display:grid;place-items:center;font-family:var(--mono);font-size:1.5rem;color:var(--ink);
   transition:transform .45s cubic-bezier(.3,1,.4,1),background .3s,color .3s}
@@ -261,7 +261,7 @@ ol.probs li,ul.probs li{margin-bottom:9px;font-size:.96rem}
 .rect .sq{width:13px;height:13px;background:var(--amber);border:1px solid var(--amber-dk);border-radius:2px}
 .rect .cap{font-family:var(--mono);font-size:.78rem;color:var(--muted)}
 .hundred{display:grid;grid-template-columns:repeat(10,1fr);gap:2px;max-width:340px}
-.hundred div{aspect-ratio:1;display:grid;place-items:center;font-family:var(--mono);font-size:.6rem;
+.hundred div{aspect-ratio:1;display:grid;place-items:center;font-family:var(--mono);font-size:.78rem;
   background:var(--card);border:1px solid var(--line);border-radius:2px;color:var(--muted)}
 .hundred div.a{background:var(--teal-pale);color:var(--teal-text);border-color:var(--teal)}
 .hundred div.b{background:var(--amber-pale);color:var(--amber-dk);border-color:var(--amber)}

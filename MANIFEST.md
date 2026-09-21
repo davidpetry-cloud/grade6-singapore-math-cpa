@@ -32,7 +32,7 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 
 | file | bytes | sha256 (first 16) |
 |---|---|---|
-| `CLAUDE.md` | 14,392 | `f3efecce649d26cc` |
+| `CLAUDE.md` | 14,916 | `8532e56652f40cfd` |
 | `README.md` | 4,714 | `6d2d5ebf47ada6c8` |
 | `angle-chase.js` | 10,490 | `2daf3c83b7d8e0cd` |
 | `angle-chase.test.js` | 4,719 | `59cf3f33124df385` |
@@ -43,7 +43,7 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 | `coord-plane.js` | 11,531 | `6f8c6bd070b347e2` |
 | `coord-plane.test.js` | 4,516 | `62238f169083fde3` |
 | `curriculum-core.js` | 51,949 | `4d9ea089543c8b4f` |
-| `curriculum.css` | 16,712 | `43d735ac0084ef87` |
+| `curriculum.css` | 16,711 | `a1ee486dfebc476d` |
 | `dist-builder.js` | 9,126 | `28d5e5b2a03283af` |
 | `dist-builder.test.js` | 3,911 | `0910cafcf6db26fc` |
 | `net-fold.js` | 9,243 | `949f6ef7b1e2807d` |
@@ -51,16 +51,16 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 | `singapore-math-6-hub.html` | 22,395 | `418318c1a5baf8fd` |
 | `test-unit.js` | 4,235 | `760c86dcdd48f57f` |
 | `theme-toggle.js` | 1,187 | `18c8994a2a613f0c` |
-| `unit-01-whole-numbers-and-operations.html` | 62,494 | `482237ee4adf9d79` |
+| `unit-01-whole-numbers-and-operations.html` | 63,324 | `cb605e91bf810258` |
 | `unit-02-fractions-and-decimals.html` | 158,500 | `f1f789cca47613fb` |
 | `unit-03-ratio-and-rate.html` | 104,442 | `84cbe450f152b8e3` |
 | `unit-04-percentage.html` | 88,255 | `8a2abc8e3b61f006` |
 | `unit-05-algebra.html` | 126,414 | `954a92f3be822552` |
 | `unit-06-angles-and-figures.html` | 95,095 | `66e6fde6910fe4bc` |
-| `unit-07-circles.html` | 92,645 | `ec98e0a627db88bf` |
+| `unit-07-circles.html` | 93,088 | `027f02ce7117338a` |
 | `unit-08-volume.html` | 93,094 | `e6ae9a7133be80ae` |
 | `unit-09-data-and-statistics.html` | 103,871 | `cdab076066830f01` |
-| `unit-10-integers-and-coordinates.html` | 93,818 | `b38c722baf6d72db` |
+| `unit-10-integers-and-coordinates.html` | 94,228 | `7c7f59391b39ecde` |
 | `unit-template.html` | 5,832 | `33ab7104d6682eb8` |
 
 ## Unit status
