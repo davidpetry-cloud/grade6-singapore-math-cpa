@@ -73,7 +73,7 @@ a{color:var(--ink-2)}
 /* day nav */
 .daynav{display:flex;gap:0;overflow-x:auto;border-top:1px solid rgba(255,255,255,.14)}
 .daynav button{
-  flex:1;min-width:74px;background:transparent;border:0;border-bottom:4px solid transparent;
+  flex:1;min-width:108px;overflow-wrap:anywhere;background:transparent;border:0;border-bottom:4px solid transparent;
   color:#9FB6CC;font-family:var(--sans);font-size:.8rem;font-weight:600;padding:13px 6px;cursor:pointer;
   display:flex;flex-direction:column;gap:2px;align-items:center;line-height:1.15;transition:color .15s
 }
@@ -164,7 +164,7 @@ ol.probs li,ul.probs li{margin-bottom:9px;font-size:.96rem}
   font-size:.88rem;padding:10px 16px;border-radius:7px;cursor:pointer;width:100%}
 
 @media(max-width:940px){
-  .lesson{grid-template-columns:1fr}
+  .lesson{grid-template-columns:minmax(0,1fr)}
   .side{position:static;flex-direction:row;flex-wrap:wrap}
   .side .card{flex:1 1 240px}
 }
@@ -185,7 +185,7 @@ ol.probs li,ul.probs li{margin-bottom:9px;font-size:.96rem}
   .exit{background:#fff;color:#000;border:1px solid #999}
   .exit h3,.exit li{color:#000}
   .side{position:static}
-  .lesson{grid-template-columns:1fr}
+  .lesson{grid-template-columns:minmax(0,1fr)}
 }
 
 /* ===== interactive manipulatives ===== */
@@ -243,11 +243,20 @@ ol.probs li,ul.probs li{margin-bottom:9px;font-size:.96rem}
 .sm-chart{display:flex;gap:3px;min-width:600px}
 .smcol{flex:1;text-align:center}
 .smcol .lab{font-family:var(--mono);font-size:.78rem;color:var(--muted);margin-bottom:5px;height:34px;line-height:1.2}
+.smcol .lab .short{display:none}
 .smcol .cell{height:52px;border:1px solid var(--line);border-radius:6px;background:var(--card);
   display:grid;place-items:center;font-family:var(--mono);font-size:1.5rem;color:var(--ink);
   transition:transform .45s cubic-bezier(.3,1,.4,1),background .3s,color .3s}
 .smcol.moved .cell{background:var(--teal-pale);color:var(--teal-text);font-weight:700}
 .smcol.gone .cell{background:var(--rose-pale);color:var(--rose-text);border-color:var(--rose);font-weight:700}
+@container (max-width:640px){
+  .sm-chart{min-width:0;gap:2px}
+  .smcol{min-width:0}
+  .smcol .lab .full{display:none}
+  .smcol .lab .short{display:block;font-weight:600}
+  .smcol .lab{height:36px;font-size:.78rem}
+  .smcol .cell{height:46px;font-size:1.3rem;border-radius:5px}
+}
 
 /* number line */
 .nl{width:100%;height:120px}
@@ -279,6 +288,10 @@ ol.probs li,ul.probs li{margin-bottom:9px;font-size:.96rem}
 .hundred div.a{background:var(--teal-pale);color:var(--teal-text);border-color:var(--teal)}
 .hundred div.b{background:var(--amber-pale);color:var(--amber-dk);border-color:var(--amber)}
 .hundred div.both{background:var(--ink-2);color:#fff;border-color:var(--ink);font-weight:600}
+@container (max-width:640px){
+  .hundred{gap:1px}
+  .hundred div{letter-spacing:-.04em}
+}
 .flists{display:flex;gap:26px;flex-wrap:wrap;margin-top:12px;font-family:var(--mono);font-size:.88rem}
 .flists .sh{background:var(--ink-2);color:#fff;border-radius:3px;padding:1px 5px}
 

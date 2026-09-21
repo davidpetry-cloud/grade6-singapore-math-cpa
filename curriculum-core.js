@@ -177,6 +177,7 @@ function shift(host){
   const $n=box.querySelector("#sn"),$o=box.querySelector("#so"),$e=box.querySelector("#se");
   const COLS=[100000000,10000000,1000000,100000,10000,1000,100,10,1];
   const NAMES=["100M","10M","M","100Th","10Th","Th","H","T","O"];
+  const SNAMES=[["100","M"],["10","M"],["1","M"],["100","K"],["10","K"],["1","K"],["100",""],["10",""],["1",""]];
 
   function paint(val,shifted,dir){
     const s=String(val).padStart(COLS.length," ");
@@ -184,7 +185,7 @@ function shift(host){
     COLS.forEach((_,i)=>{
       const ch=s[s.length-COLS.length+i]||" ";
       const col=el("div","smcol"+(shifted&&ch.trim()?" moved":""));
-      col.innerHTML=`<div class="lab">${NAMES[i]}</div><div class="cell">${ch.trim()||"·"}</div>`;
+      col.innerHTML=`<div class="lab"><span class="full">${NAMES[i]}</span><span class="short" aria-hidden="true">${SNAMES[i][0]}<br>${SNAMES[i][1]||"&nbsp;"}</span></div><div class="cell">${ch.trim()||"·"}</div>`;
       chart.appendChild(col);
     });
   }
@@ -683,9 +684,9 @@ function rateLine(host){
     return s;
   }
   function table(rowsA,rowsB,ua,ub,hi){
-    const th=`padding:6px 12px;font-family:var(--mono);font-size:.78rem;color:${MUT};font-weight:400;text-align:left;border-bottom:1px solid ${LINE}`;
-    const td=i=>`padding:6px 12px;font-family:var(--mono);font-size:.9rem;color:${INK};border-bottom:1px solid ${LINE};${i===hi?`background:#FAEDD6;font-weight:600`:""}`;
-    let h=`<table style="border-collapse:collapse;min-width:320px"><caption style="caption-side:top;text-align:left;font-family:var(--mono);font-size:.76rem;color:${MUT};padding-bottom:6px">equivalent ratios</caption><thead><tr>
+    const th=`padding:6px 8px;font-family:var(--mono);font-size:.78rem;vertical-align:bottom;color:${MUT};font-weight:400;text-align:left;border-bottom:1px solid ${LINE}`;
+    const td=i=>`padding:6px 8px;font-family:var(--mono);font-size:.9rem;color:${INK};border-bottom:1px solid ${LINE};${i===hi?`background:#FAEDD6;font-weight:600`:""}`;
+    let h=`<table style="border-collapse:collapse;width:100%"><caption style="caption-side:top;text-align:left;font-family:var(--mono);font-size:.8rem;color:${MUT};padding-bottom:6px">equivalent ratios</caption><thead><tr>
       <th scope="col" style="${th}">${ua}</th><th scope="col" style="${th}">${ub}</th><th scope="col" style="${th}">${ub} per 1 ${ua}</th></tr></thead><tbody>`;
     rowsA.forEach((v,i)=>{
       h+=`<tr><td style="${td(i)}">${fmt(v)}</td><td style="${td(i)}">${fmt(rowsB[i])}</td><td style="${td(i)}">${v?fmt(rowsB[i]/v):"—"}</td></tr>`;
