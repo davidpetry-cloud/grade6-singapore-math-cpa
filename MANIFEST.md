@@ -48,7 +48,7 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 | `dist-builder.test.js` | 3,911 | `0910cafcf6db26fc` |
 | `net-fold.js` | 9,243 | `949f6ef7b1e2807d` |
 | `net-fold.test.js` | 4,433 | `8e918d5ca40037fc` |
-| `singapore-math-6-hub.html` | 22,395 | `418318c1a5baf8fd` |
+| `singapore-math-6-hub.html` | 22,413 | `5f83276163cd6d1b` |
 | `test-unit.js` | 4,235 | `760c86dcdd48f57f` |
 | `theme-toggle.js` | 1,187 | `18c8994a2a613f0c` |
 | `unit-01-whole-numbers-and-operations.html` | 63,324 | `cb605e91bf810258` |
