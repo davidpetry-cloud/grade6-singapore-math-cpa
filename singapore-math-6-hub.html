@@ -178,6 +178,8 @@ footer{padding:36px 0;font-size:.85rem;color:var(--muted);border-top:1px solid v
   .theme-toggle{display:none}
 }
 </style>
+<!-- SAMPLE redesign layer (hub and Unit 7 only, for comparison) -->
+<link rel="stylesheet" href="redesign.css">
 </head>
 <body>
 
@@ -299,19 +301,24 @@ footer{padding:36px 0;font-size:.85rem;color:var(--muted);border-top:1px solid v
 <footer><div class="wrap">Grade 6 Mathematics — Singapore CPA Curriculum. Keep unit files in the same folder as this page for the links to open.</div></footer>
 
 <script>
-const C={teal:"#1F8A7D",amber:"#C07E1E",peri:"#5A6FA6",rose:"#B04A61",ink:"#1B3A5C",tealLt:"#2E9E8F",amberLt:"#D99433",periLt:"#6B7FB3",roseLt:"#C2536B",inkLt:"#33557A"};
+// SAMPLE redesign: one colour per unit, in a hue family per maths domain
+// (number blues, ratio ochres, algebra terracotta, geometry greens, data
+// violet). Each carries white text at 5.8:1 or better; four of the old
+// colours fell below 4.5:1.
+const C={u1:"oklch(0.38 0.09 255)",u2:"oklch(0.47 0.11 242)",u3:"oklch(0.50 0.11 62)",u4:"oklch(0.47 0.09 88)",u5:"oklch(0.50 0.14 36)",
+  u6:"oklch(0.47 0.08 168)",u7:"oklch(0.49 0.09 192)",u8:"oklch(0.47 0.10 142)",u9:"oklch(0.47 0.12 292)",u10:"oklch(0.50 0.09 222)"};
 
 const UNITS=[
- {n:1,w:2,days:10,c:C.ink,title:"Whole Numbers & Order of Operations",blurb:"Place value to billions, powers of ten, brackets and the four operations, factors and multiples.",tags:["6.NS.B.4","6.EE.A.1","6.EE.A.2c"],file:"unit-01-whole-numbers-and-operations.html",ready:true},
- {n:2,w:4,days:20,c:C.teal,title:"Fractions & Decimals",blurb:"Dividing by fractions with models, four operations on decimals, converting between forms.",tags:["6.NS.A.1","6.NS.B.2","6.NS.B.3"],file:"unit-02-fractions-and-decimals.html",ready:true},
- {n:3,w:3,days:15,c:C.amber,title:"Ratio & Rate",blurb:"Ratio language, equivalent ratios, unit rate, and comparison bar models for ratio problems.",tags:["6.RP.A.1","6.RP.A.2","6.RP.A.3b"],file:"unit-03-ratio-and-rate.html",ready:true},
- {n:4,w:3,days:15,c:C.peri,title:"Percentage",blurb:"Percent as a rate per hundred, finding the whole, percent increase and decrease.",tags:["6.RP.A.3c"],file:"unit-04-percentage.html",ready:true},
- {n:5,w:4,days:20,c:C.rose,title:"Algebraic Expressions & Equations",blurb:"Letters as unknowns, writing and evaluating expressions, solving one-step equations, inequalities.",tags:["6.EE.A.2","6.EE.B.5","6.EE.B.7"],file:"unit-05-algebra.html",ready:true},
- {n:6,w:3,days:13,c:C.inkLt,title:"Angles & Geometric Figures",blurb:"Unknown angles in triangles, parallelograms, trapezoids and rhombuses through reasoning.",tags:["6.G.A.1"],file:"unit-06-angles-and-figures.html",ready:true},
- {n:7,w:3,days:13,c:C.tealLt,title:"Circles",blurb:"Radius, diameter, circumference and area; composite figures and semicircle perimeters.",tags:["6.G.A.1"],file:"unit-07-circles.html",ready:true},
- {n:8,w:3,days:15,c:C.amberLt,title:"Volume of Solids",blurb:"Volume of rectangular prisms with fractional edges, surface area from nets, capacity.",tags:["6.G.A.2","6.G.A.4"],file:"unit-08-volume.html",ready:true},
- {n:9,w:3,days:15,c:C.periLt,title:"Data Analysis & Statistics",blurb:"Statistical questions, dot plots and histograms, mean, median, mode and variability.",tags:["6.SP.A.1","6.SP.B.4","6.SP.B.5"],file:"unit-09-data-and-statistics.html",ready:true},
- {n:10,w:3,days:13,c:C.roseLt,title:"Negative Numbers & the Coordinate Plane",blurb:"Integers in context, absolute value, ordering, and plotting in all four quadrants, including geometric figures on the grid.",tags:["6.NS.C.5","6.NS.C.6","6.NS.C.8","6.G.A.3"],file:"unit-10-integers-and-coordinates.html",ready:true}
+ {n:1,w:2,days:10,c:C.u1,title:"Whole Numbers & Order of Operations",blurb:"Place value to billions, powers of ten, brackets and the four operations, factors and multiples.",tags:["6.NS.B.4","6.EE.A.1","6.EE.A.2c"],file:"unit-01-whole-numbers-and-operations.html",ready:true},
+ {n:2,w:4,days:20,c:C.u2,title:"Fractions & Decimals",blurb:"Dividing by fractions with models, four operations on decimals, converting between forms.",tags:["6.NS.A.1","6.NS.B.2","6.NS.B.3"],file:"unit-02-fractions-and-decimals.html",ready:true},
+ {n:3,w:3,days:15,c:C.u3,title:"Ratio & Rate",blurb:"Ratio language, equivalent ratios, unit rate, and comparison bar models for ratio problems.",tags:["6.RP.A.1","6.RP.A.2","6.RP.A.3b"],file:"unit-03-ratio-and-rate.html",ready:true},
+ {n:4,w:3,days:15,c:C.u4,title:"Percentage",blurb:"Percent as a rate per hundred, finding the whole, percent increase and decrease.",tags:["6.RP.A.3c"],file:"unit-04-percentage.html",ready:true},
+ {n:5,w:4,days:20,c:C.u5,title:"Algebraic Expressions & Equations",blurb:"Letters as unknowns, writing and evaluating expressions, solving one-step equations, inequalities.",tags:["6.EE.A.2","6.EE.B.5","6.EE.B.7"],file:"unit-05-algebra.html",ready:true},
+ {n:6,w:3,days:13,c:C.u6,title:"Angles & Geometric Figures",blurb:"Unknown angles in triangles, parallelograms, trapezoids and rhombuses through reasoning.",tags:["6.G.A.1"],file:"unit-06-angles-and-figures.html",ready:true},
+ {n:7,w:3,days:13,c:C.u7,title:"Circles",blurb:"Radius, diameter, circumference and area; composite figures and semicircle perimeters.",tags:["6.G.A.1"],file:"unit-07-circles.html",ready:true},
+ {n:8,w:3,days:15,c:C.u8,title:"Volume of Solids",blurb:"Volume of rectangular prisms with fractional edges, surface area from nets, capacity.",tags:["6.G.A.2","6.G.A.4"],file:"unit-08-volume.html",ready:true},
+ {n:9,w:3,days:15,c:C.u9,title:"Data Analysis & Statistics",blurb:"Statistical questions, dot plots and histograms, mean, median, mode and variability.",tags:["6.SP.A.1","6.SP.B.4","6.SP.B.5"],file:"unit-09-data-and-statistics.html",ready:true},
+ {n:10,w:3,days:13,c:C.u10,title:"Negative Numbers & the Coordinate Plane",blurb:"Integers in context, absolute value, ordering, and plotting in all four quadrants, including geometric figures on the grid.",tags:["6.NS.C.5","6.NS.C.6","6.NS.C.8","6.G.A.3"],file:"unit-10-integers-and-coordinates.html",ready:true}
 ];
 
 const TOTAL=UNITS.reduce((s,u)=>s+u.w,0);
@@ -347,8 +354,8 @@ document.getElementById("units").innerHTML=UNITS.map(u=>{
     <h3>${u.title}</h3><p>${u.blurb}</p>
     <span class="status ${u.ready?"ready":"soon"}">${u.ready?"Lesson plans ready":"In development"}</span>`;
   return u.ready
-    ? `<a class="unit" href="${u.file}">${inner}</a>`
-    : `<div class="unit">${inner}</div>`;
+    ? `<a class="unit" style="--u:${u.c}" href="${u.file}">${inner}</a>`
+    : `<div class="unit" style="--u:${u.c}">${inner}</div>`;
 }).join("");
 
 if(!(window.matchMedia("(prefers-reduced-motion: reduce)").matches)){
