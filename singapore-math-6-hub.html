@@ -7,30 +7,9 @@
 <link rel="stylesheet" href="curriculum.css">
 <script src="theme-toggle.js"></script>
 <style>
-:root{
-  --ink:#0F2338; --ink-2:#1B3A5C; --ink-3:#33557A;
-  --header-bg:var(--ink);
-  --teal:#1F8A7D; --teal-lt:#37B0A0; --teal-pale:#DCEFEB; --teal-text:#136155;
-  --amber:#E4A03C; --amber-dk:#96630E; --amber-pale:#FAEDD6;
-  --rose:#C2536B; --rose-pale:#F6E2E6; --rose-text:#9C2C46; --peri:#6B7FB3;
-  --paper:#F3F6F8; --card:#FFFFFF; --line:#D3DCE4;
-  --grid:rgba(15,35,56,.055);
-  --text:#16283C; --muted:#5B7189;
-  --sans:"Lexend",system-ui,sans-serif;
-  --serif:"Fraunces",Georgia,serif;
-  --mono:"Lexend",ui-monospace,monospace;
-  --r:10px;
-}
-:root[data-theme="dark"]{
-  --ink:#EAF2F9; --ink-2:#BFD4E8; --ink-3:#93AEC9;
-  --header-bg:#0A1420;
-  --teal:#3FBFA9; --teal-lt:#5FD9C4; --teal-pale:#153732; --teal-text:#5FE0C7;
-  --amber:#E9AD55; --amber-dk:#F0C77E; --amber-pale:#3A2C13;
-  --rose:#E07992; --rose-pale:#3A1E27; --rose-text:#F5A8BB; --peri:#8FA0D6;
-  --paper:#0F151C; --card:#1A222B; --line:#2B3641;
-  --grid:rgba(255,255,255,.05);
-  --text:#DCE6EE; --muted:#93A7BC;
-}
+/* Colours, type and ornament come from curriculum.css; these are the hub's own */
+:root{--teal-lt:#37B0A0;--grid:rgba(15,35,56,.055);--r:10px}
+:root[data-theme="dark"]{--teal-lt:#5FD9C4;--grid:rgba(255,255,255,.05)}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
@@ -48,14 +27,7 @@ a{color:var(--ink-2)}
 :focus-visible{outline:3px solid var(--amber);outline-offset:3px;border-radius:3px}
 
 /* ---------- hero ---------- */
-.hero{
-  background:var(--header-bg);
-  background-image:
-    linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
-  background-size:26px 26px;
-  color:#fff; padding:64px 0 72px; border-bottom:5px solid var(--amber);
-}
+.hero{background:var(--header-bg);color:#fff;padding:64px 0 104px}
 .hero-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
 .kicker{font-family:var(--mono);font-size:.95rem;color:var(--amber);letter-spacing:.04em;margin:0 0 14px}
 .hero h1{
@@ -177,9 +149,161 @@ footer{padding:36px 0;font-size:.85rem;color:var(--muted);border-top:1px solid v
   .access{background:#fff;color:#000}
   .theme-toggle{display:none}
 }
+
+/* ===== Budapest layer (David, 2026-10-16): the hub's own parts; the shared
+   tokens, header frame and lesson cards are in curriculum.css ===== */
+.hero, .access{position:relative;background-image:var(--frame-image);background-size:var(--frame-size)}
+
+/* The Danube: a wave of paper with an amber line along its crest */
+.hero::after, .hero::before{
+  content:"";position:absolute;left:0;right:0;bottom:-1px;height:40px;pointer-events:none;
+  -webkit-mask:var(--wave-fill) center/100% 100% no-repeat;mask:var(--wave-fill) center/100% 100% no-repeat;
+  background:var(--paper);
+}
+.hero::before{
+  bottom:0;
+  -webkit-mask-image:var(--wave-line);mask-image:var(--wave-line);
+  background:var(--amber);z-index:1;
+}
+/* The year section that follows the hero is card-white; its wave matches */
+.hero::after{background:var(--card)}
+
+/* Type with character in the frame */
+.hero h1{font-optical-sizing:auto;letter-spacing:-.025em}
+.hero h1{font-size:clamp(2.4rem,4.4vw,3.5rem)}
+.kicker{display:flex;align-items:center;gap:10px}
+.kicker::before{flex:none}
+.hero .kicker{max-width:none}
+.kicker::before{content:"";width:28px;height:1.5px;background:var(--amber)}
+.chip{background:color-mix(in oklch, var(--header-bg), white 10%);border-color:oklch(1 0 0 / .22)}
+.demo{border-radius:var(--petal);background:color-mix(in oklch, var(--header-bg), white 6%);
+  box-shadow:inset 0 1px 0 oklch(1 0 0 / .08), 0 30px 60px -30px oklch(0 0 0 / .6);
+  outline:1px solid oklch(1 0 0 / .08);outline-offset:-8px}
+
+/* ========================= section headings ========================== */
+.sec-head{font-size:clamp(1.8rem,3.4vw,2.4rem);letter-spacing:-.02em;line-height:1.15;text-wrap:balance}
+.sec-head::after{
+  content:"";display:block;width:132px;height:16px;margin-top:10px;
+  -webkit-mask:var(--flourish) center/contain no-repeat;mask:var(--flourish) center/contain no-repeat;
+  background:var(--amber-dk);
+}
+.access .sec-head::after{background:var(--amber)}
+
+/* ===================== the year, as mosaic tiles ===================== */
+.year{border:0;position:relative}
+.yearbar{gap:4px;border:0;overflow:visible;height:80px}
+.brace{gap:4px}
+/* On phones the narrowest tile is under 24px; the unit cards below carry the
+   same choices at full size, so tighten the gaps and keep the tiles */
+@media (max-width:480px){.yearbar{gap:2px}
+  /* the day counts are in the readout and the cards; on phones the row can't fit them */
+  .brace{display:none}}
+.useg{
+  border:0;border-radius:10px;
+  box-shadow:inset 0 1px 0 oklch(1 0 0 / .22), inset 0 -2px 0 oklch(0 0 0 / .18), 0 6px 12px -8px oklch(0.25 0.05 255 / .5);
+  transition:transform .35s var(--ease), box-shadow .35s var(--ease), filter .2s;
+  position:relative;
+}
+.useg:first-child{border-radius:16px 10px 10px 16px}
+.useg:last-child{border-radius:10px 16px 16px 10px}
+.useg .w{opacity:1}
+/* The chosen unit lifts and points at its readout: shape, not just colour */
+.useg[aria-selected="true"]{
+  transform:translateY(-8px);
+  box-shadow:inset 0 1px 0 oklch(1 0 0 / .25), 0 16px 22px -12px oklch(0.25 0.05 255 / .65);
+}
+.useg[aria-selected="true"]::after{
+  content:"";position:absolute;left:50%;bottom:-13px;translate:-50% 0;
+  border:7px solid transparent;border-top-color:var(--ink);
+}
+.readout{border-radius:0 var(--r) var(--r) 0;background:var(--paper);border-left-width:6px;border-left-style:double}
+
+/* ============================ CPA stages ============================= */
+.cpa{gap:22px}
+.stage,
+.stage:first-child,.stage:last-child{border:1px solid var(--line);border-radius:var(--petal);box-shadow:var(--lift)}
+.stage:nth-child(1){border-top:6px double var(--teal)}
+.stage:nth-child(2){border-top:6px double var(--amber)}
+.stage:nth-child(3){border-top:6px double var(--peri)}
+.stage-n{
+  width:44px;height:44px;background:transparent;color:var(--ink);
+  font-family:var(--serif);font-size:1.35rem;font-weight:600;
+  border:1.5px solid currentColor;outline:1px solid var(--line);outline-offset:3px;
+}
+.stage:nth-child(1) .stage-n{color:var(--teal-text)}
+.stage:nth-child(2) .stage-n{color:var(--amber-dk)}
+.stage:nth-child(3) .stage-n{color:var(--peri-text)}
+/* A chevron between stages: the order is the point */
+@media (min-width:861px){
+  .stage:not(:last-child)::after{
+    content:"";position:absolute;top:50%;right:-17px;width:12px;height:24px;translate:0 -50%;
+    -webkit-mask:var(--chevron) center/contain no-repeat;mask:var(--chevron) center/contain no-repeat;
+    background:var(--muted);
+  }
+}
+@media (max-width:860px){
+  .stage,.stage:first-child,.stage:last-child{border-radius:var(--petal);border:1px solid var(--line)}
+}
+
+/* =============================== units =============================== */
+.units{gap:20px;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr))}
+.unit{
+  --u:var(--ink-2);
+  position:relative;border-radius:var(--petal);box-shadow:var(--lift);
+  border:1px solid var(--line);border-top:6px solid var(--u);
+  outline:1px solid color-mix(in oklch, var(--u) 22%, transparent);outline-offset:-8px;
+  transition:transform .35s var(--ease), box-shadow .35s var(--ease), border-color .2s;
+}
+a.unit:hover, a.unit:focus-visible{border-color:var(--u);box-shadow:var(--lift-hi)}
+a.unit:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+/* The hub's card header shares the class name .top with the unit pages'
+   header; keep it a plain row here */
+.unit .top{background:none;background-image:none;padding:0;color:inherit}
+.unit .num{background:var(--u)!important;border-radius:var(--petal-sm);padding:3px 11px}
+.unit h3{font-size:1.3rem;letter-spacing:-.01em}
+.status{border-radius:var(--pill, 999px);padding:4px 12px}
+.ready::before{content:"✓ " / ""}
+
+/* ============================ access band ============================ */
+.access{padding-block:88px}
+/* Boxes on the dark frame are solid (a lighter step of the header colour), so
+   the rosette pattern never shows through text (David, 2026-10-16) */
+.acc{border-radius:var(--petal);background:color-mix(in oklch, var(--header-bg), white 7%);
+  outline:1px solid oklch(1 0 0 / .06);outline-offset:-7px}
+
+/* ---------- motion (skipped when the device asks for reduced motion) ---------- */
+@media (prefers-reduced-motion: no-preference){
+  .hero{view-transition-name:masthead}
+  .hero .kicker, .hero h1, .hero-grid > div:first-child > p, .hero-meta, .demo{animation:rise .9s var(--ease) both}
+  .hero h1{animation-delay:.08s}
+  .hero-grid > div:first-child > p{animation-delay:.16s}
+  .hero-meta{animation-delay:.24s}
+  .demo{animation-delay:.3s}
+  @supports (animation-timeline: scroll()){
+    .hero{animation:drift linear both;animation-timeline:scroll(root);animation-range:0 600px}
+  }
+  /* Sections settle in as they scroll into view. The fade ends after 140px
+     (or the whole element, if shorter), so nothing rests part-faded.
+     translate, not transform, so a card's hover lift still works on top */
+  @supports (animation-timeline: view()){
+    @keyframes settle{from{opacity:0;translate:0 32px}to{opacity:1;translate:0 0}}
+    .sec-head, .sec-sub, .yearbar, .stage, .unit, .acc{
+      animation:settle linear both;animation-timeline:view();
+      animation-range:entry 0% entry min(100%,140px);
+    }
+  }
+  a.unit:hover, a.unit:focus-visible{transform:translateY(-6px)}
+  .useg:not([aria-selected="true"]):hover{transform:translateY(-4px)}
+  .readout > *{animation:arrive .45s var(--ease) both}
+  .readout > :nth-child(2){animation-delay:.05s}
+  .readout > :nth-child(3){animation-delay:.1s}
+}
+@media print{
+  .hero::before, .hero::after, .sec-head::after, .stage::after{display:none}
+  .hero, .access{background-image:none}
+  .unit, .stage{box-shadow:none}
+}
 </style>
-<!-- SAMPLE redesign layer (hub and Unit 7 only, for comparison) -->
-<link rel="stylesheet" href="redesign.css">
 </head>
 <body>
 
@@ -301,7 +425,7 @@ footer{padding:36px 0;font-size:.85rem;color:var(--muted);border-top:1px solid v
 <footer><div class="wrap">Grade 6 Mathematics — Singapore CPA Curriculum. Keep unit files in the same folder as this page for the links to open.</div></footer>
 
 <script>
-// SAMPLE redesign: one colour per unit, in a hue family per maths domain
+// One colour per unit, in a hue family per maths domain
 // (number blues, ratio ochres, algebra terracotta, geometry greens, data
 // violet). Each carries white text at 5.8:1 or better; four of the old
 // colours fell below 4.5:1.

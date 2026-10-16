@@ -266,7 +266,7 @@ function fractionDivide(host){
     out.innerHTML=`<b>${whole}</b> whole group${whole===1?"":"s"} fit${left>1e-9?`, and the leftover is <b>${mixed(an-whole*ad,ad)}</b> of another group`:" exactly"}.<br>
       ${mixed(n,d)} ÷ ${mixed(sn,sd)} = <b>${mixed(qn,qd)}</b><br>
       <span style="color:${MUT}">Same-size pieces: ${n*(cd/d)}/${cd} ÷ ${sn*(cd/sd)}/${cd} — once the pieces match, it is just ${n*(cd/d)} ÷ ${sn*(cd/sd)}. That is where ×${sd}/${sn} comes from; it is a shortcut for this picture, not a new rule.</span><br>
-      <span style="color:${D<1?T:"#C2536B"}">Size check: dividing by ${D<1?"less than one gives an answer larger than what you started with — you are counting small groups, so there are many of them.":D===1?"one leaves the amount unchanged.":"more than one gives an answer smaller than what you started with."}</span>`;
+      <span style="color:${D<1?"var(--teal-text)":"var(--rose-text)"}">Size check: dividing by ${D<1?"less than one gives an answer larger than what you started with — you are counting small groups, so there are many of them.":D===1?"one leaves the amount unchanged.":"more than one gives an answer smaller than what you started with."}</span>`;
   }
   box.querySelector("#dgo").addEventListener("click",draw);
   box.querySelectorAll("input").forEach(i=>i.addEventListener("input",draw));

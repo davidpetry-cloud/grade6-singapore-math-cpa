@@ -10,14 +10,30 @@
 @font-face{font-family:'Lexend';font-style:normal;font-weight:400 700;font-display:swap;src:url(fonts/lexend-latin.woff2) format('woff2');unicode-range:U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD}
 
 :root{
-  --ink:#0F2338; --ink-2:#1B3A5C; --ink-3:#33557A;
-  --header-bg:var(--ink);
-  --teal:#1F8A7D; --teal-pale:#DCEFEB; --teal-text:#136155;
-  --amber:#E4A03C; --amber-dk:#96630E; --amber-pale:#FAEDD6;
-  --peri:#6B7FB3; --peri-pale:#E4E9F4; --peri-text:#414F82;
-  --rose:#C2536B; --rose-pale:#F6E2E6; --rose-text:#9C2C46;
-  --paper:#F3F6F8; --card:#FFFFFF; --line:#D3DCE4;
-  --text:#16283C; --muted:#5B7189;
+  /* Budapest palette (David, 2026-10-16), built in oklch; each -text twin passes
+     4.5:1 as text. Bare hues are for fills and lines. */
+  --ink:   oklch(0.25 0.05 255);   /* #102239 */
+  --ink-2: oklch(0.34 0.07 252);
+  --ink-3: oklch(0.44 0.07 250);
+  --header-bg: oklch(0.25 0.05 255);
+  --teal:  oklch(0.52 0.09 182);   /* fills and lines */
+  --teal-text: oklch(0.45 0.08 182);  /* 6.4:1 on paper */
+  --teal-pale: oklch(0.93 0.035 182);
+  --amber: oklch(0.75 0.13 72);    /* fills and lines only */
+  --amber-dk: oklch(0.50 0.10 68); /* text-strength amber: 6.0:1 on card */
+  --amber-pale: oklch(0.94 0.04 80);
+  --peri:  oklch(0.51 0.09 275);
+  --peri-text: oklch(0.45 0.08 275);  /* 7.4:1 on card; white on it 7.6:1 */
+  --peri-pale: oklch(0.93 0.025 275);
+  --rose:  oklch(0.52 0.14 36);    /* was a pink; now Zsolnay terracotta */
+  --rose-text: oklch(0.45 0.13 36);
+  --rose-pale: oklch(0.94 0.03 45);
+  --paper: oklch(0.962 0.012 85);  /* warm limestone, #F6F2EA */
+  --card:  oklch(0.992 0.005 85);
+  --line:  oklch(0.86 0.018 80);
+  --text:  oklch(0.27 0.04 255);
+  --muted: oklch(0.48 0.035 250);  /* 5.8:1 on paper */
+  --focus: oklch(0.55 0.11 68);    /* 4.5:1 on paper; the old amber ring was 2:1 */
   --sans:"Lexend",system-ui,sans-serif;
   --serif:"Fraunces",Georgia,serif;
   --mono:"Lexend",ui-monospace,monospace;
@@ -26,35 +42,79 @@
      Reserved for "which quantity is which" in diagrams only — never
      reused for correct/incorrect feedback (that stays teal/rose). */
   --bar-1:#1F8A7D; --bar-2:#2E7FB8; --bar-3:#7B5EC7; --bar-4:#D9673F; --bar-5:#E4A03C;
+  --petal: 22px 6px 22px 6px;
+  --petal-sm: 14px 4px 14px 4px;
+  --lift: 0 2px 4px oklch(0.25 0.05 255 / .06), 0 18px 36px -22px oklch(0.25 0.05 255 / .45);
+  --lift-hi: 0 4px 8px oklch(0.25 0.05 255 / .08), 0 30px 48px -24px oklch(0.25 0.05 255 / .55);
+  --ease: cubic-bezier(.2,.75,.2,1);
+
+  /* Ornament, drawn as masks so they take any colour */
+  --rosette: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='.075'%3E%3Ccircle r='28'/%3E%3Ccircle cx='56' r='28'/%3E%3Ccircle cy='56' r='28'/%3E%3Ccircle cx='56' cy='56' r='28'/%3E%3Ccircle cx='28' cy='28' r='28'/%3E%3C/g%3E%3Ccircle cx='28' cy='28' r='1.7' fill='%23E09F45' fill-opacity='.4'/%3E%3Ccircle r='1.7' fill='%23E09F45' fill-opacity='.4'/%3E%3Ccircle cx='56' cy='56' r='1.7' fill='%23E09F45' fill-opacity='.4'/%3E%3Ccircle cx='56' r='1.7' fill='%23E09F45' fill-opacity='.4'/%3E%3Ccircle cy='56' r='1.7' fill='%23E09F45' fill-opacity='.4'/%3E%3C/svg%3E");
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .055 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  --wave-fill: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 22C150 4 300 40 450 22S750 4 900 22s225 18 300 0V40H0Z'/%3E%3C/svg%3E");
+  --wave-line: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 40' preserveAspectRatio='none'%3E%3Cpath d='M0 22C150 4 300 40 450 22S750 4 900 22s225 18 300 0' fill='none' stroke='%23000' stroke-width='3' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+  --flourish: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 132 16'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M2 8h44M86 8h44'/%3E%3Ccircle cx='66' cy='8' r='6.5'/%3E%3Cpath d='M59.5 8a6.5 6.5 0 0 1 13 0M59.5 8a6.5 6.5 0 0 0 13 0' transform='rotate(90 66 8)'/%3E%3Cpath d='M46 8q6-6 10 0M86 8q-6-6-10 0'/%3E%3C/g%3E%3C/svg%3E");
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 28'%3E%3Cpath d='M3 3l10 11L3 25' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  /* The dark frames (headers, the hub's access band): grain, lamplight and the
+     compass-rosette lattice, the overlapping circles under Zsolnay tile */
+  --frame-image: var(--grain),
+    radial-gradient(120% 90% at 85% -10%, oklch(0.42 0.08 240 / .55), transparent 60%),
+    radial-gradient(70% 70% at 0% 110%, oklch(0.45 0.08 182 / .28), transparent 65%),
+    var(--rosette);
+  --frame-size: 160px 160px, auto, auto, 56px 56px;
 }
 /* dark theme — toggled via [data-theme] on <html>, see theme-toggle.js.
    Header stays a dark band in both themes; only body chrome inverts. */
 :root[data-theme="dark"]{
-  --ink:#EAF2F9; --ink-2:#BFD4E8; --ink-3:#93AEC9;
-  --header-bg:#0A1420;
-  --teal:#3FBFA9; --teal-pale:#153732; --teal-text:#5FE0C7;
-  --amber:#E9AD55; --amber-dk:#F0C77E; --amber-pale:#3A2C13;
-  --peri:#8FA0D6; --peri-pale:#232B47; --peri-text:#C7D2F0;
-  --rose:#E07992; --rose-pale:#3A1E27; --rose-text:#F5A8BB;
-  --paper:#0F151C; --card:#1A222B; --line:#2B3641;
-  --text:#DCE6EE; --muted:#93A7BC;
+  /* Night on the Danube: deep navy paper, warm limestone text */
+  --ink:   oklch(0.95 0.012 85);
+  --ink-2: oklch(0.86 0.03 245);
+  --ink-3: oklch(0.76 0.04 245);
+  --header-bg: oklch(0.15 0.03 255);
+  --teal:  oklch(0.72 0.11 182);
+  --teal-text: oklch(0.82 0.10 180);  /* 10:1 on card */
+  --teal-pale: oklch(0.30 0.04 182);
+  --amber: oklch(0.80 0.12 75);
+  --amber-dk: oklch(0.84 0.10 78);
+  --amber-pale: oklch(0.30 0.04 75);
+  --peri:  oklch(0.72 0.08 275);
+  --peri-text: oklch(0.84 0.06 275);
+  --peri-pale: oklch(0.28 0.04 275);
+  --rose:  oklch(0.70 0.12 40);
+  --rose-text: oklch(0.80 0.08 48);   /* apricot-terracotta, not pink */
+  --rose-pale: oklch(0.29 0.05 38);
+  --paper: oklch(0.19 0.02 250);
+  --card:  oklch(0.235 0.022 250);
+  --line:  oklch(0.36 0.025 250);
+  --text:  oklch(0.92 0.012 85);    /* 13:1 on card */
+  --muted: oklch(0.74 0.025 250);   /* 7.2:1 on card */
+  --focus: oklch(0.80 0.12 75);
+  --lift: 0 1px 0 oklch(1 0 0 / .05) inset, 0 18px 36px -20px oklch(0 0 0 / .7);
+  --lift-hi: 0 1px 0 oklch(1 0 0 / .07) inset, 0 30px 48px -22px oklch(0 0 0 / .8);
   --bar-1:#3FBFA9; --bar-2:#5FA8DB; --bar-3:#A98CE8; --bar-4:#E8926B; --bar-5:#E9AD55;
 }
 /* Interactive manipulatives draw with hardcoded hex in raw SVG (7 tool
    files, predating dark mode) — theirs is the one part of the page
    that stays a light "paper" surface in dark mode rather than trying
-   to re-theme hand-drawn diagrams. Pinning the tokens here means every
-   var()-based label inside a .tool card matches that paper surface too. */
+   to re-theme hand-drawn diagrams. Pinning the tokens here (the light theme's
+   values) means every var()-based label inside a .tool card matches that
+   paper surface too, and tools look the same in both themes. */
 :root[data-theme="dark"] .tool{
-  --ink:#0F2338; --ink-2:#1B3A5C; --ink-3:#33557A;
-  --teal:#1F8A7D; --teal-pale:#DCEFEB; --teal-text:#136155;
-  --amber:#E4A03C; --amber-dk:#96630E; --amber-pale:#FAEDD6;
-  --peri:#6B7FB3; --peri-pale:#E4E9F4; --peri-text:#414F82;
-  --rose:#C2536B; --rose-pale:#F6E2E6; --rose-text:#9C2C46;
-  --paper:#F3F6F8; --card:#FFFFFF; --line:#D3DCE4;
-  --text:#16283C; --muted:#5B7189;
+  --ink:   oklch(0.25 0.05 255); --ink-2: oklch(0.34 0.07 252); --ink-3: oklch(0.44 0.07 250);
+  --teal:  oklch(0.52 0.09 182); --teal-pale: oklch(0.93 0.035 182); --teal-text: oklch(0.45 0.08 182);
+  --amber: oklch(0.75 0.13 72);  --amber-dk: oklch(0.50 0.10 68);   --amber-pale: oklch(0.94 0.04 80);
+  --peri:  oklch(0.51 0.09 275); --peri-pale: oklch(0.93 0.025 275); --peri-text: oklch(0.45 0.08 275);
+  --rose:  oklch(0.52 0.14 36);  --rose-pale: oklch(0.94 0.03 45);   --rose-text: oklch(0.45 0.13 36);
+  --paper: oklch(0.962 0.012 85); --card: oklch(0.992 0.005 85); --line: oklch(0.86 0.018 80);
+  --text:  oklch(0.27 0.04 255); --muted: oklch(0.48 0.035 250);
   --bar-1:#1F8A7D; --bar-2:#2E7FB8; --bar-3:#7B5EC7; --bar-4:#D9673F; --bar-5:#E4A03C;
 }
+/* Tools stay a light paper card in dark mode ; give their
+   focus ring the dark amber that shows on white */
+:root[data-theme="dark"] .tool{--focus: oklch(0.55 0.11 68)}
+/* ...and their own text colour: without it, unstyled text in a tool inherits
+   the page's light dark-mode text onto the white card (1.3:1). */
+:root[data-theme="dark"] .tool{color:var(--text)}
 *{box-sizing:border-box}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 body{margin:0;background:var(--paper);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased;transition:background-color .2s,color .2s}
@@ -183,7 +243,7 @@ ol.probs li,ul.probs li{margin-bottom:9px;font-size:.96rem}
     --teal:#1F8A7D;--teal-pale:#DCEFEB;--teal-text:#136155;
     --amber:#E4A03C;--amber-dk:#96630E;--amber-pale:#FAEDD6;
     --peri:#6B7FB3;--peri-pale:#E4E9F4;
-    --rose:#C2536B;--rose-pale:#F6E2E6;--rose-text:#9C2C46;
+    --rose:#AA4429;--rose-pale:#F7E6DF;--rose-text:#8F331A;
     --paper:#fff;--card:#fff;--line:#999;--text:#000;--muted:#333;
   }
   .top{background:#fff;color:#000;border-bottom:2px solid #000;background-image:none}
@@ -195,6 +255,79 @@ ol.probs li,ul.probs li{margin-bottom:9px;font-size:.96rem}
   .exit h3,.exit li{color:#000}
   .side{position:static}
   .lesson{grid-template-columns:minmax(0,1fr)}
+}
+
+/* ===== Budapest layer (David, 2026-10-16) =====
+   Ornament where it helps, calm where people read: the header frame carries the
+   texture; lesson cards get petal corners and a double rule; motion is driven by
+   the reader and skipped when the device asks for reduced motion. The hub adds
+   its own parts in its page. See docs/3d-tools.md for the one place real 3D is used. */
+:focus-visible{outline-color:var(--focus)}
+/* On the dark frames the bright amber ring is the one that shows */
+:is(.hero, header.top, .access, .exit) :focus-visible{outline-color:var(--amber)}
+
+header.top{position:relative;padding-bottom:40px;
+  background-image:var(--frame-image);background-size:var(--frame-size)}
+/* The Danube: a wave of paper with an amber line along its crest */
+header.top::after, header.top::before{
+  content:"";position:absolute;left:0;right:0;bottom:-1px;height:40px;pointer-events:none;
+  -webkit-mask:var(--wave-fill) center/100% 100% no-repeat;mask:var(--wave-fill) center/100% 100% no-repeat;
+  background:var(--paper)}
+header.top::before{bottom:0;-webkit-mask-image:var(--wave-line);mask-image:var(--wave-line);background:var(--amber);z-index:1}
+header.top h1{font-optical-sizing:auto;letter-spacing:-.025em}
+header.top .facts{gap:10px}
+/* solid, so the rosette pattern never shows through text */
+header.top .facts > span{padding:6px 12px;border:1px solid oklch(1 0 0 / .16);border-radius:var(--petal-sm);background:color-mix(in oklch, var(--header-bg), white 7%)}
+.daynav{border-top:1px solid oklch(1 0 0 / .12);gap:4px;padding-top:8px;scroll-snap-type:x proximity}
+.daynav button{border-radius:12px 12px 0 0;scroll-snap-align:start;transition:color .2s, background .25s, transform .3s var(--ease)}
+.daynav button:hover{background:oklch(1 0 0 / .06)}
+.daynav button[aria-current="true"]{background:oklch(1 0 0 / .1);border-bottom-width:4px}
+
+.hd h2{font-size:clamp(1.9rem,3.6vw,2.5rem);letter-spacing:-.02em}
+.obj{border-radius:0 10px 10px 0;border-left:6px double var(--amber);box-shadow:var(--lift)}
+.block, .tool{border-radius:var(--petal);box-shadow:var(--lift);border-color:var(--line)}
+.block.c, .tool{border-top:6px double var(--teal)}
+.block.p{border-top:6px double var(--amber)}
+.block.a{border-top:6px double var(--peri)}
+.block.w{border-top:6px double var(--rose)}
+.exit{border-radius:var(--petal);box-shadow:var(--lift-hi)}
+.card{border-radius:var(--petal-sm);box-shadow:var(--lift)}
+.watch, .readaloud{border-radius:var(--petal-sm)}
+.mins{border-radius:999px;padding:2px 10px}
+.pager button{border-radius:999px;min-height:44px;padding:10px 22px;box-shadow:var(--lift);
+  transition:transform .3s var(--ease), box-shadow .3s var(--ease), border-color .2s}
+.printbtn{border-radius:999px;min-height:44px}
+
+@media (prefers-reduced-motion: no-preference){
+  /* Moving between the hub and a unit: the header carries across */
+  @view-transition{navigation:auto}
+  header.top{view-transition-name:masthead}
+  /* Once, on arrival: the header's words rise into place */
+  @keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+  header.top .hdr-row, header.top h1, header.top .sub, header.top .facts{animation:rise .9s var(--ease) both}
+  header.top h1{animation-delay:.08s}
+  header.top .sub{animation-delay:.16s}
+  header.top .facts{animation-delay:.24s}
+  /* The rosettes drift with the scroll, so the frame feels layered */
+  @supports (animation-timeline: scroll()){
+    @keyframes drift{to{background-position:0 0, 0 0, 0 0, 0 -168px}}
+    header.top{animation:drift linear both;animation-timeline:scroll(root);animation-range:0 600px}
+  }
+  /* Hover: a straight lift and a deeper shadow; nothing tilts */
+  .daynav button:hover{transform:translateY(-2px)}
+  .pager button:hover:not(:disabled){transform:translateY(-3px);box-shadow:var(--lift-hi)}
+  /* A newly chosen lesson day settles in, one piece after another */
+  @keyframes arrive{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  #content > *, #side > *{animation:arrive .55s var(--ease) both}
+  #content > :nth-child(2), #side > :nth-child(2){animation-delay:.06s}
+  #content > :nth-child(3), #side > :nth-child(3){animation-delay:.12s}
+  #content > :nth-child(4), #side > :nth-child(4){animation-delay:.18s}
+  #content > :nth-child(n+5), #side > :nth-child(n+5){animation-delay:.24s}
+}
+@media print{
+  header.top::before, header.top::after{display:none}
+  header.top{background-image:none}
+  .block, .tool, .card{box-shadow:none}
 }
 
 /* ===== interactive manipulatives ===== */
@@ -210,6 +343,7 @@ ol.probs li,ul.probs li{margin-bottom:9px;font-size:.96rem}
   font-family:var(--mono);font-size:.95rem;padding:7px 9px;border:1px solid var(--line);
   border-radius:6px;background:var(--paper);color:var(--text)}
 .ctl input[type=text]{min-width:200px}
+.ctl select{max-width:100%}
 .btn{font-family:var(--sans);font-size:.86rem;font-weight:600;padding:8px 14px;border-radius:6px;
   border:1px solid var(--line);background:var(--paper);color:var(--ink-2);cursor:pointer}
 .btn:hover{border-color:var(--ink-3)}
