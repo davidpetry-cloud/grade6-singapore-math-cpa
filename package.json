@@ -2,5 +2,13 @@
   "license": "CC-BY-4.0",
   "dependencies": {
     "jsdom": "^30.0.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "three": "^0.186.1"
+  },
+  "scripts": {
+    "build:3d": "esbuild src/net-fold-3d.js --bundle --minify --format=iife --target=es2020 --legal-comments=inline --banner:js=\"/*! net-fold-3d.js: built from src/net-fold-3d.js (npm run build:3d). Includes three.js, MIT License, Copyright 2010-2026 three.js authors. Do not edit by hand. */\" --outfile=net-fold-3d.js",
+    "test": "node net-fold-geometry.test.js && node net-fold.test.js && node test-unit.js unit-08-volume.html"
   }
 }
