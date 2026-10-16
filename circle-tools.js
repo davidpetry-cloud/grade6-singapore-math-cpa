@@ -94,7 +94,7 @@ function circleUnroll(host){
         : off<0.08
           ? `Off the true ratio by ${r2(off)} — normal for string and a ruler. The circle is exact; the measuring is not.`
           : `Off by ${r2(off)}, which is more than measuring error usually explains. Worth re-measuring — did the string slip, or was the diameter taken off-centre?`}</span><br>
-      <span style="color:${T}">Whatever circle you pick, this number keeps coming out the same. That is why it earned its own name.</span>`;
+      <span style="color:var(--teal-text)">Whatever circle you pick, this number keeps coming out the same. That is why it earned its own name.</span>`;
   }
   $("#cugo").addEventListener("click",draw);
   box.querySelectorAll("input").forEach(i=>i.addEventListener("input",draw));
