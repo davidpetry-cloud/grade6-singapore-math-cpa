@@ -44,7 +44,7 @@ Everything stays in one folder. Links and shared assets break otherwise.
 In `curriculum-core.js` (promoted when a second unit reused them):
 `decimalGrid` · `rateLine`
 
-Still unit-local: `balanceScale` in unit-05 (also shipped as `balance-scale.js`); `angleChase` in unit-06 (also shipped as `angle-chase.js`); `circleUnroll` and `circleWedges` in unit-07 (also shipped as `circle-tools.js`); `netFold` in unit-08 (also shipped as `net-fold.js`); `distBuilder` in unit-09 (also shipped as `dist-builder.js`); `coordPlane` in unit-10 (also shipped as `coord-plane.js`)
+Still unit-local: `balanceScale` in unit-05 (also shipped as `balance-scale.js`); `angleChase` in unit-06 (also shipped as `angle-chase.js`); `circleUnroll` and `circleWedges` in unit-07 (also shipped as `circle-tools.js`); `netFold` in unit-08 (loaded from `net-fold.js`, not inlined, with its 3D fold preview `net-fold-3d.js` and maths `net-fold-geometry.js`; see `docs/3d-tools.md`); `distBuilder` in unit-09 (also shipped as `dist-builder.js`); `coordPlane` in unit-10 (also shipped as `coord-plane.js`)
 
 Still unit-local, in unit-02: `fractionModel` · `fractionDivide`
 
@@ -103,8 +103,9 @@ another calculation.
 ## Testing
 
 ```
-npm install jsdom      # once
+npm install            # once: jsdom, plus three and esbuild for the 3D tools
 node test-unit.js unit-03-ratio-and-rate.html
+npm test               # the fold maths, netFold, and the Unit 8 page
 ```
 
 Adapts to lesson count. Checks structural completeness of every lesson, CPA
@@ -228,8 +229,11 @@ in the results discussed rather than tidied away, is the whole point of days 4�
 - Days 13–14 capacity and real containers
 - Day 15 review and assessment
 
-Tools: `power` for the cube-building. **Decide at the start** whether nets need
-a fold-preview tool; if yes, that upgrades this unit to Opus.
+Tools: `power` for the cube-building. Nets got a 3D fold preview (decided by
+David, 2026-10-16, built on Opus): `netFold` now folds the net up in Three.js
+after "Fold it". Real 3D is allowed only inside geometry tools like this one;
+the standard, decision log and roadmap are in `docs/3d-tools.md`. Rebuild the
+bundle with `npm run build:3d` after editing `src/net-fold-3d.js`.
 Concrete: unit cubes, nets printed to cut and fold, measuring jugs and boxes.
 Nets must be physically folded. A net that is only ever a picture defeats the
 concrete stage.

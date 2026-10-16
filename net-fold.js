@@ -6,7 +6,8 @@
 window.__EXTRA_TOOLS__=Object.assign(window.__EXTRA_TOOLS__||{},(function(){
 const rm=()=>(!!window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
-const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#5B7189", ROSE="#C2536B";
+/* Text colours, each at least 4.5:1 on white. ROSE is terracotta now, not pink. */
+const T="#0E7A6D", INK="#1B3A5C", MUT="#5B7189", ROSE="#AA4429";
 
 /* A net folds into a cube iff: exactly 6 squares, all edge-connected, and no
    two squares land on the same cube face when folded. We fold it for real —
@@ -83,93 +84,141 @@ const PRESETS=[
  {k:"2x3 block (fails)",  cells:[[0,0],[1,0],[2,0],[0,1],[1,1],[2,1]]}
 ];
 
+/* Grid squares are real buttons: Tab reaches the grid once, the arrow keys
+   move, and Space or Enter places or removes a square. Squares carry their
+   number (reading order) so the grid, the 3D view and the messages agree.
+   Colours: white text on #0E7A6D is 5.3:1; clashing squares are terracotta
+   with hatching and the word "clash", so the cue isn't colour alone. */
+const NF_CSS=`
+.nf-grid{display:grid;grid-template-columns:repeat(8,minmax(24px,54px));justify-content:center;margin:0 auto}
+.nf-cell{aspect-ratio:1;margin:0;padding:0;border:1px solid #7E8FA2;background:#fff;cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  font-family:var(--sans);color:#fff;line-height:1.05;position:relative}
+.nf-cell:hover{background:#EEF3F6}
+.nf-cell[aria-pressed="true"]{background:#0E7A6D;border-color:#102239}
+.nf-cell.clash{background:repeating-linear-gradient(45deg,#AA4429 0 6px,#8E3A22 6px 12px)}
+.nf-cell:focus-visible{outline:none;z-index:1;box-shadow:0 0 0 2px #fff,0 0 0 5px #102239}
+.nf-cell .n{font-weight:700;font-size:.82rem}
+.nf-cell .f{font-size:.68rem}
+.nf3d h4{font-family:var(--serif);font-size:1.05rem;font-weight:600;margin:20px 0 4px;color:var(--ink)}
+@media (max-width:420px){.nf-cell .f{display:none}}`;
+
 function netFold(host){
+  if(!document.getElementById("nf-style")){
+    const st=document.createElement("style");st.id="nf-style";st.textContent=NF_CSS;document.head.appendChild(st);
+  }
+  const G=window.NetFoldGeometry;
   const box=el("div","tool");
   box.innerHTML=`<h3>Folding a net<span class="mins">tool</span></h3>
     <p class="sense">touch · spatial reasoning</p>
-    <p class="how">Click squares to lay out a net, then fold it. Paper tells you a bad net failed. This tells you which rule it broke — too few squares, a gap, or two faces trying to land in the same place.</p>
+    <p class="how">Fold your paper net first. Then lay it out here: click squares, or reach the grid with Tab, move with the arrow keys and press Space. Fold it to find out whether it closes into a cube. Paper tells you a bad net failed. This tells you which rule it broke: too few squares, a gap, or two faces trying to land in the same place.</p>
     <div class="ctl picker" id="nfp"></div>
     <div class="ctl">
       <button class="btn go" id="nffold">Fold it</button>
       <button class="btn sm" id="nfclear">Clear</button>
       <span id="nfcount" style="font-family:var(--mono);font-size:.85rem;color:var(--muted)">0 of 6 squares</span>
     </div>
-    <div class="stage-area"><svg viewBox="0 0 700 330" role="img" style="width:100%;height:auto"></svg></div>
-    <div class="out" id="nfout"></div>
-    <p class="note">There are exactly eleven nets that fold into a cube. Five are loaded as presets and two deliberate failures are too — try those on purpose, and read what the tool says is wrong with them.</p>`;
+    <div class="stage-area"><div class="nf-grid" role="group" aria-label="Net grid, 8 columns by 5 rows" aria-describedby="nfout"></div></div>
+    <div class="out" id="nfout" aria-live="polite"></div>
+    <div class="nf3d" id="nf3d"></div>
+    <p class="note">There are exactly eleven nets that fold into a cube. Five are loaded as presets and two deliberate failures are too. Try those on purpose, and read what the tool says is wrong with them.</p>`;
   host.appendChild(box);
-  const svg=box.querySelector("svg"), out=box.querySelector("#nfout"), $=s=>box.querySelector(s);
+  const grid=box.querySelector(".nf-grid"), out=box.querySelector("#nfout"), mount3d=box.querySelector("#nf3d"), $=s=>box.querySelector(s);
   $("#nfp").innerHTML=PRESETS.map((p,i)=>`<button class="btn sm" data-i="${i}">${p.k}</button>`).join("");
 
-  let cells=[], folded=null;
-  const COLS=8, ROWS=5, CW=54, GX=120, GY=24;
+  let cells=[], folded=null, clash=new Set(), view=null, cursor={x:0,y:0};
+  const COLS=8, ROWS=5;
   const has=(x,y)=>cells.some(c=>c.x===x&&c.y===y);
+  for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
+    const b=el("button","nf-cell");b.type="button";b.dataset.x=x;b.dataset.y=y;
+    b.tabIndex=(x===0&&y===0)?0:-1;grid.appendChild(b);
+  }
+  const cellAt=(x,y)=>grid.children[y*COLS+x];
 
   function draw(){
-    let s="";
-    /* grid */
+    const num=G?G.numberCells(cells):(()=>{const s=cells.slice().sort((a,b)=>a.y-b.y||a.x-b.x);return c=>s.findIndex(d=>d.x===c.x&&d.y===c.y)+1;})();
     for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){
-      const on=has(x,y);
-      let fill="#fff", stroke="#D3DCE4", sw=1;
-      let label="";
-      if(on){
-        fill=T; stroke=INK; sw=2;
-        if(folded&&folded.ok){
-          const v=folded.faces.get(x+","+y);
-          if(v){label=FACE_NAME[v.join(",")]||"";}
-        }
-        if(folded&&folded.reason==="overlap"&&folded.clash&&
-           folded.clash.some(c=>c.x===x&&c.y===y)){ fill=ROSE; }
-      }
-      s+=`<rect class="nfsq" data-x="${x}" data-y="${y}" x="${GX+x*CW}" y="${GY+y*CW}" width="${CW}" height="${CW}" fill="${fill}" fill-opacity="${on?".85":"1"}" stroke="${stroke}" stroke-width="${sw}" style="cursor:pointer"/>`;
-      if(label){
-        s+=`<text x="${GX+x*CW+CW/2}" y="${GY+y*CW+CW/2+4}" font-family="Lexend" font-size="11" fill="#fff" text-anchor="middle" pointer-events="none">${label}</text>`;
-      }
+      const b=cellAt(x,y), on=has(x,y);
+      let face="";
+      if(on&&folded&&folded.ok){const v=folded.faces.get(x+","+y);if(v)face=FACE_NAME[v.join(",")]||"";}
+      const n=on?num({x,y}):0, isClash=on&&clash.has(n);
+      b.setAttribute("aria-pressed",on?"true":"false");
+      b.classList.toggle("clash",isClash);
+      b.innerHTML=on?`<span class="n">${n}</span>${face?`<span class="f">${face}</span>`:isClash?`<span class="f">clash</span>`:""}`:"";
+      b.setAttribute("aria-label",`Column ${x+1}, row ${y+1}: `+(on?`square ${n}${face?", "+face:""}${isClash?", clashes":""}`:"empty"));
     }
-    svg.innerHTML=s;
     $("#nfcount").textContent=`${cells.length} of 6 squares`;
-
-    const desc = cells.length
-      ? `A grid with ${cells.length} shaded square${cells.length===1?"":"s"} forming a net layout.`
-      : `An empty grid, ready for squares to be placed.`;
-    svg.setAttribute("aria-label", desc + (folded
-      ? (folded.ok
-         ? ` This net folds into a cube; each square is labelled with the cube face it becomes: front, back, top, bottom, left and right.`
-         : ` This net does not fold into a cube.`)
-      : ""));
   }
 
   function report(){
     if(!folded){out.innerHTML=`<span style="color:${MUT}">Lay out six squares, then press Fold it.</span>`;return;}
     if(folded.ok){
-      out.innerHTML=`<b style="color:${T}">It folds.</b> Every square landed on a different face of the cube — front, back, top, bottom, left and right, all six filled exactly once.<br>
+      out.innerHTML=`<b style="color:${T}">It folds.</b> Every square landed on a different face of the cube: front, back, top, bottom, left and right, all six filled exactly once.<br>
         <span style="color:${MUT}">The labels show where each square ends up. Notice that squares far apart on the flat net can end up next to each other on the cube; flat distance and folded distance are different things.</span>`;
       return;
     }
     const R=folded.reason;
+    const detail=(R==="overlap"&&G)?" "+G.describe(G.closeUp(cells))+" Those squares are hatched and marked clash.":"";
     const msg = R==="count"
-      ? `<b style="color:${ROSE}">Not six squares.</b> You have ${folded.count}. A cube has six faces, so a net needs exactly six squares — no more, no fewer.`
+      ? `<b style="color:${ROSE}">Not six squares.</b> You have ${folded.count}. A cube has six faces, so a net needs exactly six squares, no more and no fewer.`
       : R==="disconnected"
-        ? `<b style="color:${ROSE}">The squares are not all joined.</b> Only ${folded.connected} of your 6 connect to each other along edges. A net has to be one piece — if you cut it out, it must come away in a single flat shape.`
+        ? `<b style="color:${ROSE}">The squares are not all joined.</b> Only ${folded.connected} of your 6 connect to each other along edges. A net has to be one piece: if you cut it out, it must come away in a single piece.`
         : R==="overlap"
-          ? `<b style="color:${ROSE}">Two faces land in the same place.</b> When this folds, two of your squares try to occupy the same face of the cube — so some other face is left open. The shaded red squares are the pair that clash.`
+          ? `<b style="color:${ROSE}">Two faces land in the same place.</b>${detail}`
           : `<b style="color:${ROSE}">This one doesn't fold.</b>`;
     out.innerHTML = msg + `<br><span style="color:${MUT}">Change one square and try again. Knowing which rule a net breaks is more useful than knowing it failed.</span>`;
   }
 
-  svg.addEventListener("click",e=>{
-    const r=e.target.closest("rect[data-x]");if(!r)return;
-    const x=+r.dataset.x, y=+r.dataset.y;
+  function clear3d(){if(view){view.destroy();view=null;}mount3d.innerHTML="";}
+  function show3d(){
+    clear3d();
+    if(!G||!G.foldTree(cells))return;
+    if(!(window.NetFold3D&&window.NetFold3D.supported())){
+      mount3d.innerHTML=`<p class="note">The 3D view needs WebGL, which this browser isn't offering. The check above works without it.</p>`;
+      return;
+    }
+    mount3d.innerHTML=`<h4>See it fold</h4><div></div>`;
+    view=window.NetFold3D.mount(mount3d.lastElementChild,cells.map(c=>({x:c.x,y:c.y})));
+    if(view)view.animateTo(1);
+  }
+  function changed(){folded=null;clash=new Set();clear3d();draw();report();}
+
+  function toggle(x,y){
     if(has(x,y)) cells=cells.filter(c=>!(c.x===x&&c.y===y));
     else cells.push({x,y});
-    folded=null; draw(); report();
+    changed();
+  }
+  grid.addEventListener("click",e=>{
+    const b=e.target.closest("button[data-x]");if(!b)return;
+    const x=+b.dataset.x,y=+b.dataset.y;
+    moveTo(x,y,false);toggle(x,y);
   });
-  $("#nffold").addEventListener("click",()=>{folded=foldNet(cells);draw();report();});
-  $("#nfclear").addEventListener("click",()=>{cells=[];folded=null;draw();report();});
+  function moveTo(x,y,focus=true){
+    cellAt(cursor.x,cursor.y).tabIndex=-1;
+    cursor={x:Math.max(0,Math.min(COLS-1,x)),y:Math.max(0,Math.min(ROWS-1,y))};
+    const b=cellAt(cursor.x,cursor.y);b.tabIndex=0;if(focus)b.focus();
+  }
+  /* however a square gets focus (Tab, a click), the arrow keys start from it */
+  grid.addEventListener("focusin",e=>{
+    const b=e.target.closest("button[data-x]");if(b&&(+b.dataset.x!==cursor.x||+b.dataset.y!==cursor.y))moveTo(+b.dataset.x,+b.dataset.y,false);
+  });
+  grid.addEventListener("keydown",e=>{
+    const m={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];
+    if(m){e.preventDefault();moveTo(cursor.x+m[0],cursor.y+m[1]);return;}
+    if(e.key==="Home"){e.preventDefault();moveTo(0,cursor.y);}
+    if(e.key==="End"){e.preventDefault();moveTo(COLS-1,cursor.y);}
+  });
+  $("#nffold").addEventListener("click",()=>{
+    folded=foldNet(cells);
+    clash=new Set();
+    if(folded.reason==="overlap"&&G){const r=G.closeUp(cells);if(r)r.clashes.forEach(c=>c.squares.forEach(n=>clash.add(n)));}
+    draw();report();show3d();
+  });
+  $("#nfclear").addEventListener("click",()=>{cells=[];changed();});
   $("#nfp").addEventListener("click",e=>{
     const b=e.target.closest("button[data-i]");if(!b)return;
     cells=PRESETS[+b.dataset.i].cells.map(([x,y])=>({x,y}));
-    folded=null;draw();report();
+    changed();
   });
   draw();report();
 }
