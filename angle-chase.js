@@ -5,7 +5,7 @@
 window.__EXTRA_TOOLS__=Object.assign(window.__EXTRA_TOOLS__||{},(function(){
 const rm=()=>(!!window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
-const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#5B7189";
+const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#4A5D72", tx=c=>({"#1F8A7D":"#136155","#E4A03C":"#7E520E","#6B7FB3":"#4A5590","#AA4429":"#9A3B22"})[c]||c;
 
 /* Each scenario: an SVG-drawing function(known, unknown) and a chain of
    {rule, work, result} steps that lead from 'known' to 'unknown'. Angles are
@@ -21,9 +21,9 @@ const SCENARIOS={
     return `<line x1="60" y1="150" x2="640" y2="150" stroke="${INK}" stroke-width="2"/>
       <line x1="340" y1="150" x2="470" y2="40" stroke="${INK}" stroke-width="2"/>
       <path d="M310 150 A30 30 0 0 1 ${340+30*Math.cos(Math.PI*(1-k/180))} ${150-30*Math.sin(Math.PI*(1-k/180))}" fill="none" stroke="${T}" stroke-width="2"/>
-      <text x="290" y="135" font-family="Lexend" font-size="16" fill="${T}">${k}°</text>
+      <text x="290" y="135" font-family="Lexend" font-size="16" fill="${tx(T)}">${k}°</text>
       <path d="M${340+30*Math.cos(Math.PI*(1-k/180))} ${150-30*Math.sin(Math.PI*(1-k/180))} A30 30 0 0 1 370 150" fill="none" stroke="${b!=null?T:A}" stroke-width="2"/>
-      <text x="385" y="135" font-family="Lexend" font-size="16" fill="${b!=null?T:A}">${b!=null?b+"°":"?"}</text>`;
+      <text x="385" y="135" font-family="Lexend" font-size="16" fill="${tx(b!=null?T:A)}">${b!=null?b+"°":"?"}</text>`;
   }
  },
  point:{
@@ -47,7 +47,7 @@ const SCENARIOS={
     const labels=[[k,T,(a0+a1)/2],[adj!=null?adj:null,adj!=null?T:A,(a1+a2)/2],[opp!=null?opp:null,opp!=null?T:A,(a2+a3)/2],[adj2!=null?adj2:null,adj2!=null?T:A,(a3+a0+360)/2%360]];
     labels.forEach(([v,c,ang])=>{
       const [lx,ly]=L(ang,r2);
-      s+=`<text x="${lx}" y="${ly}" font-family="Lexend" font-size="15" fill="${c}" text-anchor="middle">${v!=null?v+"°":"?"}</text>`;
+      s+=`<text x="${lx}" y="${ly}" font-family="Lexend" font-size="15" fill="${tx(c)}" text-anchor="middle">${v!=null?v+"°":"?"}</text>`;
     });
     return s;
   }
@@ -60,9 +60,9 @@ const SCENARIOS={
   ]};},
   draw(a,b,c){
     return `<polygon points="120,190 560,190 380,40" fill="none" stroke="${INK}" stroke-width="2"/>
-      <text x="155" y="175" font-family="Lexend" font-size="15" fill="${T}">${a}°</text>
-      <text x="500" y="175" font-family="Lexend" font-size="15" fill="${T}">${b}°</text>
-      <text x="370" y="65" font-family="Lexend" font-size="15" fill="${c!=null?T:A}">${c!=null?c+"°":"?"}</text>`;
+      <text x="155" y="175" font-family="Lexend" font-size="15" fill="${tx(T)}">${a}°</text>
+      <text x="500" y="175" font-family="Lexend" font-size="15" fill="${tx(T)}">${b}°</text>
+      <text x="370" y="65" font-family="Lexend" font-size="15" fill="${tx(c!=null?T:A)}">${c!=null?c+"°":"?"}</text>`;
   }
  },
  quad:{
@@ -74,10 +74,10 @@ const SCENARIOS={
   draw(a,b,c,d){
     return `<polygon points="120,190 520,150 460,40 160,60" fill="none" stroke="${INK}" stroke-width="2"/>
       <line x1="120" y1="190" x2="460" y2="40" stroke="${MUT}" stroke-width="1" stroke-dasharray="4 4"/>
-      <text x="145" y="175" font-family="Lexend" font-size="14" fill="${T}">${a}°</text>
-      <text x="475" y="140" font-family="Lexend" font-size="14" fill="${T}">${b}°</text>
-      <text x="430" y="55" font-family="Lexend" font-size="14" fill="${T}">${c}°</text>
-      <text x="175" y="70" font-family="Lexend" font-size="14" fill="${d!=null?T:A}">${d!=null?d+"°":"?"}</text>`;
+      <text x="145" y="175" font-family="Lexend" font-size="14" fill="${tx(T)}">${a}°</text>
+      <text x="475" y="140" font-family="Lexend" font-size="14" fill="${tx(T)}">${b}°</text>
+      <text x="430" y="55" font-family="Lexend" font-size="14" fill="${tx(T)}">${c}°</text>
+      <text x="175" y="70" font-family="Lexend" font-size="14" fill="${tx(d!=null?T:A)}">${d!=null?d+"°":"?"}</text>`;
   }
  }
 };

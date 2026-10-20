@@ -68,6 +68,12 @@ trades looks against readability, readability wins.
   light and dark themes. Use the `-text` colour tokens for coloured text.
 - Never fill a badge with `--ink`/`--ink-2`/`--ink-3` under white text: those
   tokens flip light in dark mode. Use `--header-bg`.
+- Light theme is warm sandstone, never bright white: page `--paper` #EBE1CF,
+  cards `--card` #F2E9DA. White is for print only. Drawings in the tools use
+  #F2E9DA where they once used #fff.
+- Coloured text in tool drawings goes through `tx()`, which swaps a fill
+  colour for its darker text twin (teal #136155, amber #7E520E, periwinkle
+  #4A5590, terracotta #9A3B22) so labels pass 4.5:1 on sandstone.
 - Interactive tools stay a light "paper" surface in dark mode (`.tool`).
 - Sizes follow Apple's Human Interface Guidelines (a point is a CSS pixel):
   body text 17px (`html{font-size:106.25%}`, so 1rem = 17px and the reader's

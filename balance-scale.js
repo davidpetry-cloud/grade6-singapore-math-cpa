@@ -5,7 +5,7 @@
 window.__EXTRA_TOOLS__=Object.assign(window.__EXTRA_TOOLS__||{},(function(){
 const rm=()=>(!!window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
-const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#5B7189", ROSE="#C2536B";
+const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#4A5D72", ROSE="#AA4429", tx=c=>({"#1F8A7D":"#136155","#E4A03C":"#7E520E","#6B7FB3":"#4A5590","#AA4429":"#9A3B22"})[c]||c;
 
 function balanceScale(host){
   const box=el("div","tool");
@@ -80,7 +80,7 @@ function balanceScale(host){
   function pan(cx,cy,cups,units,tone){
     let s=`<line x1="${cx}" y1="${cy-64}" x2="${cx-52}" y2="${cy-10}" stroke="${MUT}" stroke-width="1.5"/>
            <line x1="${cx}" y1="${cy-64}" x2="${cx+52}" y2="${cy-10}" stroke="${MUT}" stroke-width="1.5"/>
-           <path d="M${cx-58} ${cy-10} L${cx+58} ${cy-10} L${cx+44} ${cy+12} L${cx-44} ${cy+12} Z" fill="#fff" stroke="${INK}" stroke-width="2"/>`;
+           <path d="M${cx-58} ${cy-10} L${cx+58} ${cy-10} L${cx+44} ${cy+12} L${cx-44} ${cy+12} Z" fill="#F2E9DA" stroke="${INK}" stroke-width="2"/>`;
     /* cups sit left, discs right, stacked in rows above the pan */
     let x=cx-46,y=cy-26;
     for(let i=0;i<cups;i++){
@@ -124,8 +124,8 @@ function balanceScale(host){
     s+=`<circle cx="${cx}" cy="${cy}" r="9" fill="${INK}"/>`;
     /* the sentence, above the beam */
     const relShown = rel==="=" ? (L===R?"=":(L>R?"&gt;":"&lt;")) : "&gt;";
-    s+=`<text x="${cx}" y="34" font-family="Fraunces" font-size="26" fill="${broken&&rel==="="?ROSE:INK}" text-anchor="middle">${expr(st.lc,st.lu)} ${relShown} ${expr(st.rc,st.ru)}</text>`;
-    if(rel==="="&&broken)s+=`<text x="${cx}" y="58" font-family="Lexend" font-size="13" fill="${ROSE}" text-anchor="middle">no longer the sentence you started with</text>`;
+    s+=`<text x="${cx}" y="34" font-family="Fraunces" font-size="26" fill="${tx(broken&&rel==="="?ROSE:INK)}" text-anchor="middle">${expr(st.lc,st.lu)} ${relShown} ${expr(st.rc,st.ru)}</text>`;
+    if(rel==="="&&broken)s+=`<text x="${cx}" y="58" font-family="Lexend" font-size="13" fill="${tx(ROSE)}" text-anchor="middle">no longer the sentence you started with</text>`;
     svg.innerHTML=s;
 
     const solved = rel==="=" && !broken && st.lc===1 && st.lu===0 && st.rc===0;

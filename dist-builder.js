@@ -7,7 +7,7 @@
 window.__EXTRA_TOOLS__=Object.assign(window.__EXTRA_TOOLS__||{},(function(){
 const rm=()=>(!!window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
-const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#5B7189", ROSE="#C2536B";
+const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#4A5D72", ROSE="#AA4429", tx=c=>({"#1F8A7D":"#136155","#E4A03C":"#7E520E","#6B7FB3":"#4A5590","#AA4429":"#9A3B22"})[c]||c;
 const r2=x=>Math.round(x*100)/100;
 
 const PRESETS=[
@@ -84,14 +84,14 @@ function distBuilder(host){
     const stack=new Map();
     [...data].sort((a,b)=>a-b).forEach(v=>{
       const k=stack.get(v)||0; stack.set(v,k+1);
-      s+=`<circle class="dbdot" data-v="${v}" cx="${px(v)}" cy="${DY-10-k*13}" r="5.5" fill="${T}" stroke="#fff" stroke-width="1" style="cursor:pointer"/>`;
+      s+=`<circle class="dbdot" data-v="${v}" cx="${px(v)}" cy="${DY-10-k*13}" r="5.5" fill="${T}" stroke="#F2E9DA" stroke-width="1" style="cursor:pointer"/>`;
     });
     /* mean as a balance point, median as a line */
     if(st){
       s+=`<polygon points="${px(st.mean)},${DY+8} ${px(st.mean)-7},${DY+22} ${px(st.mean)+7},${DY+22}" fill="${A}"/>`;
-      s+=`<text x="${px(st.mean)}" y="${DY+36}" font-family="Lexend" font-size="11" fill="#B87C1C" text-anchor="middle">mean</text>`;
+      s+=`<text x="${px(st.mean)}" y="${DY+36}" font-family="Lexend" font-size="11" fill="#7E520E" text-anchor="middle">mean</text>`;
       s+=`<line x1="${px(st.median)}" y1="${DY-95}" x2="${px(st.median)}" y2="${DY-6}" stroke="${P}" stroke-width="2" stroke-dasharray="4 3"/>`;
-      s+=`<text x="${px(st.median)}" y="${DY-100}" font-family="Lexend" font-size="11" fill="${P}" text-anchor="middle">median</text>`;
+      s+=`<text x="${px(st.median)}" y="${DY-100}" font-family="Lexend" font-size="11" fill="${tx(P)}" text-anchor="middle">median</text>`;
     }
 
     /* ---- histogram ---- */

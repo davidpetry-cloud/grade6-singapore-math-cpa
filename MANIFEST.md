@@ -1,7 +1,8 @@
 # MANIFEST — Grade 6 Singapore Math (CPA)
 
 **Bundle version:** complete (through-u10)
-**Built:** 2026-10-20 — sizes brought to Apple's Human Interface Guidelines
+**Built:** 2026-10-20 — light theme moved to warm sandstone (no bright
+white), and sizes brought to Apple's Human Interface Guidelines
 (17px body text, 44px touch targets, fades under reduce motion). Earlier:
 2026-10-16 — the Budapest look rolled out to every unit (oklch palette in
 light and dark, rosette header frames, petal cards, reader-driven motion), and
@@ -34,38 +35,38 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 
 | file | bytes | sha256 (first 16) |
 |---|---|---|
-| `CLAUDE.md` | 15,994 | `5481e82a108d7a2f` |
+| `CLAUDE.md` | 16,399 | `30d1e39011503993` |
 | `README.md` | 8,235 | `b4b4646e1d98cd18` |
-| `angle-chase.js` | 10,490 | `2daf3c83b7d8e0cd` |
+| `angle-chase.js` | 10,627 | `af00877dbcb5767f` |
 | `angle-chase.test.js` | 4,719 | `59cf3f33124df385` |
-| `balance-scale.js` | 9,724 | `5d0f15f7daa87323` |
+| `balance-scale.js` | 9,832 | `e299160c1db5b9b5` |
 | `balance-scale.test.js` | 3,260 | `18d60ecff41e5566` |
-| `circle-tools.js` | 12,132 | `277bda948496ef70` |
+| `circle-tools.js` | 12,255 | `298b0a3e73f2fe90` |
 | `circle-tools.test.js` | 3,842 | `458c1ec1afe4c5d9` |
-| `coord-plane.js` | 11,531 | `6f8c6bd070b347e2` |
+| `coord-plane.js` | 11,635 | `9af8d9734cb98007` |
 | `coord-plane.test.js` | 4,516 | `62238f169083fde3` |
-| `curriculum-core.js` | 52,327 | `b8bc3203125d4f78` |
-| `curriculum.css` | 31,625 | `184d993332cc6cc0` |
-| `dist-builder.js` | 9,126 | `28d5e5b2a03283af` |
+| `curriculum-core.js` | 52,440 | `213e91b37d634993` |
+| `curriculum.css` | 31,775 | `cf28f92783945b68` |
+| `dist-builder.js` | 9,230 | `09aca521536cd6e4` |
 | `dist-builder.test.js` | 3,911 | `0910cafcf6db26fc` |
 | `net-fold-3d.js` | 546,173 | `b821900a338331a8` |
 | `net-fold-geometry.js` | 5,495 | `9751f04a7ef274d3` |
 | `net-fold-geometry.test.js` | 5,345 | `3f30d719a1e857b2` |
-| `net-fold.js` | 12,315 | `79ab009e0f32b615` |
+| `net-fold.js` | 12,321 | `940bdd29007a1c08` |
 | `net-fold.test.js` | 7,044 | `aba29e98162242e1` |
 | `singapore-math-6-hub.html` | 29,642 | `f7ba97455210babf` |
 | `test-unit.js` | 4,235 | `760c86dcdd48f57f` |
 | `theme-toggle.js` | 1,187 | `18c8994a2a613f0c` |
 | `unit-01-whole-numbers-and-operations.html` | 63,023 | `3792cb54f2befdd1` |
-| `unit-02-fractions-and-decimals.html` | 158,225 | `cd85b7435028369d` |
-| `unit-03-ratio-and-rate.html` | 104,141 | `b58b166a2704d316` |
+| `unit-02-fractions-and-decimals.html` | 158,361 | `da31a81a72cbb59b` |
+| `unit-03-ratio-and-rate.html` | 104,141 | `5b390146931920d3` |
 | `unit-04-percentage.html` | 87,954 | `b4ca8583bedd93b3` |
-| `unit-05-algebra.html` | 126,113 | `d853f362adc5344f` |
-| `unit-06-angles-and-figures.html` | 94,794 | `582f9cccc4227870` |
-| `unit-07-circles.html` | 92,799 | `3d0d19b41dbedb02` |
+| `unit-05-algebra.html` | 126,221 | `e4020fdfd29836d0` |
+| `unit-06-angles-and-figures.html` | 94,931 | `550b132030206ddc` |
+| `unit-07-circles.html` | 92,922 | `1cd6ef2989006337` |
 | `unit-08-volume.html` | 83,893 | `5cb0ba48b4ad48b0` |
-| `unit-09-data-and-statistics.html` | 103,570 | `242a7ddfc2f744fb` |
-| `unit-10-integers-and-coordinates.html` | 93,927 | `0659370a5cc4cab3` |
+| `unit-09-data-and-statistics.html` | 103,674 | `953234ef62674bf9` |
+| `unit-10-integers-and-coordinates.html` | 94,031 | `12ccd459818b7e88` |
 | `unit-template.html` | 5,531 | `3db9d2a347291ebd` |
 
 ## Unit status

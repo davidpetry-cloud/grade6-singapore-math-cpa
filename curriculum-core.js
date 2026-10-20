@@ -137,9 +137,9 @@ function rounding(host){
       <line x1="60" y1="48" x2="60" y2="72" stroke="#33557A" stroke-width="2"/>
       <line x1="640" y1="48" x2="640" y2="72" stroke="#33557A" stroke-width="2"/>
       <line x1="350" y1="42" x2="350" y2="78" stroke="#E4A03C" stroke-width="2" stroke-dasharray="5 4"/>
-      <text x="60" y="92" font-family="Lexend" font-size="13" fill="#5B7189" text-anchor="middle">${cm(lo)}</text>
-      <text x="640" y="92" font-family="Lexend" font-size="13" fill="#5B7189" text-anchor="middle">${cm(hi)}</text>
-      <text x="350" y="106" font-family="Lexend" font-size="12" fill="#B87C1C" text-anchor="middle">midpoint ${cm(mid)}</text>
+      <text x="60" y="92" font-family="Lexend" font-size="13" fill="#4A5D72" text-anchor="middle">${cm(lo)}</text>
+      <text x="640" y="92" font-family="Lexend" font-size="13" fill="#4A5D72" text-anchor="middle">${cm(hi)}</text>
+      <text x="350" y="106" font-family="Lexend" font-size="12" fill="#7E520E" text-anchor="middle">midpoint ${cm(mid)}</text>
       <g class="mk" style="transform:translateX(${mx-350}px)">
         <polygon points="350,50 344,34 356,34" fill="#1F8A7D"/>
         <rect x="290" y="10" width="120" height="22" rx="4" fill="#1F8A7D"/>
@@ -362,7 +362,7 @@ function barModel(host){
   $m.addEventListener("change",()=>{q("#pwc").hidden=$m.value!=="pw";q("#cmpc").hidden=$m.value!=="cmp";draw();});
 
   function bar(x,y,w,h,fill,label){
-    return `<rect class="bmseg" x="${x}" y="${y}" width="${w}" height="${h}" rx="3" style="fill:${fill}" stroke="#fff" stroke-width="1.5"/>
+    return `<rect class="bmseg" x="${x}" y="${y}" width="${w}" height="${h}" rx="3" style="fill:${fill}" stroke="#F2E9DA" stroke-width="1.5"/>
       <text x="${x+w/2}" y="${y+h/2+5}" font-family="Lexend" font-size="14" fill="#fff" text-anchor="middle">${label}</text>`;
   }
   function draw(){
@@ -457,7 +457,7 @@ function factors(host){
       <div>factors of ${b}<br>${fb.map(x=>sh.includes(x)?`<span class="sh">${x}</span>`:x).join(" ")}</div>`;
     gout.innerHTML=`Shared factors: ${sh.join(", ")} → <b>GCF = ${gcf}</b>.<br>
       First square shaded in both colours → <b>LCM = ${lcm}</b>.<br>
-      <span style="color:#5B7189">Size check: the GCF is never larger than ${Math.min(a,b)}, and the LCM is never smaller than ${Math.max(a,b)}.</span>`;
+      <span style="color:#4A5D72">Size check: the GCF is never larger than ${Math.min(a,b)}, and the LCM is never smaller than ${Math.max(a,b)}.</span>`;
   }
   box.querySelector("#fgo").addEventListener("click",buildRects);
   box.querySelector("#fn").addEventListener("input",buildRects);
@@ -474,7 +474,7 @@ const rm=()=>(!!window.matchMedia&&window.matchMedia("(prefers-reduced-motion: r
 const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
 const gcd=(a,b)=>b?gcd(b,a%b):Math.abs(a);
 const lcm=(a,b)=>a*b/gcd(a,b);
-const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#5B7189", LINE="#D3DCE4";
+const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#4A5D72", LINE="#D3DCE4", tx=c=>({"#1F8A7D":"#136155","#E4A03C":"#7E520E","#6B7FB3":"#4A5590","#AA4429":"#9A3B22"})[c]||c;
 /* mixed-number string from an improper fraction */
 function mixed(n,d){
   const g=gcd(n,d)||1,N=n/g,D=d/g;
@@ -522,7 +522,7 @@ function decimalGrid(host){
   const r2=x=>Math.round(x*100)/100;
 
   function grid(x,y,S,val,fill,label,second,fill2){
-    const c=S/10;let s=`<rect x="${x}" y="${y}" width="${S}" height="${S}" fill="#fff" stroke="${INK}" stroke-width="1.5"/>`;
+    const c=S/10;let s=`<rect x="${x}" y="${y}" width="${S}" height="${S}" fill="#F2E9DA" stroke="${INK}" stroke-width="1.5"/>`;
     const cells=Math.round(Math.min(1,val)*100);
     for(let i=0;i<cells;i++){
       const r=Math.floor(i/10),k=i%10;
@@ -533,7 +533,7 @@ function decimalGrid(host){
       for(let i=0;i<c2;i++){
         const r=Math.floor((99-i)/10),k=(99-i)%10;
         s+=`<rect class="bmseg" x="${x+k*c}" y="${y+r*c}" width="${c}" height="${c}" fill="${fill2}" opacity=".9"/>`;
-        for(let t=2;t<c;t+=5)s+=`<line x1="${x+k*c+t}" y1="${y+r*c}" x2="${x+k*c+t-c}" y2="${y+r*c+c}" stroke="#fff" stroke-width="1" opacity=".5"/>`;
+        for(let t=2;t<c;t+=5)s+=`<line x1="${x+k*c+t}" y1="${y+r*c}" x2="${x+k*c+t-c}" y2="${y+r*c+c}" stroke="#F2E9DA" stroke-width="1" opacity=".5"/>`;
       }
     }
     for(let i=1;i<10;i++){
@@ -569,7 +569,7 @@ function decimalGrid(host){
     if(m==="mul"){
       const GX=60,GY=26,c=S/10;
       const ac=Math.round(Math.min(1,a)*10),bc=Math.round(Math.min(1,b)*10);
-      let s=`<rect x="${GX}" y="${GY}" width="${S}" height="${S}" fill="#fff" stroke="${INK}" stroke-width="1.5"/>`;
+      let s=`<rect x="${GX}" y="${GY}" width="${S}" height="${S}" fill="#F2E9DA" stroke="${INK}" stroke-width="1.5"/>`;
       s+=`<rect x="${GX}" y="${GY}" width="${S}" height="${ac*c}" fill="${T}" opacity=".28"/>`;
       s+=`<rect x="${GX}" y="${GY}" width="${bc*c}" height="${S}" fill="${A}" opacity=".28"/>`;
       s+=`<rect class="bmseg" x="${GX}" y="${GY}" width="${bc*c}" height="${ac*c}" fill="${INK}"/>`;
@@ -582,7 +582,7 @@ function decimalGrid(host){
       s+=`<text x="${GX-14}" y="${GY+S/2}" font-family="Lexend" font-size="13" fill="${MUT}" text-anchor="middle" transform="rotate(-90 ${GX-14} ${GY+S/2})">${(ac/10)} down</text>`;
       s+=`<text x="${GX+S+40}" y="${GY+70}" font-family="Lexend" font-size="14" fill="${INK}">overlap = ${cells} cells</text>`;
       s+=`<text x="${GX+S+40}" y="${GY+94}" font-family="Lexend" font-size="14" fill="${INK}">each cell = 0.01</text>`;
-      s+=`<text x="${GX+S+40}" y="${GY+128}" font-family="Fraunces" font-size="22" fill="${T}">${val}</text>`;
+      s+=`<text x="${GX+S+40}" y="${GY+128}" font-family="Fraunces" font-size="22" fill="${tx(T)}">${val}</text>`;
       svg.innerHTML=s;
       svg.setAttribute("aria-label",`A unit square. ${ac} of ten rows shaded one way, ${bc} of ten columns the other. The ${cells} cells shaded both ways equal ${val}.`);
       out.innerHTML=`${ac/10} × ${bc/10} = <b>${val}</b>.<br>
