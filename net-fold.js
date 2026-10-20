@@ -7,7 +7,7 @@ window.__EXTRA_TOOLS__=Object.assign(window.__EXTRA_TOOLS__||{},(function(){
 const rm=()=>(!!window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
 /* Text colours, each at least 4.5:1 on white. ROSE is terracotta now, not pink. */
-const T="#0E7A6D", INK="#1B3A5C", MUT="#5B7189", ROSE="#AA4429";
+const T="#0E7A6D", INK="#1B3A5C", MUT="#4A5D72", ROSE="#AA4429";
 
 /* A net folds into a cube iff: exactly 6 squares, all edge-connected, and no
    two squares land on the same cube face when folded. We fold it for real —
@@ -91,13 +91,13 @@ const PRESETS=[
    with hatching and the word "clash", so the cue isn't colour alone. */
 const NF_CSS=`
 .nf-grid{display:grid;grid-template-columns:repeat(8,minmax(24px,54px));justify-content:center;margin:0 auto}
-.nf-cell{aspect-ratio:1;margin:0;padding:0;border:1px solid #7E8FA2;background:#fff;cursor:pointer;
+.nf-cell{aspect-ratio:1;margin:0;padding:0;border:1px solid #66778B;background:#F2E9DA;cursor:pointer;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
   font-family:var(--sans);color:#fff;line-height:1.05;position:relative}
-.nf-cell:hover{background:#EEF3F6}
+.nf-cell:hover{background:#E5D9C3}
 .nf-cell[aria-pressed="true"]{background:#0E7A6D;border-color:#102239}
 .nf-cell.clash{background:repeating-linear-gradient(45deg,#AA4429 0 6px,#8E3A22 6px 12px)}
-.nf-cell:focus-visible{outline:none;z-index:1;box-shadow:0 0 0 2px #fff,0 0 0 5px #102239}
+.nf-cell:focus-visible{outline:none;z-index:1;box-shadow:0 0 0 2px #F2E9DA,0 0 0 5px #102239}
 .nf-cell .n{font-weight:700;font-size:.82rem}
 .nf-cell .f{font-size:.68rem}
 .nf3d h4{font-family:var(--serif);font-size:1.05rem;font-weight:600;margin:20px 0 4px;color:var(--ink)}

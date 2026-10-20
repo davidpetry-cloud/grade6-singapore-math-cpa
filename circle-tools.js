@@ -6,7 +6,7 @@
 window.__EXTRA_TOOLS__=Object.assign(window.__EXTRA_TOOLS__||{},(function(){
 const rm=()=>(!!window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
-const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#5B7189", ROSE="#C2536B";
+const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#4A5D72", ROSE="#AA4429", tx=c=>({"#1F8A7D":"#136155","#E4A03C":"#7E520E","#6B7FB3":"#4A5590","#AA4429":"#9A3B22"})[c]||c;
 const r2=x=>Math.round(x*100)/100;
 
 /* Real classroom measurements are never exactly pi. These are plausible
@@ -58,7 +58,7 @@ function circleUnroll(host){
     const R=52, cx=110, cy=68;
     s+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${INK}" stroke-width="2.5"/>`;
     s+=`<line x1="${cx-R}" y1="${cy}" x2="${cx+R}" y2="${cy}" stroke="${A}" stroke-width="2.5"/>`;
-    s+=`<text x="${cx}" y="${cy-8}" font-family="Lexend" font-size="12" fill="${A}" text-anchor="middle">d = ${r2(d)}</text>`;
+    s+=`<text x="${cx}" y="${cy-8}" font-family="Lexend" font-size="12" fill="${tx(A)}" text-anchor="middle">d = ${r2(d)}</text>`;
     s+=`<text x="${cx}" y="${cy+R+20}" font-family="Lexend" font-size="12" fill="${MUT}" text-anchor="middle">circumference ${r2(c)}</text>`;
 
     /* the measuring line, marked in diameter-lengths */
@@ -75,12 +75,12 @@ function circleUnroll(host){
     /* the unrolled circumference laid along it */
     s+=`<rect class="bmseg" x="${X0}" y="${LY-24}" width="${cLen}" height="14" rx="3" fill="${T}" opacity=".85"${noAnim?"":' style="transform-origin:left center"'}/>`;
     s+=`<line x1="${X0+cLen}" y1="${LY-30}" x2="${X0+cLen}" y2="${LY+9}" stroke="${ROSE}" stroke-width="2"/>`;
-    s+=`<text x="${X0+cLen}" y="${LY-38}" font-family="Lexend" font-size="13" fill="${ROSE}" text-anchor="middle">lands here</text>`;
+    s+=`<text x="${X0+cLen}" y="${LY-38}" font-family="Lexend" font-size="13" fill="${tx(ROSE)}" text-anchor="middle">lands here</text>`;
     /* the leftover past 3d, called out */
     if(ratio>3&&ratio<4){
       const x3=X0+3*per;
       s+=`<path d="M${x3} ${LY+44} L${x3} ${LY+52} L${X0+cLen} ${LY+52} L${X0+cLen} ${LY+44}" fill="none" stroke="${ROSE}" stroke-width="1.5"/>`;
-      s+=`<text x="${(x3+X0+cLen)/2}" y="${LY+68}" font-family="Lexend" font-size="12" fill="${ROSE}" text-anchor="middle">a bit more: ${r2(ratio-3)} of a diameter</text>`;
+      s+=`<text x="${(x3+X0+cLen)/2}" y="${LY+68}" font-family="Lexend" font-size="12" fill="${tx(ROSE)}" text-anchor="middle">a bit more: ${r2(ratio-3)} of a diameter</text>`;
     }
     svg.innerHTML=s;
     svg.setAttribute("aria-label",
@@ -146,7 +146,7 @@ function circleWedges(host){
     const cx=120, cy=90;
     for(let i=0;i<n;i++){
       const fill = i%2 ? T : A;
-      s+=`<path d="${wedgePath(cx,cy,R,i*per,(i+1)*per)}" fill="${fill}" opacity=".8" stroke="#fff" stroke-width="1"/>`;
+      s+=`<path d="${wedgePath(cx,cy,R,i*per,(i+1)*per)}" fill="${fill}" opacity=".8" stroke="#F2E9DA" stroke-width="1"/>`;
     }
     s+=`<text x="${cx}" y="${cy+R+24}" font-family="Lexend" font-size="12" fill="${MUT}" text-anchor="middle">radius ${r2(r)}</text>`;
     s+=`<text x="${cx}" y="${cy+R+42}" font-family="Lexend" font-size="12" fill="${MUT}" text-anchor="middle">${n} wedges</text>`;
@@ -161,14 +161,14 @@ function circleWedges(host){
       /* each wedge drawn as a thin triangle of height R, alternating direction */
       const y0 = up ? BY+R : BY-R;
       const apex = up ? BY-R : BY+R;
-      s+=`<path class="bmseg" d="M${x} ${y0} L${x+wW} ${y0} L${x+wW/2} ${apex} Z" fill="${fill}" opacity=".8" stroke="#fff" stroke-width="1"/>`;
+      s+=`<path class="bmseg" d="M${x} ${y0} L${x+wW} ${y0} L${x+wW/2} ${apex} Z" fill="${fill}" opacity=".8" stroke="#F2E9DA" stroke-width="1"/>`;
     }
     /* the bounding shape it is approaching */
     s+=`<rect x="${BX}" y="${BY-R}" width="${halfW*2}" height="${R*2}" fill="none" stroke="${INK}" stroke-width="2" stroke-dasharray="6 4"/>`;
     s+=`<line x1="${BX-14}" y1="${BY-R}" x2="${BX-14}" y2="${BY+R}" stroke="${P}" stroke-width="2"/>`;
-    s+=`<text x="${BX-22}" y="${BY}" font-family="Lexend" font-size="12" fill="${P}" text-anchor="middle" transform="rotate(-90 ${BX-22} ${BY})">height = r</text>`;
+    s+=`<text x="${BX-22}" y="${BY}" font-family="Lexend" font-size="12" fill="${tx(P)}" text-anchor="middle" transform="rotate(-90 ${BX-22} ${BY})">height = r</text>`;
     s+=`<line x1="${BX}" y1="${BY+R+22}" x2="${BX+halfW*2}" y2="${BY+R+22}" stroke="${P}" stroke-width="2"/>`;
-    s+=`<text x="${BX+halfW}" y="${BY+R+40}" font-family="Lexend" font-size="12" fill="${P}" text-anchor="middle">base = half the circumference = πr</text>`;
+    s+=`<text x="${BX+halfW}" y="${BY+R+40}" font-family="Lexend" font-size="12" fill="${tx(P)}" text-anchor="middle">base = half the circumference = πr</text>`;
     svg.innerHTML=s;
 
     const area=Math.PI*r*r;

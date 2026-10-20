@@ -18,21 +18,23 @@
   --header-bg: oklch(0.25 0.05 255);
   --teal:  oklch(0.52 0.09 182);   /* fills and lines */
   --teal-text: oklch(0.45 0.08 182);  /* 6.4:1 on paper */
-  --teal-pale: oklch(0.93 0.035 182);
+  --teal-pale: oklch(0.895 0.045 182);
   --amber: oklch(0.75 0.13 72);    /* fills and lines only */
   --amber-dk: oklch(0.50 0.10 68); /* text-strength amber: 6.0:1 on card */
-  --amber-pale: oklch(0.94 0.04 80);
+  --amber-pale: oklch(0.90 0.055 80);
   --peri:  oklch(0.51 0.09 275);
   --peri-text: oklch(0.45 0.08 275);  /* 7.4:1 on card; white on it 7.6:1 */
-  --peri-pale: oklch(0.93 0.025 275);
+  --peri-pale: oklch(0.895 0.035 275);
   --rose:  oklch(0.52 0.14 36);    /* was a pink; now Zsolnay terracotta */
   --rose-text: oklch(0.45 0.13 36);
-  --rose-pale: oklch(0.94 0.03 45);
-  --paper: oklch(0.962 0.012 85);  /* warm limestone, #F6F2EA */
-  --card:  oklch(0.992 0.005 85);
-  --line:  oklch(0.86 0.018 80);
+  --rose-pale: oklch(0.90 0.04 45);
+  /* Warm sandstone, never bright white (David, 2026-10-16): the page is
+     #EBE1CF and cards sit one gentle step lighter at #F2E9DA */
+  --paper: oklch(0.913 0.026 82);
+  --card:  oklch(0.937 0.022 81);
+  --line:  oklch(0.80 0.03 78);
   --text:  oklch(0.27 0.04 255);
-  --muted: oklch(0.48 0.035 250);  /* 5.8:1 on paper */
+  --muted: oklch(0.43 0.035 250);  /* 5.3:1 on sandstone paper */
   --focus: oklch(0.55 0.11 68);    /* 4.5:1 on paper; the old amber ring was 2:1 */
   --sans:"Lexend",system-ui,sans-serif;
   --serif:"Fraunces",Georgia,serif;
@@ -101,12 +103,12 @@
    paper surface too, and tools look the same in both themes. */
 :root[data-theme="dark"] .tool{
   --ink:   oklch(0.25 0.05 255); --ink-2: oklch(0.34 0.07 252); --ink-3: oklch(0.44 0.07 250);
-  --teal:  oklch(0.52 0.09 182); --teal-pale: oklch(0.93 0.035 182); --teal-text: oklch(0.45 0.08 182);
-  --amber: oklch(0.75 0.13 72);  --amber-dk: oklch(0.50 0.10 68);   --amber-pale: oklch(0.94 0.04 80);
-  --peri:  oklch(0.51 0.09 275); --peri-pale: oklch(0.93 0.025 275); --peri-text: oklch(0.45 0.08 275);
-  --rose:  oklch(0.52 0.14 36);  --rose-pale: oklch(0.94 0.03 45);   --rose-text: oklch(0.45 0.13 36);
-  --paper: oklch(0.962 0.012 85); --card: oklch(0.992 0.005 85); --line: oklch(0.86 0.018 80);
-  --text:  oklch(0.27 0.04 255); --muted: oklch(0.48 0.035 250);
+  --teal:  oklch(0.52 0.09 182); --teal-pale: oklch(0.895 0.045 182); --teal-text: oklch(0.45 0.08 182);
+  --amber: oklch(0.75 0.13 72);  --amber-dk: oklch(0.50 0.10 68);   --amber-pale: oklch(0.90 0.055 80);
+  --peri:  oklch(0.51 0.09 275); --peri-pale: oklch(0.895 0.035 275); --peri-text: oklch(0.45 0.08 275);
+  --rose:  oklch(0.52 0.14 36);  --rose-pale: oklch(0.90 0.04 45);   --rose-text: oklch(0.45 0.13 36);
+  --paper: oklch(0.913 0.026 82); --card: oklch(0.937 0.022 81); --line: oklch(0.80 0.03 78);
+  --text:  oklch(0.27 0.04 255); --muted: oklch(0.43 0.035 250);
   --bar-1:#1F8A7D; --bar-2:#2E7FB8; --bar-3:#7B5EC7; --bar-4:#D9673F; --bar-5:#E4A03C;
 }
 /* Tools stay a light paper card in dark mode ; give their
@@ -137,7 +139,7 @@ sup,sub{font-size:max(.75em,.736rem);line-height:0}
 .hdr-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .back{font-family:var(--sans);font-size:1.2rem;color:#0F2338;text-decoration:none;
   display:inline-flex;align-items:center;gap:9px;margin-bottom:18px;
-  background:#fff;border:2px solid #fff;border-radius:999px;padding:12px 24px 12px 20px;font-weight:700}
+  background:#F2E9DA;border:2px solid #F2E9DA;border-radius:999px;padding:12px 24px 12px 20px;font-weight:700}
 .back:hover{background:var(--amber);border-color:var(--amber);color:#2B1B04}
 .theme-toggle{font-family:var(--sans);font-size:1.2rem;color:#fff;font-weight:700;
   display:inline-flex;align-items:center;gap:9px;margin-bottom:18px;cursor:pointer;
@@ -351,7 +353,7 @@ header.top .facts > span{padding:6px 12px;border:1px solid oklch(1 0 0 / .16);bo
   font-family:var(--mono);font-size:.95rem;padding:7px 9px;border:1px solid var(--line);
   border-radius:6px;background:var(--paper);color:var(--text);min-height:44px}
 /* Touch targets: 44px by default, never under 28px (Apple HIG, 2026-10-20) */
-input[type=range]{min-height:44px}
+input[type=range]{min-height:44px;background:transparent}
 .ctl input[type=number]{min-width:44px}
 .ctl input[type=text]{min-width:200px}
 .ctl select{max-width:100%}

@@ -6,7 +6,7 @@
 window.__EXTRA_TOOLS__=Object.assign(window.__EXTRA_TOOLS__||{},(function(){
 const rm=()=>(!!window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;};
-const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#5B7189", ROSE="#C2536B";
+const T="#1F8A7D", A="#E4A03C", P="#6B7FB3", INK="#1B3A5C", MUT="#4A5D72", ROSE="#AA4429", tx=c=>({"#1F8A7D":"#136155","#E4A03C":"#7E520E","#6B7FB3":"#4A5590","#AA4429":"#9A3B22"})[c]||c;
 const LETTERS="ABCDEFGH";
 
 function quadrant(x,y){
@@ -77,8 +77,8 @@ function coordPlane(host){
     return s;
   }
   function dot(x,y,fill,label,dy){
-    return `<circle cx="${px(x)}" cy="${py(y)}" r="6" fill="${fill}" stroke="#fff" stroke-width="1.5"/>` +
-      (label?`<text x="${px(x)}" y="${py(y)+(dy||-12)}" font-family="Lexend" font-size="13" fill="${fill}" text-anchor="middle">${label} (${x}, ${y})</text>`:"");
+    return `<circle cx="${px(x)}" cy="${py(y)}" r="6" fill="${fill}" stroke="#F2E9DA" stroke-width="1.5"/>` +
+      (label?`<text x="${px(x)}" y="${py(y)+(dy||-12)}" font-family="Lexend" font-size="13" fill="${tx(fill)}" text-anchor="middle">${label} (${x}, ${y})</text>`:"");
   }
 
   function vis(){
