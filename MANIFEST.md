@@ -1,7 +1,9 @@
 # MANIFEST — Grade 6 Singapore Math (CPA)
 
 **Bundle version:** complete (through-u10)
-**Built:** 2026-10-16 — the Budapest look rolled out to every unit (oklch palette in
+**Built:** 2026-10-20 — sizes brought to Apple's Human Interface Guidelines
+(17px body text, 44px touch targets, fades under reduce motion). Earlier:
+2026-10-16 — the Budapest look rolled out to every unit (oklch palette in
 light and dark, rosette header frames, petal cards, reader-driven motion), and
 Unit 8's 3D fold preview. Earlier: 2026-09-16 UI/dark-mode pass and content audit
 
@@ -32,7 +34,7 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 
 | file | bytes | sha256 (first 16) |
 |---|---|---|
-| `CLAUDE.md` | 15,379 | `e70ebecd9abed01a` |
+| `CLAUDE.md` | 15,994 | `5481e82a108d7a2f` |
 | `README.md` | 8,235 | `b4b4646e1d98cd18` |
 | `angle-chase.js` | 10,490 | `2daf3c83b7d8e0cd` |
 | `angle-chase.test.js` | 4,719 | `59cf3f33124df385` |
@@ -42,8 +44,8 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 | `circle-tools.test.js` | 3,842 | `458c1ec1afe4c5d9` |
 | `coord-plane.js` | 11,531 | `6f8c6bd070b347e2` |
 | `coord-plane.test.js` | 4,516 | `62238f169083fde3` |
-| `curriculum-core.js` | 52,329 | `7d2976aa01019c78` |
-| `curriculum.css` | 29,578 | `72933c6323d3f59d` |
+| `curriculum-core.js` | 52,327 | `b8bc3203125d4f78` |
+| `curriculum.css` | 31,625 | `184d993332cc6cc0` |
 | `dist-builder.js` | 9,126 | `28d5e5b2a03283af` |
 | `dist-builder.test.js` | 3,911 | `0910cafcf6db26fc` |
 | `net-fold-3d.js` | 546,173 | `b821900a338331a8` |
@@ -51,7 +53,7 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 | `net-fold-geometry.test.js` | 5,345 | `3f30d719a1e857b2` |
 | `net-fold.js` | 12,315 | `79ab009e0f32b615` |
 | `net-fold.test.js` | 7,044 | `aba29e98162242e1` |
-| `singapore-math-6-hub.html` | 29,098 | `8e748959d06b2fb3` |
+| `singapore-math-6-hub.html` | 29,642 | `f7ba97455210babf` |
 | `test-unit.js` | 4,235 | `760c86dcdd48f57f` |
 | `theme-toggle.js` | 1,187 | `18c8994a2a613f0c` |
 | `unit-01-whole-numbers-and-operations.html` | 63,023 | `3792cb54f2befdd1` |

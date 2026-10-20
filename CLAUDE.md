@@ -69,8 +69,16 @@ trades looks against readability, readability wins.
 - Never fill a badge with `--ink`/`--ink-2`/`--ink-3` under white text: those
   tokens flip light in dark mode. Use `--header-bg`.
 - Interactive tools stay a light "paper" surface in dark mode (`.tool`).
-- Primary controls are larger than body text; small mono labels stay at
-  .83rem or above.
+- Sizes follow Apple's Human Interface Guidelines (a point is a CSS pixel):
+  body text 17px (`html{font-size:106.25%}`, so 1rem = 17px and the reader's
+  own browser text size still applies); nothing under 12.5px, this project's
+  floor for children and projectors; pages still work with text at 200%.
+- Touch targets 44px by default, never under 28px. A few phone-only grids
+  (hub year tiles, the place-value +/− buttons, the net-fold grid) sit between
+  28 and 44px so the whole grid fits on screen.
+- With reduce motion on, movement becomes a fade: anything that would slide,
+  zoom or scale fades in place or changes at once (end of `curriculum.css`).
+- Primary controls are larger than body text.
 - Verify by rendering, not by reading specs.
 
 ## Non-negotiables

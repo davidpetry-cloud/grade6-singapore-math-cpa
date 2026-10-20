@@ -12,10 +12,11 @@
 :root[data-theme="dark"]{--teal-lt:#5FD9C4;--grid:rgba(255,255,255,.05)}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+/* Reduce motion: curriculum.css turns movement into fades for the whole site */
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{
   margin:0; background:var(--paper); color:var(--text);
-  font-family:var(--sans); font-size:17px; line-height:1.65;
+  font-family:var(--sans); font-size:1rem; line-height:1.65;
   -webkit-font-smoothing:antialiased; transition:background-color .2s,color .2s;
 }
 .theme-toggle{font-family:var(--sans);font-size:1.2rem;color:#fff;font-weight:700;
@@ -70,7 +71,7 @@ section{padding:64px 0}
 .useg .w{font-weight:400;opacity:.85;font-size:.78rem}
 .brace{display:flex;margin-top:7px;font-family:var(--mono);font-size:.78rem;color:var(--muted)}
 .brace span{border-top:1px solid var(--line);border-left:1px solid var(--line);border-right:1px solid var(--line);
-  padding:5px 4px 0;text-align:center;height:22px}
+  padding:5px 4px 0;text-align:center;min-height:22px;min-width:28px}
 .readout{
   margin-top:22px;background:var(--paper);border-left:4px solid var(--teal);
   border-radius:0 var(--r) var(--r) 0;padding:18px 22px;min-height:96px
@@ -133,7 +134,7 @@ footer{padding:36px 0;font-size:.85rem;color:var(--muted);border-top:1px solid v
   .stage:first-child{border-radius:var(--r) var(--r) 0 0}
   .stage:last-child{border-radius:0 0 var(--r) var(--r);border-bottom:1px solid var(--line)}
   .useg .w{display:none}
-  .yearbar{height:64px}
+  .yearbar{min-height:64px}
 }
 @media print{
   :root,:root[data-theme="dark"]{
@@ -191,7 +192,8 @@ footer{padding:36px 0;font-size:.85rem;color:var(--muted);border-top:1px solid v
 
 /* ===================== the year, as mosaic tiles ===================== */
 .year{border:0;position:relative}
-.yearbar{gap:4px;border:0;overflow:visible;height:80px}
+/* min-height, not height, so the tiles grow with enlarged text */
+.yearbar{gap:4px;border:0;overflow:visible;height:auto;min-height:80px}
 .brace{gap:4px}
 /* On phones the narrowest tile is under 24px; the unit cards below carry the
    same choices at full size, so tighten the gaps and keep the tiles */
@@ -203,6 +205,9 @@ footer{padding:36px 0;font-size:.85rem;color:var(--muted);border-top:1px solid v
   box-shadow:inset 0 1px 0 oklch(1 0 0 / .22), inset 0 -2px 0 oklch(0 0 0 / .18), 0 6px 12px -8px oklch(0.25 0.05 255 / .5);
   transition:transform .35s var(--ease), box-shadow .35s var(--ease), filter .2s;
   position:relative;
+  /* Never a target under 28px (Apple HIG): on phones Unit 1's two weeks would
+     draw 21px wide, so the shortest tiles widen slightly past exact scale */
+  min-width:28px;
 }
 .useg:first-child{border-radius:16px 10px 10px 16px}
 .useg:last-child{border-radius:10px 16px 16px 10px}
@@ -226,7 +231,7 @@ footer{padding:36px 0;font-size:.85rem;color:var(--muted);border-top:1px solid v
 .stage:nth-child(2){border-top:6px double var(--amber)}
 .stage:nth-child(3){border-top:6px double var(--peri)}
 .stage-n{
-  width:44px;height:44px;background:transparent;color:var(--ink);
+  width:1.95em;height:1.95em;background:transparent;color:var(--ink);
   font-family:var(--serif);font-size:1.35rem;font-weight:600;
   border:1.5px solid currentColor;outline:1px solid var(--line);outline-offset:3px;
 }
@@ -298,6 +303,13 @@ a.unit:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
   .readout > :nth-child(2){animation-delay:.05s}
   .readout > :nth-child(3){animation-delay:.1s}
 }
+/* Phones: ten tiles of at least 28px need 289px; slimmer edges and gaps give
+   them that down to a 320px screen */
+@media (max-width:480px){
+  .wrap{padding:0 16px}
+  .yearbar{gap:1px}
+}
+@media (max-width:340px){.yearbar{gap:0}}
 @media print{
   .hero::before, .hero::after, .sec-head::after, .stage::after{display:none}
   .hero, .access{background-image:none}
