@@ -848,7 +848,7 @@ function show(i){
 
   <div class="block">
     <h3>Warm-up<span class="mins">${L.warmup.mins} min</span></h3>
-    <p style="margin:0;font-size:.97rem">${L.warmup.text}</p>
+    <p style="margin:0;font-size:1rem">${L.warmup.text}</p>
   </div>
 
   ${L.stages.map(stageBlock).join("")}

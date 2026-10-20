@@ -116,10 +116,18 @@
    the page's light dark-mode text onto the white card (1.3:1). */
 :root[data-theme="dark"] .tool{color:var(--text)}
 *{box-sizing:border-box}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-body{margin:0;background:var(--paper);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.62;-webkit-font-smoothing:antialiased;transition:background-color .2s,color .2s}
+/* Sizes follow Apple's Human Interface Guidelines (David, 2026-10-20): body text
+   17px, so 1rem = 17px. A percentage, not px, so a reader's own browser text size
+   still scales everything (the page must work with text at 200%). */
+html{font-size:106.25%}
+body{margin:0;background:var(--paper);color:var(--text);font-family:var(--sans);font-size:1rem;line-height:1.62;-webkit-font-smoothing:antialiased;transition:background-color .2s,color .2s;
+  /* a word too long for its column (at 200% text) breaks instead of spilling */
+  overflow-wrap:break-word}
 :focus-visible{outline:3px solid var(--amber);outline-offset:2px;border-radius:3px}
 a{color:var(--ink-2)}
+/* Exponents never drop below the 12.5px floor (a browser's default shrinks a
+   superscript in a small caption to about 11px) */
+sup,sub{font-size:max(.75em,.736rem);line-height:0}
 
 /* header */
 .top{background:var(--header-bg);color:#fff;padding:34px 0 0;
@@ -173,9 +181,9 @@ main{padding:34px 0 70px}
 .block.w{border-top:4px solid var(--rose)}
 
 .moves{margin:0 0 16px;padding-left:18px}
-.moves li{margin-bottom:6px;font-size:.96rem}
+.moves li{margin-bottom:6px;font-size:1rem}
 .say{border-left:3px solid var(--line);padding:2px 0 2px 16px;margin:0 0 14px}
-.say p{margin:0 0 9px;font-size:.97rem;color:var(--ink-2)}
+.say p{margin:0 0 9px;font-size:1rem;color:var(--ink-2)}
 .say p:last-child{margin-bottom:0}
 .say .who{font-family:var(--mono);font-size:.8rem;color:var(--muted);display:block;margin-bottom:2px}
 .watch,.readaloud{position:relative;border-radius:10px;padding:24px 16px 15px;font-size:.92rem;
@@ -190,7 +198,7 @@ main{padding:34px 0 70px}
 :root[data-theme="dark"] .readaloud b{color:#0F2338}
 
 ol.probs,ul.probs{margin:0;padding-left:20px}
-ol.probs li,ul.probs li{margin-bottom:9px;font-size:.96rem}
+ol.probs li,ul.probs li{margin-bottom:9px;font-size:1rem}
 .ans{font-family:var(--mono);font-size:1em;font-weight:600;color:var(--teal-text);margin-left:6px}
 
 .ws-sec{margin-bottom:18px}
@@ -198,7 +206,7 @@ ol.probs li,ul.probs li{margin-bottom:9px;font-size:.96rem}
 .ws-sec h4{font-family:var(--serif);font-size:1.05rem;font-weight:600;margin:0 0 4px;color:var(--ink)}
 .ws-sec .dir{font-size:.88rem;color:var(--muted);margin:0 0 9px}
 .ws-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:7px 20px;margin:0;padding:0;list-style:none;counter-reset:q}
-.ws-items li{font-size:.95rem;padding-left:26px;position:relative;font-family:var(--mono)}
+.ws-items li{font-size:1rem;padding-left:26px;position:relative;font-family:var(--mono)}
 .ws-items li::before{counter-increment:q;content:counter(q) ".";position:absolute;left:0;color:var(--muted);font-size:.85rem}
 .ws-items.wide{grid-template-columns:1fr}
 .ws-items.wide li{font-family:var(--sans);margin-bottom:8px}
@@ -207,7 +215,7 @@ ol.probs li,ul.probs li{margin-bottom:9px;font-size:.96rem}
 .exit h3{color:#fff}
 .exit .sense{color:var(--amber)}
 .exit ol{padding-left:20px;margin:0}
-.exit li{margin-bottom:8px;font-size:.96rem;color:#DDE8F1}
+.exit li{margin-bottom:8px;font-size:1rem;color:#DDE8F1}
 .exit .crit{margin-top:14px;font-size:.88rem;color:#A9BFD3;border-top:1px solid rgba(255,255,255,.15);padding-top:12px}
 
 /* sidebar */
@@ -341,16 +349,19 @@ header.top .facts > span{padding:6px 12px;border:1px solid oklch(1 0 0 / .16);bo
 .ctl label{font-family:var(--mono);font-size:.8rem;color:var(--muted)}
 .ctl input[type=number],.ctl input[type=text],.ctl select{
   font-family:var(--mono);font-size:.95rem;padding:7px 9px;border:1px solid var(--line);
-  border-radius:6px;background:var(--paper);color:var(--text)}
+  border-radius:6px;background:var(--paper);color:var(--text);min-height:44px}
+/* Touch targets: 44px by default, never under 28px (Apple HIG, 2026-10-20) */
+input[type=range]{min-height:44px}
+.ctl input[type=number]{min-width:44px}
 .ctl input[type=text]{min-width:200px}
 .ctl select{max-width:100%}
 .btn{font-family:var(--sans);font-size:.86rem;font-weight:600;padding:8px 14px;border-radius:6px;
-  border:1px solid var(--line);background:var(--paper);color:var(--ink-2);cursor:pointer}
+  border:1px solid var(--line);background:var(--paper);color:var(--ink-2);cursor:pointer;min-height:44px}
 .btn:hover{border-color:var(--ink-3)}
 .btn.go{background:var(--ink-2);border-color:var(--ink-2);color:#fff}
 .btn.go:hover{background:var(--ink)}
 .btn.amb{background:var(--amber);border-color:var(--amber);color:#2B1B04}
-.btn.sm{padding:5px 10px;font-size:.8rem}
+.btn.sm{padding:5px 10px;font-size:.8rem;min-width:44px}
 .stage-area{container-type:inline-size;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:16px;overflow-x:auto}
 .out{margin-top:14px;font-family:var(--mono);font-size:.95rem;color:var(--ink-2);line-height:1.9}
 .out b{color:var(--teal-text);font-weight:600}
@@ -359,7 +370,7 @@ header.top .facts > span{padding:6px 12px;border:1px solid oklch(1 0 0 / .16);bo
 /* place value */
 .pv{display:flex;gap:4px;min-width:640px}
 .pvcol{flex:1;text-align:center}
-.pvcol .lab{font-family:var(--mono);font-size:.78rem;color:var(--muted);line-height:1.25;margin-bottom:6px;height:54px}
+.pvcol .lab{font-family:var(--mono);font-size:.78rem;color:var(--muted);line-height:1.25;margin-bottom:6px;height:4.4em}
 .pvcol .bin{min-height:132px;border:1px dashed var(--line);border-radius:6px;background:var(--card);
   display:flex;flex-wrap:wrap-reverse;align-content:flex-start;gap:3px;padding:5px;justify-content:center}
 .pvcol.hot .bin{border-color:var(--amber);background:var(--amber-pale)}
@@ -378,16 +389,16 @@ header.top .facts > span{padding:6px 12px;border:1px solid oklch(1 0 0 / .16);bo
   .pvcol .bin{min-height:120px;padding:3px;gap:2px}
   .pvcol .disc{width:10px;height:10px}
   .pvcol .btns{flex-direction:column;gap:4px}
-  .pvcol .btns .btn{padding:0;height:34px;width:100%;font-size:1.1rem}
+  .pvcol .btns .btn{padding:0;min-height:44px;min-width:0;width:100%;font-size:1.1rem}
 }
 .pvcol .cnt{font-family:var(--mono);font-size:.8rem;color:var(--ink-2);margin-top:4px}
 
 /* shift machine */
 .sm-chart{display:flex;gap:3px;min-width:600px}
 .smcol{flex:1;text-align:center}
-.smcol .lab{font-family:var(--mono);font-size:.78rem;color:var(--muted);margin-bottom:5px;height:34px;line-height:1.2}
+.smcol .lab{font-family:var(--mono);font-size:.78rem;color:var(--muted);margin-bottom:5px;height:2.8em;line-height:1.2}
 .smcol .lab .short{display:none}
-.smcol .cell{height:52px;border:1px solid var(--line);border-radius:6px;background:var(--card);
+.smcol .cell{height:2.2em;border:1px solid var(--line);border-radius:6px;background:var(--card);
   display:grid;place-items:center;font-family:var(--mono);font-size:1.5rem;color:var(--ink);
   transition:transform .45s cubic-bezier(.3,1,.4,1),background .3s,color .3s}
 .smcol.moved .cell{background:var(--teal-pale);color:var(--teal-text);font-weight:700}
@@ -397,8 +408,8 @@ header.top .facts > span{padding:6px 12px;border:1px solid oklch(1 0 0 / .16);bo
   .smcol{min-width:0}
   .smcol .lab .full{display:none}
   .smcol .lab .short{display:block;font-weight:600}
-  .smcol .lab{height:36px;font-size:.78rem}
-  .smcol .cell{height:46px;font-size:1.3rem;border-radius:5px}
+  .smcol .lab{height:2.9em;font-size:.78rem}
+  .smcol .cell{height:2.2em;font-size:1.3rem;border-radius:5px}
 }
 
 /* number line */
@@ -425,7 +436,7 @@ header.top .facts > span{padding:6px 12px;border:1px solid oklch(1 0 0 / .16);bo
 .rect .grid{display:grid;gap:2px;justify-content:center;margin-bottom:5px}
 .rect .sq{width:13px;height:13px;background:var(--amber);border:1px solid var(--amber-dk);border-radius:2px}
 .rect .cap{font-family:var(--mono);font-size:.78rem;color:var(--muted)}
-.hundred{display:grid;grid-template-columns:repeat(10,1fr);gap:2px;max-width:340px}
+.hundred{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:2px;max-width:340px}
 .hundred div{aspect-ratio:1;display:grid;place-items:center;font-family:var(--mono);font-size:.78rem;
   background:var(--card);border:1px solid var(--line);border-radius:2px;color:var(--muted)}
 .hundred div.a{background:var(--teal-pale);color:var(--teal-text);border-color:var(--teal)}
@@ -448,4 +459,30 @@ header.top .facts > span{padding:6px 12px;border:1px solid oklch(1 0 0 / .16);bo
 .layer{position:absolute;display:grid;gap:2px}
 .picker{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
 .picker .btn[aria-pressed=true]{background:var(--ink-2);border-color:var(--ink-2);color:#fff}
-@media (prefers-reduced-motion:reduce){.disc.pop,.anim .bmseg{animation:none}.smcol .cell,.nl .mk{transition:none}}
+/* Phones: slimmer edges give the tools' charts the width their controls need, so
+   each place-value column stays at least 28px wide down to a 320px screen. Last in
+   the file on purpose: it must come after the base .tool and .stage-area rules. */
+@media(max-width:480px){
+  .wrap{padding:0 16px}
+  .block,.tool{padding:18px 14px}
+  .stage-area{padding:10px}
+  /* A tool shown inside the review-day toolkit loses its second card frame */
+  .tool .tool{padding:0;border:0;box-shadow:none;background:none}
+}
+
+/* Reduce motion (David, 2026-10-20, after Apple's HIG): nothing slides, zooms or
+   scales. What would have moved fades in place; everything else changes at once.
+   Colour and fade transitions stay, so a change is still seen, not missed. */
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;
+    transition-property:opacity,color,background-color,border-color,outline-color,box-shadow!important}
+  /* Between pages: a plain cross-fade, without the header's move */
+  @view-transition{navigation:auto}
+  /* The header's words, a newly chosen day, and the hub's hero and unit readout
+     fade in where they rise or settle in the full-motion version */
+  header.top .hdr-row, header.top h1, header.top .sub, header.top .facts,
+  #content > *, #side > *,
+  .hero .kicker, .hero h1, .hero-grid > div:first-child > p, .hero-meta, .demo,
+  .readout > *{animation:fade .35s ease both!important}
+}

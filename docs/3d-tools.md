@@ -61,8 +61,8 @@ than no tool": every number or face name a 3D tool shows is asserted in a test.
   what's left open), updated as it changes. Results also appear as text.
 - **No drag-only controls** (WCAG 2.5.7). Turning the view has buttons and arrow
   keys as well as dragging. Folding has a slider and buttons.
-- **Keyboard everywhere**, with the visible focus ring; targets at least 24px
-  (44px for buttons, as on the rest of the site).
+- **Keyboard everywhere**, with the visible focus ring; targets 44px by default,
+  never under 28px (Apple's Human Interface Guidelines, as on the rest of the site).
 - **Colour is never the only cue.** A problem face gets a pattern (hatching), a
   number, and a sentence naming it, as well as a colour. No pinks; terracotta
   marks a problem.
