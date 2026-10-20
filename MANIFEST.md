@@ -54,7 +54,7 @@ this bundle; an identical hash means it did not, and you can skip re-reading it.
 | `net-fold-geometry.test.js` | 5,345 | `3f30d719a1e857b2` |
 | `net-fold.js` | 12,321 | `940bdd29007a1c08` |
 | `net-fold.test.js` | 7,044 | `aba29e98162242e1` |
-| `singapore-math-6-hub.html` | 29,642 | `f7ba97455210babf` |
+| `singapore-math-6-hub.html` | 29,951 | `c0a1d9656c205f30` |
 | `test-unit.js` | 4,235 | `760c86dcdd48f57f` |
 | `theme-toggle.js` | 1,187 | `18c8994a2a613f0c` |
 | `unit-01-whole-numbers-and-operations.html` | 63,023 | `3792cb54f2befdd1` |
